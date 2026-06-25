@@ -1,0 +1,24 @@
+---
+description: Правила проекта «Развилка» — стек, auth, LLM, документация
+globs:
+alwaysApply: true
+---
+
+Стек строго: Next.js App Router + TypeScript + Prisma 6 + PostgreSQL (Neon) + Tailwind + Zod.
+Auth — JWT + bcrypt, сессия в httpOnly cookie (НЕ localStorage), без NextAuth.
+  lib/auth.ts: createSessionCookie / getCurrentUser / requireUser / clearSessionCookie.
+  Защищённые эндпоинты вызывают requireUser(); Server Components читают сессию из cookie.
+Мутации — только Route Handlers (app/api/.../route.ts). Чтение данных — Server Components.
+Вызовы LLM — только на сервере, ключ через process.env. Никогда не светить ключ на клиенте.
+LLM-клиент — OpenAI-совместимый (npm openai) с настраиваемым baseURL из env.
+Любой ответ LLM: срезать markdown (lib/json.ts) -> JSON.parse -> Zod-валидация. Невалидный — не сохранять, вернуть ошибку, залогировать сырой ответ.
+Значения enum (likelihood, kind) — в ВЕРХНЕМ регистре (LOW/MEDIUM/HIGH, OPTIMISTIC/BASE/PESSIMISTIC), как в Prisma. Zod нормализует регистр; отдельный маппер не нужен.
+PrismaClient — синглтон из lib/prisma.ts. Все обработчики — Node runtime (не Edge).
+Все эндпоинты валидируют вход через Zod.
+Версия — единый источник lib/version.ts (__version__ = version/date/time). Использовать её в UI, логах, сборке. НЕ хардкодить номер версии в других файлах.
+Документы держать в актуальном состоянии: docs/STATUS.md, docs/PLAN.md, docs/CHANGELOG.md, docs/PROMPTS.md, docs/DECISIONS.md.
+По запросу «сводка» / «завершение»: заполнить docs/TEMPLATE-dev-log.md и сохранить копию docs/YY.MM.DD-CRS-Краткое_название-vX.X.md (код CRS = Cursor); обновить CHANGELOG.md и STATUS.md.
+Комментарии в коде — на русском (зачем, не что). Имена переменных — на английском, понятные.
+Секреты — только через process.env. .env всегда в .gitignore. Пароли не выводить в логи.
+Вероятность — только метка LOW/MEDIUM/HIGH, никаких процентов и выдуманных цифр.
+Не давать в ответах ИИ окончательных юр./мед./инвест. советов.
