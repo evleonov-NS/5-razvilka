@@ -10,12 +10,12 @@
 
 | Область | Статус |
 |---------|--------|
-| Код приложения | ❌ не начат |
-| Prisma / БД | ❌ не начат |
-| Деплой Vercel | ❌ не начат |
-| Документация | ✅ README, PROJECT, docs/ |
+| Этап 0 (smoke-тест) | ✅ Завершён |
+| Prisma / Neon | ✅ Note, migrate, seed |
+| Деплой Vercel | ✅ Production Ready |
+| Документация | ✅ docs/ + dev-log |
 
-**Следующий шаг:** Этап 0 — каркас + smoke-тест деплоя.
+**Следующий шаг:** Этап 1 — доменная схема (Промпт 1).
 
 ---
 
@@ -41,7 +41,7 @@
 - [ ] 8. Сгенерировать дерево развилок
 - [ ] 9. Отметить фактический исход
 - [ ] 10. Получить ревью (ближайший сценарий + урок)
-- [ ] 11. `npm run build` проходит локально и на Vercel
+- [x] 11. `npm run build` проходит локально и на Vercel
 
 ### Вне scope MVP
 Калибровка во времени, редактор дерева, числовые вероятности/деньги, голос, оплата.
@@ -95,15 +95,15 @@ npm install -D tsx @types/bcryptjs @types/jsonwebtoken
 **Цель:** зелёный деплой на Vercel с чтением из Neon.
 
 #### Задачи
-- [ ] `create-next-app` — App Router, TypeScript, Tailwind, ESLint
-- [ ] Prisma: временная модель `Note { id, title, createdAt }`
-- [ ] `lib/prisma.ts` — синглтон
-- [ ] `lib/version.ts` — `__version__`, `versionLabel`
-- [ ] `app/page.tsx` — список заметок + футер с версией
-- [ ] `.env.example`
-- [ ] `prisma/seed.ts` — 2–3 заметки
-- [ ] `package.json` scripts: dev, build, start, lint, db:seed
-- [ ] Деплой Vercel + миграция Neon
+- [x] `create-next-app` — App Router, TypeScript, Tailwind, ESLint
+- [x] Prisma: временная модель `Note { id, title, createdAt }`
+- [x] `lib/prisma.ts` — синглтон
+- [x] `lib/version.ts` — `__version__`, `versionLabel`
+- [x] `app/page.tsx` — список заметок + футер с версией
+- [x] `.env.example`
+- [x] `prisma/seed.ts` — 2–3 заметки
+- [x] `package.json` scripts: dev, build, start, lint, db:seed
+- [x] Деплой Vercel + миграция Neon
 
 #### Проверка
 ```powershell
@@ -114,9 +114,9 @@ npm run db:seed
 npm run build
 npm run dev
 ```
-- [ ] Главная показывает заметки из Neon
-- [ ] Vercel build проходит
-- [ ] Версия в футере из `lib/version.ts`
+- [x] Главная показывает заметки из Neon
+- [x] Vercel build проходит
+- [x] Версия в футере из `lib/version.ts`
 
 ---
 

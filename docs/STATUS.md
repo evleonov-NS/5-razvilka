@@ -2,7 +2,7 @@
 
 **Обновлено:** 2026-06-25  
 **Версия приложения:** 0.1.0 (lib/version.ts)  
-**Текущий этап:** 0 — каркас готов, нужен деплoy Vercel + Neon
+**Текущий этап:** 1 — доменная схема (следующий)
 
 ---
 
@@ -11,12 +11,13 @@
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
 | Next.js каркас | ✅ Готово | App Router, TypeScript, Tailwind |
-| Prisma + Note | ✅ Готово | schema, seed, миграция init_note |
-| lib/prisma.ts, lib/version.ts | ✅ Готово | |
-| Главная (чтение БД) | ✅ Готово | app/page.tsx |
-| npm run build | ✅ Проходит | локально |
-| Инфраструктура Neon | ⏳ Не настроено | Нужны DATABASE_URL, DIRECT_URL |
-| Деплой Vercel | ⏳ Не настроено | Следующий шаг после Neon |
+| Prisma + Note | ✅ Готово | smoke-тест Этапа 0 |
+| Neon PostgreSQL | ✅ Готово | migrate deploy, seed |
+| Деплoy Vercel | ✅ Готово | Production Ready (`5b4af00`) |
+| Главная (чтение БД) | ✅ Готово | 3 заметки local + prod |
+| npm run build | ✅ Проходит | local + Vercel |
+| Доменная схема | ⏳ Следующий | Этап 1 |
+| MVP DoD | 0 / 11 | smoke-тест пройден, MVP не начат |
 
 ---
 
@@ -24,8 +25,8 @@
 
 | Этап | Название | Статус |
 |------|----------|--------|
-| 0 | Каркас + smoke-тест деплоя | 🟡 Код готов, ждёт Neon/Vercel |
-| 1 | Доменная схема | ⚪ Ожидает |
+| 0 | Каркас + smoke-тест деплоя | ✅ Завершён |
+| 1 | Доменная схема | 🔵 Следующий |
 | 2 | Авторизация | ⚪ Ожидает |
 | 3 | LLM-слой и валидация | ⚪ Ожидает |
 | 4 | Создание решения (ядро) | ⚪ Ожидает |
@@ -41,39 +42,29 @@
 
 ## Заблокировано
 
-| Блокер | Что нужно |
-|--------|-----------|
-| Нет Next.js-проекта | Этап 0 |
-| Нет Neon | Зарегистрировать, получить connection strings |
-| Нет Vercel | Подключить репозиторий после этапа 0 |
+_Нет блокеров для Этапа 1._
 
 ---
 
 ## В работе
 
-- Этап 0: деплой на Vercel + подключение Neon, `prisma migrate deploy`, seed.
+_Пусто — Этап 0 закрыт, готов Этап 1._
 
 ---
 
-## Готово
+## Готово (Этап 0)
 
-- [x] Next.js App Router + TypeScript + Tailwind
-- [x] Prisma: модель Note, миграция, seed
-- [x] app/page.tsx — чтение заметок из БД
-- [x] lib/prisma.ts, lib/version.ts
-- [x] npm run build — проходит локально
+- [x] docs/: PLAN, STATUS, CHANGELOG, PROMPTS, DECISIONS, dev-log
+- [x] Next.js + Prisma + модель Note + миграция + seed
+- [x] Neon: DATABASE_URL (pooled), DIRECT_URL (direct)
+- [x] Vercel: env, production deploy
+- [x] Правило kip в `.cursor/rules/project.mdc`
+- [x] dev-log: `docs/25.06.25-CRS-Этап_0_smoke-тест-v0.1.0.md`
 
 ---
 
 ## Следующий шаг
 
-1. Создать проект Neon, скопировать `.env.example` → `.env`, заполнить `DATABASE_URL` и `DIRECT_URL`.
-2. Применить миграции и seed:
-   ```powershell
-   npx prisma migrate deploy
-   npm run db:seed
-   ```
-3. Деплой на Vercel: задать env, build = `prisma generate && next build` (уже в package.json).
-4. После зелёного деплоя — этап 1 (доменная схема).
+**Промпт 1** — заменить `Note` на доменную схему (User, Decision, Scenario, FailureMode), миграция `domain_init`.
 
-Подробности: [PLAN.md](./PLAN.md), промпты: [PROMPTS.md](./PROMPTS.md).
+Подробности: [PLAN.md](./PLAN.md), [PROMPTS.md](./PROMPTS.md).
