@@ -7,10 +7,10 @@
 ## [Unreleased]
 
 ### Added
+- Этап 0: Next.js App Router + Prisma + модель `Note`.
+- `app/page.tsx` — главная читает заметки из PostgreSQL (Neon).
+- `lib/prisma.ts`, `lib/version.ts`, `prisma/seed.ts`, миграция `init_note`.
 - Документация проекта: `docs/PLAN.md`, `docs/STATUS.md`, `docs/CHANGELOG.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`, `docs/TEMPLATE-dev-log.md`.
-- Правила Cursor: `.cursor/rules/project.mdc`.
-- Шаблон переменных окружения: `.env.example`.
-- Подробный пошаговый план реализации MVP (10 этапов).
 
 ---
 

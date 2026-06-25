@@ -1,8 +1,8 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
 **Обновлено:** 2026-06-25  
-**Версия приложения:** не развёрнуто (целевая MVP — 0.1.0)  
-**Текущий этап:** 0 — каркас + smoke-тест деплоя
+**Версия приложения:** 0.1.0 (lib/version.ts)  
+**Текущий этап:** 0 — каркас готов, нужен деплoy Vercel + Neon
 
 ---
 
@@ -10,14 +10,13 @@
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
-| Документация | ✅ Готово | README, PROJECT, docs/ |
+| Next.js каркас | ✅ Готово | App Router, TypeScript, Tailwind |
+| Prisma + Note | ✅ Готово | schema, seed, миграция init_note |
+| lib/prisma.ts, lib/version.ts | ✅ Готово | |
+| Главная (чтение БД) | ✅ Готово | app/page.tsx |
+| npm run build | ✅ Проходит | локально |
 | Инфраструктура Neon | ⏳ Не настроено | Нужны DATABASE_URL, DIRECT_URL |
-| Деплой Vercel | ⏳ Не настроено | Блокирует переход к этапу 1+ |
-| Код приложения | ❌ Не начат | — |
-| Auth | ❌ Не начат | Этап 2 |
-| LLM-пайплайн | ❌ Не начат | Этап 3–4 |
-| UI экраны | ❌ Не начат | Этапы 5–8 |
-| MVP DoD (11 пунктов) | 0 / 11 | — |
+| Деплой Vercel | ⏳ Не настроено | Следующий шаг после Neon |
 
 ---
 
@@ -25,7 +24,7 @@
 
 | Этап | Название | Статус |
 |------|----------|--------|
-| 0 | Каркас + smoke-тест деплоя | 🔵 Следующий |
+| 0 | Каркас + smoke-тест деплоя | 🟡 Код готов, ждёт Neon/Vercel |
 | 1 | Доменная схема | ⚪ Ожидает |
 | 2 | Авторизация | ⚪ Ожидает |
 | 3 | LLM-слой и валидация | ⚪ Ожидает |
@@ -52,28 +51,29 @@
 
 ## В работе
 
-_Пусто — документы проекта созданы, код не начат._
+- Этап 0: деплой на Vercel + подключение Neon, `prisma migrate deploy`, seed.
 
 ---
 
 ## Готово
 
-- [x] README.md
-- [x] PROJECT.md (полное ТЗ MVP)
-- [x] docs/PLAN.md
-- [x] docs/STATUS.md
-- [x] docs/CHANGELOG.md
-- [x] docs/PROMPTS.md
-- [x] docs/DECISIONS.md
-- [x] docs/TEMPLATE-dev-log.md
-- [x] .cursor/rules/project.mdc
-- [x] .env.example
+- [x] Next.js App Router + TypeScript + Tailwind
+- [x] Prisma: модель Note, миграция, seed
+- [x] app/page.tsx — чтение заметок из БД
+- [x] lib/prisma.ts, lib/version.ts
+- [x] npm run build — проходит локально
 
 ---
 
 ## Следующий шаг
 
-1. Этап 0: `create-next-app` + Prisma + Note + seed + деплoy Vercel.
-2. После зелёного деплоя — этап 1 (доменная схема).
+1. Создать проект Neon, скопировать `.env.example` → `.env`, заполнить `DATABASE_URL` и `DIRECT_URL`.
+2. Применить миграции и seed:
+   ```powershell
+   npx prisma migrate deploy
+   npm run db:seed
+   ```
+3. Деплой на Vercel: задать env, build = `prisma generate && next build` (уже в package.json).
+4. После зелёного деплоя — этап 1 (доменная схема).
 
 Подробности: [PLAN.md](./PLAN.md), промпты: [PROMPTS.md](./PROMPTS.md).
