@@ -27,6 +27,34 @@ ScenarioKind/Likelihood; User; Decision (tree Json?, outcome, lesson, reviewClos
 Scenario; FailureMode. Внешние ключи через relations, индексы @@index. Сделай миграцию.
 ```
 
+### Промпт 1а — DATABASE.md + миграция + verify (полный цикл)
+
+```text
+Ты — ведущий fullstack-разработчик проекта «Развилка» (Next.js + Prisma 6 + Neon).
+
+Контекст:
+- В корне есть DATABASE.md — заготовка другого проекта (User, Prompt, Vote). Не ломай историю: перенеси в docs/DATABASE.sample.md.
+- Создай docs/DATABASE.md под текущий проект по PROJECT.md §6 (User, Decision, Scenario, FailureMode).
+- Корневой DATABASE.md — короткая ссылка на docs/.
+
+Задачи:
+1. prisma/schema.prisma — доменная схема, удалить Note. Связи 1—N, onDelete: Cascade, @@index.
+2. npx prisma migrate dev --name domain_init (или migrate deploy на Neon).
+3. prisma/seed.ts — демо-кейс §16 (пользователь + решение + 3 сценария + failure modes). db:seed через prisma db seed.
+4. prisma/verify-domain.ts — короткий smoke: создать User, Decision, Scenario, FailureMode; проверить связи.
+   Маппинг с sample: Prompt → Decision, Vote в MVP нет.
+5. npm run db:verify — tsx --env-file=.env.
+6. app/page.tsx — читать Decision из БД (вместо Note).
+7. Обновить docs/PROMPTS.md (этот промпт), docs/STATUS.md, docs/PLAN.md.
+
+Проверка:
+- npm run db:seed && npm run db:verify
+- npm run build
+- главная показывает решения из Neon
+
+Не коммитить .env. Комментарии в коде — на русском.
+```
+
 ### Промпт 2 — auth (JWT + bcrypt)
 
 ```text

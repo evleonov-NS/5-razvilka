@@ -2,7 +2,7 @@
 
 **Обновлено:** 2026-06-25  
 **Версия приложения:** 0.1.0 (lib/version.ts)  
-**Текущий этап:** 1 — доменная схема (следующий)
+**Текущий этап:** 2 — авторизация (следующий)
 
 ---
 
@@ -10,14 +10,12 @@
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
-| Next.js каркас | ✅ Готово | App Router, TypeScript, Tailwind |
-| Prisma + Note | ✅ Готово | smoke-тест Этапа 0 |
-| Neon PostgreSQL | ✅ Готово | migrate deploy, seed |
-| Деплoy Vercel | ✅ Готово | Production Ready (`5b4af00`) |
-| Главная (чтение БД) | ✅ Готово | 3 заметки local + prod |
-| npm run build | ✅ Проходит | local + Vercel |
-| Доменная схема | ⏳ Следующий | Этап 1 |
-| MVP DoD | 0 / 11 | smoke-тест пройден, MVP не начат |
+| Доменная схема Prisma | ✅ Готово | User, Decision, Scenario, FailureMode |
+| docs/DATABASE.md | ✅ Готово | sample → docs/DATABASE.sample.md |
+| Миграция domain_init | ✅ Применена | Note удалена |
+| seed + db:verify | ✅ Готово | демо §16 + smoke связей |
+| Главная (Decision) | ✅ Готово | app/page.tsx |
+| Auth | ⏳ Следующий | Этап 2 |
 
 ---
 
@@ -26,8 +24,8 @@
 | Этап | Название | Статус |
 |------|----------|--------|
 | 0 | Каркас + smoke-тест деплоя | ✅ Завершён |
-| 1 | Доменная схема | 🔵 Следующий |
-| 2 | Авторизация | ⚪ Ожидает |
+| 1 | Доменная схема | ✅ Завершён |
+| 2 | Авторизация | 🔵 Следующий |
 | 3 | LLM-слой и валидация | ⚪ Ожидает |
 | 4 | Создание решения (ядро) | ⚪ Ожидает |
 | 5 | Экран результата | ⚪ Ожидает |
@@ -42,29 +40,31 @@
 
 ## Заблокировано
 
-_Нет блокеров для Этапа 1._
+_Нет блокеров для Этапа 2._
 
 ---
 
 ## В работе
 
-_Пусто — Этап 0 закрыт, готов Этап 1._
+_Пусто — Этап 1 закрыт, готов Этап 2 (auth)._
 
 ---
 
-## Готово (Этап 0)
+## Готово
 
-- [x] docs/: PLAN, STATUS, CHANGELOG, PROMPTS, DECISIONS, dev-log
-- [x] Next.js + Prisma + модель Note + миграция + seed
-- [x] Neon: DATABASE_URL (pooled), DIRECT_URL (direct)
-- [x] Vercel: env, production deploy
-- [x] Правило kip в `.cursor/rules/project.mdc`
-- [x] dev-log: `docs/25.06.25-CRS-Этап_0_smoke-тест-v0.1.0.md`
+### Этап 0
+- [x] Next.js + Prisma + Neon + Vercel smoke-тест
+
+### Этап 1
+- [x] docs/DATABASE.md, docs/DATABASE.sample.md
+- [x] Доменная схема Prisma, миграция `domain_init`
+- [x] seed (демо §16), `npm run db:verify`
+- [x] app/page.tsx — список Decision
 
 ---
 
 ## Следующий шаг
 
-**Промпт 1** — заменить `Note` на доменную схему (User, Decision, Scenario, FailureMode), миграция `domain_init`.
+**Промпт 2** — JWT + bcrypt auth, login/register.
 
 Подробности: [PLAN.md](./PLAN.md), [PROMPTS.md](./PROMPTS.md).

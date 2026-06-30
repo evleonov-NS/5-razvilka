@@ -8,9 +8,84 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Временная сущность для smoke-теста деплоя (Этап 0). Удалить после доменной миграции.
-model Note {
-  id        String   @id @default(uuid()) @db.Uuid
-  title     String
-  createdAt DateTime @default(now())
+enum Horizon {
+  THREE_MONTHS
+  ONE_YEAR
+  FIVE_YEARS
+}
+
+enum DecisionType {
+  DECISION
+  HABIT
+}
+
+enum DecisionStatus {
+  OPEN
+  RESOLVED
+}
+
+enum ScenarioKind {
+  OPTIMISTIC
+  BASE
+  PESSIMISTIC
+}
+
+enum Likelihood {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  decisions    Decision[]
+}
+
+model Decision {
+  id                    String         @id @default(uuid()) @db.Uuid
+  userId                String         @db.Uuid
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                 String
+  context               String
+  horizon               Horizon        @default(ONE_YEAR)
+  type                  DecisionType   @default(DECISION)
+  status                DecisionStatus @default(OPEN)
+  tree                  Json?
+  outcome               String?
+  lesson                String?
+  reviewClosestScenario ScenarioKind?
+  reviewMissed          String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  resolvedAt            DateTime?
+  scenarios             Scenario[]
+  failureModes          FailureMode[]
+
+  @@index([userId])
+}
+
+model Scenario {
+  id         String       @id @default(uuid()) @db.Uuid
+  decisionId String       @db.Uuid
+  decision   Decision     @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  kind       ScenarioKind
+  likelihood Likelihood
+  narrative  String
+  orderIdx   Int          @default(0)
+
+  @@index([decisionId])
+}
+
+model FailureMode {
+  id         String   @id @default(uuid()) @db.Uuid
+  decisionId String   @db.Uuid
+  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  cause      String
+  prevention String
+  orderIdx   Int      @default(0)
+
+  @@index([decisionId])
 }

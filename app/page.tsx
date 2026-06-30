@@ -3,26 +3,45 @@ import { versionLabel } from "@/lib/version";
 
 export const dynamic = "force-dynamic";
 
+const HORIZON_LABELS: Record<string, string> = {
+  THREE_MONTHS: "3 месяца",
+  ONE_YEAR: "1 год",
+  FIVE_YEARS: "5 лет",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  OPEN: "открыто",
+  RESOLVED: "решено",
+};
+
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "numeric",
     month: "long",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   }).format(date);
 }
 
 export default async function HomePage() {
-  let notes: { id: string; title: string; createdAt: Date }[] = [];
+  let decisions: {
+    id: string;
+    title: string;
+    horizon: string;
+    status: string;
+    createdAt: Date;
+    _count: { scenarios: number; failureModes: number };
+  }[] = [];
   let dbError: string | null = null;
 
   try {
-    notes = await prisma.note.findMany({
+    decisions = await prisma.decision.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        _count: { select: { scenarios: true, failureModes: true } },
+      },
     });
   } catch (error) {
-    console.error("Ошибка чтения Note из БД:", error);
+    console.error("Ошибка чтения Decision из БД:", error);
     dbError =
       "Не удалось подключиться к базе данных. Проверьте DATABASE_URL и DIRECT_URL в .env.";
   }
@@ -35,12 +54,12 @@ export default async function HomePage() {
           Посмотри, куда ведёт каждый выбор
         </p>
         <p className="mt-4 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm">
-          Smoke-тест Этап 0: главная читает заметки из PostgreSQL (Neon).
+          Этап 1: доменная схема — главная читает решения из PostgreSQL (Neon).
         </p>
       </header>
 
       <main className="flex-1">
-        <h2 className="mb-4 text-lg font-semibold">Заметки из базы</h2>
+        <h2 className="mb-4 text-lg font-semibold">Решения в базе</h2>
 
         {dbError ? (
           <div
@@ -49,9 +68,9 @@ export default async function HomePage() {
           >
             {dbError}
           </div>
-        ) : notes.length === 0 ? (
+        ) : decisions.length === 0 ? (
           <p className="text-[var(--muted)]">
-            Заметок пока нет. Запустите{" "}
+            Решений пока нет. Запустите{" "}
             <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-sm">
               npm run db:seed
             </code>
@@ -59,14 +78,22 @@ export default async function HomePage() {
           </p>
         ) : (
           <ul className="divide-y divide-[var(--border)] rounded-lg border border-[var(--border)] bg-white">
-            {notes.map((note) => (
-              <li key={note.id} className="px-4 py-3">
-                <p className="font-medium">{note.title}</p>
+            {decisions.map((decision) => (
+              <li key={decision.id} className="px-4 py-3">
+                <p className="font-medium">{decision.title}</p>
+                <p className="mt-1 text-sm text-[var(--muted)]">
+                  {HORIZON_LABELS[decision.horizon] ?? decision.horizon}
+                  {" · "}
+                  {STATUS_LABELS[decision.status] ?? decision.status}
+                  {" · "}
+                  {decision._count.scenarios} сценариев,{" "}
+                  {decision._count.failureModes} рисков
+                </p>
                 <time
-                  className="text-sm text-[var(--muted)]"
-                  dateTime={note.createdAt.toISOString()}
+                  className="text-xs text-[var(--muted)]"
+                  dateTime={decision.createdAt.toISOString()}
                 >
-                  {formatDate(note.createdAt)}
+                  {formatDate(decision.createdAt)}
                 </time>
               </li>
             ))}

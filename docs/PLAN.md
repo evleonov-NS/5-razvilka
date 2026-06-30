@@ -11,11 +11,12 @@
 | Область | Статус |
 |---------|--------|
 | Этап 0 (smoke-тест) | ✅ Завершён |
-| Prisma / Neon | ✅ Note, migrate, seed |
-| Деплой Vercel | ✅ Production Ready |
-| Документация | ✅ docs/ + dev-log |
+| Этап 1 (доменная схема) | ✅ Завершён |
+| Prisma / Neon | ✅ User, Decision, Scenario, FailureMode |
+| Деплой Vercel | ✅ (обновить после push) |
+| Документация | ✅ docs/DATABASE.md |
 
-**Следующий шаг:** Этап 1 — доменная схема (Промпт 1).
+**Следующий шаг:** Этап 2 — авторизация (Промпт 2).
 
 ---
 
@@ -124,18 +125,21 @@ npm run dev
 **Промпт 1** · Неделя 1
 
 #### Задачи
-- [ ] Заменить `Note` на схему §6 PROJECT.md (User, Decision, Scenario, FailureMode, enums)
-- [ ] Миграция `domain_init`
-- [ ] Обновить `seed.ts` — демо-кейс §16
-- [ ] Убрать чтение Note с главной
+- [x] Заменить `Note` на схему §6 PROJECT.md (User, Decision, Scenario, FailureMode, enums)
+- [x] Миграция `domain_init`
+- [x] Обновить `seed.ts` — демо-кейс §16
+- [x] Убрать чтение Note с главной
+- [x] docs/DATABASE.md + DATABASE.sample.md
+- [x] prisma/verify-domain.ts + npm run db:verify
 
 #### Проверка
 ```powershell
-npx prisma migrate dev --name domain_init
-npx prisma studio
+npx prisma migrate deploy
+npm run db:seed
+npm run db:verify
 ```
-- [ ] Таблицы и связи корректны
-- [ ] Seed создаёт демо-пользователя и решение
+- [x] Таблицы и связи корректны
+- [x] Seed создаёт демо-пользователя и решение
 
 ---
 
