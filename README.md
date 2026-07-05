@@ -74,4 +74,4 @@ LLM_MODEL=
 
 Полное продуктово-техническое описание — в [PROJECT.md](./PROJECT.md).
 
-Рабочие документы проекта — в `docs/`: `PLAN.md` (план), `STATUS.md` (состояние), `CHANGELOG.md` (изменения), `PROMPTS.md` (промпты), `DECISIONS.md` (решения).
+Рабочие документы проекта — в `docs/`: `PLAN.md` (план), `STATUS.md` (состояние), `CHANGELOG.md` (изменения), `PROMPTS.md` (промпты), `DECISIONS.md` (решения), `AUTH_GOOGLE_VERCEL.md` (вход через Google + Vercel env).

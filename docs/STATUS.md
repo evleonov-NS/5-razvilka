@@ -1,9 +1,9 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
-**Обновлено:** 2026-06-30  
+**Обновлено:** 2026-07-05  
 **Версия приложения:** 0.1.0 (`lib/version.ts`)  
-**Последний коммит:** `e09cf1c` — «Этап 1: доменная схема Prisma и DATABASE.md»  
-**Текущий этап:** 2 — авторизация (следующий, не начат)
+**Последний коммит:** `8e9a5bd` — «Этап 2: Auth.js + Google OAuth»  
+**Текущий этап:** 3 — LLM-слой (следующий)
 
 ---
 
@@ -12,13 +12,11 @@
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
 | Доменная схема Prisma | ✅ Готово | User, Decision, Scenario, FailureMode |
-| docs/DATABASE.md | ✅ Готово | sample → docs/DATABASE.sample.md |
-| Миграция domain_init | ✅ Применена | Note удалена |
-| seed + db:verify | ✅ Готово | демо §16 + smoke связей |
-| Главная (Decision) | ✅ Готово | `app/page.tsx` — список всех Decision |
-| Auth | ⏳ Следующий | Этап 2 — Auth.js v5 + Google OAuth |
-| LLM / Zod | ⚪ Ожидает | Этап 3 — зависимости не установлены |
-| Деплой Vercel | ⚠️ Уточнить | После Этапа 1 push/деплой не зафиксирован в CHANGELOG |
+| Auth (Google OAuth) | ✅ Готово | Auth.js v5, local + Vercel |
+| view-db (dev) | ✅ Готово | `/view-db`, только локально |
+| docs/AUTH_GOOGLE_VERCEL.md | ✅ Готово | полная инструкция OAuth |
+| LLM / OpenAI | ⏳ Следующий | Этап 3 |
+| Деплой Vercel | ✅ | https://5-razvilka.vercel.app |
 
 ---
 
@@ -28,8 +26,8 @@
 |------|----------|--------|
 | 0 | Каркас + smoke-тест деплоя | ✅ Завершён |
 | 1 | Доменная схема | ✅ Завершён |
-| 2 | Авторизация | 🔵 Следующий |
-| 3 | LLM-слой и валидация | ⚪ Ожидает |
+| 2 | Авторизация (Google) | ✅ Завершён |
+| 3 | LLM-слой и валидация | 🔵 Следующий |
 | 4 | Создание решения (ядро) | ⚪ Ожидает |
 | 5 | Экран результата | ⚪ Ожидает |
 | 6 | Журнал (главная) | ⚪ Ожидает |
@@ -37,71 +35,34 @@
 | 8 | Ревью по исходу | ⚪ Ожидает |
 | 9 | Полировка и деплой | ⚪ Ожидает |
 
-**Легенда:** ✅ готово · 🔵 в работе / следующий · ⚪ ожидает · 🔴 заблокировано
-
 ---
 
-## Заблокировано
+## Готово (Этап 2)
 
-_Нет блокеров для Этапа 2._
-
----
-
-## В работе
-
-_Пусто — Этап 1 закрыт в коде и закоммичен, готов Этап 2 (auth)._
-
-**Локально не закоммичено:** `.cursor/rules/project.mdc` (правила Agent, не влияет на приложение).
-
----
-
-## Готово
-
-### Этап 0
-- [x] Next.js + Prisma + Neon + Vercel smoke-тест
-- [x] Dev-log: `docs/25.06.25-CRS-Этап_0_smoke-тест-v0.1.0.md`
-
-### Этап 1
-- [x] `docs/DATABASE.md`, `docs/DATABASE.sample.md`
-- [x] Доменная схема Prisma, миграция `20250625230000_domain_init`
-- [x] `prisma/seed.ts` — демо §16 (`demo@razvilka.local` / `demo1234`)
-- [x] `prisma/verify-domain.ts` + `npm run db:verify`
-- [x] `app/page.tsx` — список Decision из Neon
-- [x] `bcryptjs` в зависимостях (используется в seed)
-
----
-
-## Что есть в коде сейчас
-
-```text
-app/page.tsx, app/layout.tsx
-lib/prisma.ts, lib/version.ts
-prisma/schema.prisma, seed.ts, verify-domain.ts, migrations/
-```
-
-**Ещё нет:** Auth.js, `lib/auth.ts`, `app/api/auth/[...nextauth]`, `app/login`, `components/Header.tsx`, `lib/llm.ts`, …
-
-**Этап 2:** Auth.js v5 + Google only (без email/пароля). Env: `AUTH_SECRET`, `GOOGLE_CLIENT_*`.
-
----
-
-## Документация — расхождения
-
-| Файл | Замечание |
-|------|-----------|
-| `docs/CHANGELOG.md` | Этап 1 не отражён в [Unreleased] / новой версии |
-| `README.md` | В разделе «Запуск» ещё написано «заметки из Neon» — устарело |
-| Dev-log Этапа 1 | Не создан (есть только для Этапа 0) |
+- [x] `next-auth` beta + `@auth/prisma-adapter`
+- [x] Миграция `auth_google`, Account/Session/VerificationToken
+- [x] `auth.ts`, `/api/auth/[...nextauth]`, `/login`, Header
+- [x] `lib/auth.ts` — getCurrentUser, requireUser
+- [x] Google OAuth: local + production
+- [x] Dev-log: `docs/05.07.26-CRS-Этап_2_Google_OAuth-v0.1.0.md`
 
 ---
 
 ## Следующий шаг
 
-**Промпт 2 — Auth.js v5 + Google OAuth:**
+**Промпт 3 — LLM-слой:**
 
-1. `next-auth`, `@auth/prisma-adapter`; Prisma: Account, Session, User без passwordHash
-2. `auth.ts` + `app/api/auth/[...nextauth]/route.ts`
-3. `lib/auth.ts` — `getCurrentUser`, `requireUser`
-4. `app/login` — кнопка «Войти через Google»; Google Cloud OAuth credentials
+- `lib/llm.ts`, `lib/json.ts`, `lib/validators.ts`
+- env: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `LLM_MODEL`
 
-Подробности: [PLAN.md](./PLAN.md) § Этап 2, [PROMPTS.md](./PROMPTS.md) — Промпт 2 и 2а.
+Подробности: [PLAN.md](./PLAN.md) § Этап 3, [PROMPTS.md](./PROMPTS.md).
+
+---
+
+## Документация
+
+| Документ | Назначение |
+|----------|------------|
+| [AUTH_GOOGLE_VERCEL.md](./AUTH_GOOGLE_VERCEL.md) | OAuth: Google, .env, Vercel |
+| [PLAN.md](./PLAN.md) | План MVP |
+| [PROMPTS.md](./PROMPTS.md) | Промпты Cursor |

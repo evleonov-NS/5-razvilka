@@ -7,27 +7,32 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Доменная схема, auth, LLM, журнал, дерево, ревью
+- LLM-слой, создание решения, журнал, дерево, ревью
 
 ---
 
-## [0.1.0] — 2026-06-25
+## [0.1.0] — 2026-06-25 … 2026-07-05
 
 ### Added
-- **Этап 0 (smoke-тест):** Next.js App Router + Prisma 6 + Neon + Vercel.
-- Модель `Note`, миграция `init_note`, seed (3 заметки).
-- `app/page.tsx` — главная читает заметки из PostgreSQL.
-- `lib/prisma.ts`, `lib/version.ts`.
-- Документация: `docs/PLAN.md`, `STATUS.md`, `PROMPTS.md`, `DECISIONS.md`, `TEMPLATE-dev-log.md`.
-- Правило **kip** в `.cursor/rules/project.mdc`.
-- Dev-log: `docs/25.06.25-CRS-Этап_0_smoke-тест-v0.1.0.md`.
+- **Этап 0:** Next.js App Router + Prisma 6 + Neon + Vercel smoke-тест.
+- **Этап 1:** доменная схема User, Decision, Scenario, FailureMode.
+- **view-db:** dev-утилита `/view-db` — таблицы Neon, CRUD, local/prod.
+- **Этап 2 (auth):** Auth.js v5 + Google OAuth; миграция `auth_google`.
+- `auth.ts`, `/login`, Header, `getCurrentUser` / `requireUser`.
+- Документация: PLAN, STATUS, PROMPTS, DECISIONS, AUTH_SETUP, **AUTH_GOOGLE_VERCEL**.
+- Dev-log: Этап 0, Этап 2 (`05.07.26-CRS-Этап_2_Google_OAuth`).
+
+### Changed
+- ADR-003: Auth.js + Google вместо JWT+bcrypt.
+- Prisma User без `passwordHash`; модели Account, Session.
 
 ### Fixed
-- `npm run db:seed` — через `prisma db seed` (загрузка `.env`).
+- `npm run db:seed` — через `prisma db seed`.
+- OAuth на Vercel: redirect_uri, AUTH_URL, env (см. AUTH_GOOGLE_VERCEL.md).
 
 ### Deploy
-- Vercel Production: `5-razvilka-git-main-evgenyleonovns.vercel.app`
-- Коммиты: `02ea110`, `5b4af00`
+- Production: https://5-razvilka.vercel.app
+- Коммиты: `02ea110` … `8e9a5bd`
 
 ---
 
