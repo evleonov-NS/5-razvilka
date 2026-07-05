@@ -5,9 +5,9 @@ alwaysApply: true
 ---
 
 Стек строго: Next.js App Router + TypeScript + Prisma 6 + PostgreSQL (Neon) + Tailwind + Zod.
-Auth — JWT + bcrypt, сессия в httpOnly cookie (НЕ localStorage), без NextAuth.
-  lib/auth.ts: createSessionCookie / getCurrentUser / requireUser / clearSessionCookie.
-  Защищённые эндпоинты вызывают requireUser(); Server Components читают сессию из cookie.
+Auth — Auth.js v5 (`next-auth`) + Google OAuth only; сессия в httpOnly cookie (database), НЕ localStorage.
+  lib/auth.ts: getCurrentUser / requireUser поверх auth(); handlers в app/api/auth/[...nextauth]/route.ts.
+  Защищённые эндпоинты вызывают requireUser(); Server Components — auth() / getCurrentUser().
 Мутации — только Route Handlers (app/api/.../route.ts). Чтение данных — Server Components.
 Вызовы LLM — только на сервере, ключ через process.env. Никогда не светить ключ на клиенте.
 LLM-клиент — OpenAI-совместимый (npm openai) с настраиваемым baseURL из env.

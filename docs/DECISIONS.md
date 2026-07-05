@@ -24,16 +24,25 @@
 
 ---
 
-## ADR-003: JWT + bcrypt в httpOnly cookie (без NextAuth)
+## ADR-003: Auth.js v5 + Google OAuth (пересмотр 2026-07-05)
 
-**Решение:** собственная auth: bcrypt для паролей, JWT в httpOnly cookie.
+**Было:** собственная auth: bcrypt + JWT в httpOnly cookie, без NextAuth.
+
+**Решение:** [Auth.js v5](https://authjs.dev/) (`next-auth`) + **только Google OAuth**. Email/пароль — вне scope MVP.
 
 **Причина:**
-- сессия доступна и Route Handlers, и Server Components через cookie;
-- не localStorage (уязвимость к XSS);
-- MVP не требует OAuth/social login.
+- готовая библиотека: OAuth flow, callback, CSRF, session cookie;
+- Prisma Adapter — пользователь и сессии в своей Neon БД;
+- сессия в **httpOnly cookie** (database strategy), не localStorage;
+- один провайдер — минимальная сложность UI (кнопка «Войти через Google»).
 
-**API:** `createSessionCookie`, `getCurrentUser`, `requireUser`, `clearSessionCookie` в `lib/auth.ts`.
+**Схема Prisma:** `User` (без `passwordHash`) + `Account` + `Session` + `VerificationToken` (стандарт adapter).
+
+**API для приложения:** `auth()` / `getCurrentUser()` / `requireUser()` — обёртки над сессией Auth.js. Route Handler: `app/api/auth/[...nextauth]/route.ts`.
+
+**Env:** `AUTH_SECRET`, `AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
+
+**Отклонено:** email+пароль (лишний UX и bcrypt); Better Auth (выбран Auth.js по запросу).
 
 ---
 

@@ -1,10 +1,8 @@
 /**
  * Короткая проверка доменной схемы после миграции.
  * Создаёт: User → Decision → Scenario + FailureMode.
- * (В sample DATABASE.md: User → Prompt → Vote; в Развилке Vote нет — вместо Prompt = Decision.)
  */
 import { PrismaClient, ScenarioKind, Likelihood } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -14,7 +12,8 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       email,
-      passwordHash: bcrypt.hashSync("verify-test", 10),
+      name: "Verify User",
+      emailVerified: new Date(),
     },
   });
 
@@ -62,10 +61,9 @@ async function main() {
 
   console.log("Verify OK — доменная схема работает:");
   console.log(`  User:     ${user.email}`);
-  console.log(`  Decision: ${decision.title} (≈ Prompt в sample-схеме)`);
+  console.log(`  Decision: ${decision.title}`);
   console.log(`  Scenario: ${scenario.kind} / ${scenario.likelihood}`);
   console.log(`  FailureMode: ${failureMode.cause.slice(0, 40)}…`);
-  console.log("  (Vote в MVP нет — голосование не входит в Развилку v1)");
 }
 
 main()

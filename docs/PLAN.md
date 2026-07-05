@@ -32,8 +32,8 @@
 
 ### Definition of Done (§15 PROJECT.md)
 
-- [ ] 1. Зарегистрироваться
-- [ ] 2. Войти
+- [ ] 1. Войти через Google
+- [ ] 2. Выйти из аккаунта
 - [ ] 3. Создать новое решение
 - [ ] 4. Получить 3 сценария будущего
 - [ ] 5. Получить pre-mortem
@@ -55,7 +55,7 @@
 |--------|---------|
 | Фреймворк | Next.js App Router + TypeScript |
 | БД | Neon PostgreSQL + Prisma 6 (`url` + `directUrl`) |
-| Auth | JWT + bcrypt, httpOnly cookie, без NextAuth |
+| Auth | Auth.js v5 + Google OAuth, httpOnly cookie (database session) |
 | Мутации | Route Handlers (`app/api/.../route.ts`) |
 | Чтение | Server Components напрямую из БД |
 | UI | Tailwind CSS |
@@ -72,7 +72,7 @@
 1. **Neon** — `DATABASE_URL` (pooled), `DIRECT_URL` (direct).
 2. **Vercel** — репозиторий + env-переменные.
 3. **OpenAI** (или совместимый агрегатор) — `OPENAI_API_KEY`, `LLM_MODEL`.
-4. **JWT_SECRET** — длинная случайная строка.
+4. **AUTH_SECRET**, **GOOGLE_CLIENT_ID**, **GOOGLE_CLIENT_SECRET** — Auth.js + Google OAuth.
 
 ### 3.2. Локальная среда
 ```powershell
@@ -82,8 +82,8 @@ Copy-Item .env.example .env
 
 ### 3.3. npm-зависимости (итог)
 ```powershell
-npm install prisma @prisma/client openai zod bcryptjs jsonwebtoken
-npm install -D tsx @types/bcryptjs @types/jsonwebtoken
+npm install prisma @prisma/client openai zod next-auth @auth/prisma-adapter
+npm install -D tsx
 ```
 
 ---
@@ -146,27 +146,35 @@ npm run db:verify
 ### Этап 2 — Авторизация
 **Промпт 2** · Неделя 1
 
-#### Задачи — `lib/auth.ts`
-- [ ] `createSessionCookie(userId)`
-- [ ] `getCurrentUser()`
-- [ ] `requireUser()` → 401
-- [ ] `clearSessionCookie()`
+**Стек:** Auth.js v5 (`next-auth`) + Google OAuth only. Сессия в httpOnly cookie (database strategy). Без email/пароля.
 
-#### API
-- [ ] `POST /api/auth/register`
-- [ ] `POST /api/auth/login`
-- [ ] `POST /api/auth/logout`
-- [ ] `GET /api/auth/me`
+#### Зависимости
+- [ ] `next-auth`, `@auth/prisma-adapter`
+
+#### Prisma
+- [ ] User без `passwordHash`; поля `name`, `emailVerified`, `image` (Auth.js)
+- [ ] Модели `Account`, `Session`, `VerificationToken`
+- [ ] Миграция `auth_google`
+- [ ] Обновить `seed.ts`
+
+#### Auth.js
+- [ ] `auth.ts` — GoogleProvider, PrismaAdapter, `AUTH_SECRET`
+- [ ] `app/api/auth/[...nextauth]/route.ts`
+- [ ] `lib/auth.ts` — `getCurrentUser()`, `requireUser()` поверх `auth()`
+
+#### Env
+- [ ] `AUTH_SECRET`, `AUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- [ ] Те же переменные на Vercel
 
 #### UI
-- [ ] `app/login/page.tsx`, `app/register/page.tsx`
-- [ ] `components/Header.tsx`
-- [ ] Защита маршрутов (middleware или layout)
+- [ ] `app/login/page.tsx` — кнопка «Войти через Google»
+- [ ] `components/Header.tsx` — user + signOut
+- [ ] `middleware.ts` — заготовка защиты маршрутов
 
 #### Проверка
-- [ ] Регистрация → cookie → `/api/auth/me` OK
+- [ ] Google login → callback → сессия OK
 - [ ] Logout очищает сессию
-- [ ] Без cookie → 401 / redirect
+- [ ] Без сессии → redirect /login или 401
 
 ---
 
@@ -289,11 +297,10 @@ npm run db:verify
 app/
   page.tsx
   login/page.tsx
-  register/page.tsx
   decisions/new/page.tsx
   decisions/[id]/page.tsx
   decisions/[id]/review/page.tsx
-  api/auth/{register,login,logout,me}/route.ts
+  api/auth/[...nextauth]/route.ts
   api/decisions/route.ts
   api/decisions/[id]/route.ts
   api/decisions/[id]/tree/route.ts
@@ -306,6 +313,8 @@ components/
 
 lib/
   prisma.ts, auth.ts, llm.ts, validators.ts, json.ts, version.ts
+
+auth.ts                 # конфиг Auth.js (корень проекта)
 
 prisma/
   schema.prisma, seed.ts

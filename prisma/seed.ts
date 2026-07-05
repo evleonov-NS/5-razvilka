@@ -1,5 +1,4 @@
 import { PrismaClient, ScenarioKind, Likelihood } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -7,12 +6,16 @@ async function main() {
   await prisma.failureMode.deleteMany();
   await prisma.scenario.deleteMany();
   await prisma.decision.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.account.deleteMany();
   await prisma.user.deleteMany();
 
+  // Демо-пользователь без OAuth — только для seed-данных в dev
   const user = await prisma.user.create({
     data: {
       email: "demo@razvilka.local",
-      passwordHash: bcrypt.hashSync("demo1234", 10),
+      name: "Demo User",
+      emailVerified: new Date(),
     },
   });
 
@@ -79,6 +82,7 @@ async function main() {
   console.log(`  Decision: ${decision.title} (${decision.id})`);
   console.log(`  Scenarios: ${decision.scenarios.length}`);
   console.log(`  FailureModes: ${decision.failureModes.length}`);
+  console.log("  (Вход в приложение — через Google OAuth, не через seed-user)");
 }
 
 main()

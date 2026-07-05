@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { versionLabel } from "@/lib/version";
+import { Header } from "@/components/Header";
 
 export const dynamic = "force-dynamic";
 
@@ -48,15 +49,14 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-12">
-      <header className="mb-10">
+      <Header />
+
+      <div className="mb-10">
         <h1 className="text-3xl font-bold tracking-tight">Развилка</h1>
         <p className="mt-2 text-[var(--muted)]">
           Посмотри, куда ведёт каждый выбор
         </p>
-        <p className="mt-4 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm">
-          Этап 1: доменная схема — главная читает решения из PostgreSQL (Neon).
-        </p>
-      </header>
+      </div>
 
       <main className="flex-1">
         <h2 className="mb-4 text-lg font-semibold">Решения в базе</h2>

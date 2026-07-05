@@ -16,7 +16,7 @@
 | Миграция domain_init | ✅ Применена | Note удалена |
 | seed + db:verify | ✅ Готово | демо §16 + smoke связей |
 | Главная (Decision) | ✅ Готово | `app/page.tsx` — список всех Decision |
-| Auth | ⏳ Следующий | Этап 2 — `lib/auth.ts` и API ещё нет |
+| Auth | ⏳ Следующий | Этап 2 — Auth.js v5 + Google OAuth |
 | LLM / Zod | ⚪ Ожидает | Этап 3 — зависимости не установлены |
 | Деплой Vercel | ⚠️ Уточнить | После Этапа 1 push/деплой не зафиксирован в CHANGELOG |
 
@@ -79,9 +79,9 @@ lib/prisma.ts, lib/version.ts
 prisma/schema.prisma, seed.ts, verify-domain.ts, migrations/
 ```
 
-**Ещё нет:** `lib/auth.ts`, `app/api/**`, `app/login`, `app/register`, `components/*`, `lib/llm.ts`, `lib/validators.ts`, `lib/json.ts`.
+**Ещё нет:** Auth.js, `lib/auth.ts`, `app/api/auth/[...nextauth]`, `app/login`, `components/Header.tsx`, `lib/llm.ts`, …
 
-**Зависимости для Этапа 2 (по PLAN.md):** `zod`, `jsonwebtoken`, `@types/jsonwebtoken` — не установлены.
+**Этап 2:** Auth.js v5 + Google only (без email/пароля). Env: `AUTH_SECRET`, `GOOGLE_CLIENT_*`.
 
 ---
 
@@ -97,11 +97,11 @@ prisma/schema.prisma, seed.ts, verify-domain.ts, migrations/
 
 ## Следующий шаг
 
-**Промпт 2 — авторизация (JWT + bcrypt):**
+**Промпт 2 — Auth.js v5 + Google OAuth:**
 
-1. `lib/auth.ts` — `createSessionCookie`, `getCurrentUser`, `requireUser`, `clearSessionCookie`
-2. API: `POST /api/auth/{register,login,logout}`, `GET /api/auth/me`
-3. UI: `app/login/page.tsx`, `app/register/page.tsx`, `components/Header.tsx`
-4. Установить: `zod`, `jsonwebtoken`, `@types/jsonwebtoken`
+1. `next-auth`, `@auth/prisma-adapter`; Prisma: Account, Session, User без passwordHash
+2. `auth.ts` + `app/api/auth/[...nextauth]/route.ts`
+3. `lib/auth.ts` — `getCurrentUser`, `requireUser`
+4. `app/login` — кнопка «Войти через Google»; Google Cloud OAuth credentials
 
-Подробности: [PLAN.md](./PLAN.md) § Этап 2, [PROMPTS.md](./PROMPTS.md) — Промпт 2.
+Подробности: [PLAN.md](./PLAN.md) § Этап 2, [PROMPTS.md](./PROMPTS.md) — Промпт 2 и 2а.
