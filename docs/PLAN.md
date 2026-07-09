@@ -178,6 +178,26 @@ npm run db:verify
 
 ---
 
+---
+
+### Личный кабинет (до этапа 3)
+**PROMPT.md** · приоритет перед LLM
+
+#### Задачи
+- [x] `app/cabinet/*` — layout, сайдбар, журнал, open, resolved, settings
+- [x] `/` — лендинг + redirect авторизованных на `/cabinet`
+- [x] `DELETE /api/decisions/[id]` + UI удаления с confirm
+- [x] Поиск, пагинация, EmptyState, DecisionCard
+- [x] Заглушки `/decisions/new`, `/decisions/[id]`
+- [x] middleware: `/cabinet/*`
+
+#### Проверка
+- [x] Гость видит лендинг; после входа — кабинет
+- [x] Список только своих Decision
+- [x] `npm run build`
+
+---
+
 ### Этап 3 — LLM-слой и валидация
 **Промпт 3** · Неделя 2
 
@@ -200,9 +220,10 @@ npm run db:verify
 - [ ] `POST /api/decisions` — промпт 9.1, транзакция Prisma, ошибка → не сохранять
 - [ ] `GET /api/decisions` — список
 - [ ] `GET /api/decisions/[id]` — одно решение + ownership
+- [x] `DELETE /api/decisions/[id]` — удаление (кабинет)
 
 #### UI
-- [ ] `app/decisions/new/page.tsx`
+- [x] `app/decisions/new/page.tsx` (заглушка)
 - [ ] `components/DecisionForm.tsx`
 
 #### Проверка
@@ -215,7 +236,7 @@ npm run db:verify
 **Промпт 5** · Неделя 2
 
 #### Задачи
-- [ ] `app/decisions/[id]/page.tsx`
+- [x] `app/decisions/[id]/page.tsx` (заглушка)
 - [ ] `components/ScenarioCard.tsx`
 - [ ] `components/FailureModeList.tsx`
 - [ ] `components/LoadingState.tsx`, `components/ErrorMessage.tsx`
@@ -232,14 +253,15 @@ npm run db:verify
 **Промпт 6** · Неделя 3
 
 #### Задачи
-- [ ] `app/page.tsx` — список решений текущего user
-- [ ] `components/EmptyState.tsx`
-- [ ] Кнопка «Новое решение»
-- [ ] Лендинг для неавторизованных (H1, слоган, CTA)
+- [x] `app/page.tsx` — лендинг; авторизованные → `/cabinet`
+- [x] `components/EmptyState.tsx`
+- [x] Кнопка «Новое решение» (в кабинете)
+- [x] Лендинг для неавторизованных (H1, слоган, CTA)
+- [x] Журнал в `/cabinet` — список решений текущего user
 
 #### Проверка
-- [ ] Новое решение появляется в журнале
-- [ ] Empty state при пустом списке
+- [ ] Новое решение появляется в журнале (после этапа 4)
+- [x] Empty state при пустом списке
 
 ---
 
