@@ -9,6 +9,11 @@ export const STATUS_LABELS: Record<string, string> = {
   RESOLVED: "решено",
 };
 
+export const TYPE_LABELS: Record<string, string> = {
+  DECISION: "решение",
+  HABIT: "привычка",
+};
+
 export function formatDecisionDate(date: Date): string {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "numeric",

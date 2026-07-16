@@ -1,6 +1,6 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
-**Обновлено:** 2026-07-09  
+**Обновлено:** 2026-07-16  
 **Версия приложения:** 0.1.0 (`lib/version.ts`)  
 **Последний коммит:** `8e9a5bd` — «Этап 2: Auth.js + Google OAuth»  
 **Текущий этап:** 3 — LLM-слой (следующий)
@@ -14,6 +14,7 @@
 | Доменная схема Prisma | ✅ Готово | User, Decision, Scenario, FailureMode |
 | Auth (Google OAuth) | ✅ Готово | Auth.js v5, local + Vercel |
 | Личный кабинет | ✅ Готово | `/cabinet`, журнал, удаление |
+| Социальные механики | ✅ Готово | `/explore`, лайки, isPublic |
 | view-db (dev) | ✅ Готово | `/view-db`, только локально |
 | docs/AUTH_GOOGLE_VERCEL.md | ✅ Готово | полная инструкция OAuth |
 | LLM / OpenAI | ⏳ Следующий | Этап 3 |
@@ -37,6 +38,14 @@
 | 9 | Полировка и деплой | ⚪ Ожидает |
 
 ---
+
+## Готово (социальные механики)
+
+- [x] `Decision.isPublic`, модель `DecisionLike`, миграция `decision_public_likes`
+- [x] `POST /api/decisions/[id]/like`, `PATCH /api/decisions/[id]/visibility`
+- [x] `/explore` — лента, sort=popular|recent; `/explore/[id]` — публичный просмотр
+- [x] `LikeButton`, `VisibilityToggle`, `PublicDecisionCard`
+- [x] Промпт: [PROMPT-socium.md](./PROMPT-socium.md)
 
 ## Готово (личный кабинет)
 

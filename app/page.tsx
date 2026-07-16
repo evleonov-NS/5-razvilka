@@ -13,7 +13,15 @@ export default async function HomePage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-6 py-12">
       <header className="mb-16 flex items-center justify-between">
-        <span className="text-lg font-semibold tracking-tight">Развилка</span>
+        <nav className="flex items-center gap-4">
+          <span className="text-lg font-semibold tracking-tight">Развилка</span>
+          <Link
+            href="/explore"
+            className="text-sm text-[var(--muted)] transition hover:text-[var(--foreground)]"
+          >
+            Сообщество
+          </Link>
+        </nav>
         <Link
           href="/login"
           className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium transition hover:bg-white"

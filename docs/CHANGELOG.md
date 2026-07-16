@@ -10,6 +10,7 @@
 - LLM-слой, создание решения, экран результата, дерево, ревью
 
 ### Added
+- **Социальные механики:** `isPublic` на Decision, `DecisionLike`, лента `/explore`, toggle лайков и публикации.
 - **Личный кабинет:** `/cabinet` (журнал, открытые, решённые), лендинг `/`, `DELETE /api/decisions/[id]`.
 - Компоненты кабинета, `lucide-react`, заглушки `/decisions/new`, `/decisions/[id]`.
 

@@ -33,7 +33,7 @@ npm run db:seed
 npm run dev
 ```
 
-Откройте [http://localhost:3000](http://localhost:3000) — главная показывает заметки из Neon.
+Откройте [http://localhost:3015](http://localhost:3015) — главная показывает заметки из Neon.
 
 ## Сборка
 

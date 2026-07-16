@@ -5,7 +5,7 @@
 **Стек:** Auth.js v5 (`next-auth` beta) + `@auth/prisma-adapter` + Google OAuth only (без email/пароля).
 
 **Production:** [https://5-razvilka.vercel.app](https://5-razvilka.vercel.app)  
-**Локально:** [http://localhost:3000](http://localhost:3000)
+**Локально:** [http://localhost:3015](http://localhost:3015)
 
 ---
 
@@ -49,7 +49,7 @@
 | Переменная | За что отвечает | Локально | Vercel Production |
 |------------|-----------------|----------|-------------------|
 | `AUTH_SECRET` | Подпись/шифрование cookie сессии. Без неё — «Server configuration error» | Своя строка (см. ниже) | **Та же** или отдельная для prod |
-| `AUTH_URL` | Базовый URL приложения для OAuth redirect | `http://localhost:3000` | `https://5-razvilka.vercel.app` |
+| `AUTH_URL` | Базовый URL приложения для OAuth redirect | `http://localhost:3015` | `https://5-razvilka.vercel.app` |
 | `GOOGLE_CLIENT_ID` | Публичный ID OAuth-клиента из Google | Из Google Console | **То же значение** |
 | `GOOGLE_CLIENT_SECRET` | Секрет OAuth-клиента | Из Google Console | **То же значение** |
 
@@ -118,7 +118,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 Без пути, только origin:
 
 ```text
-http://localhost:3000
+http://localhost:3015
 https://5-razvilka.vercel.app
 https://5-razvilka-git-main-evgenyleonovns.vercel.app
 ```
@@ -128,7 +128,7 @@ https://5-razvilka-git-main-evgenyleonovns.vercel.app
 **Точный путь** до `/google`:
 
 ```text
-http://localhost:3000/api/auth/callback/google
+http://localhost:3015/api/auth/callback/google
 https://5-razvilka.vercel.app/api/auth/callback/google
 https://5-razvilka-git-main-evgenyleonovns.vercel.app/api/auth/callback/google
 ```
@@ -161,14 +161,14 @@ DIRECT_URL=postgresql://...
 
 # --- Auth (Auth.js + Google) ---
 AUTH_SECRET=64_символа_hex
-AUTH_URL=http://localhost:3000
+AUTH_URL=http://localhost:3015
 GOOGLE_CLIENT_ID=....apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-....
 ```
 
 ### Правила
 
-- `AUTH_URL` **локально** — только `http://localhost:3000`
+- `AUTH_URL` **локально** — только `http://localhost:3015`
 - **Не** ставьте production URL в локальный `.env` — сломается вход на localhost
 - В значениях **нет** префикса `ИМЯ=` (только само значение после `=`)
 
@@ -178,7 +178,7 @@ GOOGLE_CLIENT_SECRET=GOCSPX-....
 npm run dev
 ```
 
-Проверка: [http://localhost:3000/login](http://localhost:3000/login)
+Проверка: [http://localhost:3015/login](http://localhost:3015/login)
 
 ---
 
@@ -220,7 +220,7 @@ npm run dev
 
 | Переменная | `.env` на ПК | Vercel Production |
 |------------|--------------|-------------------|
-| `AUTH_URL` | `http://localhost:3000` | `https://5-razvilka.vercel.app` |
+| `AUTH_URL` | `http://localhost:3015` | `https://5-razvilka.vercel.app` |
 | `AUTH_SECRET` | ваш секрет | тот же (или отдельный) |
 | `GOOGLE_*` | из Google | **те же** |
 | `DATABASE_*` | из Neon | **те же** |
@@ -235,7 +235,7 @@ npm run dev
 npm run dev
 ```
 
-- [http://localhost:3000/login](http://localhost:3000/login) → «Войти через Google»
+- [http://localhost:3015/login](http://localhost:3015/login) → «Войти через Google»
 - После входа — имя/аватар в шапке, кнопка «Выйти»
 
 ### Production
@@ -260,7 +260,7 @@ npm run dev
 | `redirect_uri_mismatch` | URI в Google ≠ фактический `redirect_uri` | Добавить точный URI из «Подробностей»; проверить `AUTH_URL` |
 | `redirect_uri` = `...git-main...vercel.app` | Vercel использует deployment URL | Добавить git-main URI в Google **или** выровнять `AUTH_URL` на основной домен |
 | `Server configuration error` | Нет `AUTH_SECRET` / Google keys на Vercel | Добавить все env на Vercel + **Redeploy** |
-| Локалка работала, потом сломалась | В `.env` стоит production `AUTH_URL` | Вернуть `AUTH_URL=http://localhost:3000` |
+| Локалка работала, потом сломалась | В `.env` стоит production `AUTH_URL` | Вернуть `AUTH_URL=http://localhost:3015` |
 | `Access blocked` | Email не в Test users | Google Console → Аудитория → Test users |
 | Сайт не открывается (timeout) | Сеть / DNS / блокировка | Попробовать другую сеть; проверить [vercel.com/status](https://www.vercel-status.com/) |
 | `invalid_client` | Неверный Client Secret | Пересоздать secret в Google, обновить `.env` и Vercel |
@@ -278,7 +278,7 @@ npm run dev
 
 ### Локальный `.env`
 
-- [ ] `AUTH_URL=http://localhost:3000`
+- [ ] `AUTH_URL=http://localhost:3015`
 - [ ] `AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 - [ ] `DATABASE_URL`, `DIRECT_URL`
 

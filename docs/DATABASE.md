@@ -10,6 +10,7 @@ PostgreSQL (Neon) + Prisma 6. Источник истины: `prisma/schema.pris
 |--------|------------|
 | **User** | Пользователь (email + passwordHash) |
 | **Decision** | Решение или привычка пользователя |
+| **DecisionLike** | Лайк публичного разбора (toggle, UNIQUE userId + decisionId) |
 | **Scenario** | Один из 3 сценариев будущего (OPTIMISTIC / BASE / PESSIMISTIC) |
 | **FailureMode** | Pre-mortem: причина провала + профилактика |
 
@@ -22,6 +23,7 @@ PostgreSQL (Neon) + Prisma 6. Источник истины: `prisma/schema.pris
 ```text
 User 1 — N Decision 1 — N Scenario
                       1 — N FailureMode
+User 1 — N DecisionLike N — 1 Decision (только isPublic)
 ```
 
 - `Decision.tree` — JSON дерева развилок (генерируется отдельно, Этап 7)
@@ -63,6 +65,7 @@ User 1 — N Decision 1 — N Scenario
 | horizon | Horizon | default ONE_YEAR |
 | type | DecisionType | default DECISION |
 | status | DecisionStatus | default OPEN |
+| isPublic | Boolean | default false; публичная лента /explore |
 | tree | Json? | дерево развилок |
 | outcome | String? | факт из ревью |
 | lesson | String? | урок из ревью |
@@ -70,7 +73,18 @@ User 1 — N Decision 1 — N Scenario
 | reviewMissed | String? | |
 | createdAt, updatedAt, resolvedAt | DateTime | |
 
-**Индекс:** `@@index([userId])`
+**Индексы:** `@@index([userId])`, `@@index([isPublic, createdAt])`
+
+### DecisionLike
+
+| Поле | Тип | Примечание |
+|------|-----|------------|
+| id | UUID | PK |
+| userId | UUID | FK → User, CASCADE |
+| decisionId | UUID | FK → Decision, CASCADE |
+| createdAt | DateTime | |
+
+**Ограничения:** `@@unique([userId, decisionId])` — защита от накрутки.
 
 ### Scenario
 
@@ -125,7 +139,7 @@ User 1 — N Decision 1 — N Scenario
 |-----------------|----------|
 | User | User |
 | Prompt | **Decision** (основная сущность контента) |
-| Vote | *нет в MVP* (будущая калибровка — отдельно) |
+| Vote | **DecisionLike** (лайк публичного разбора; Vote-калибровка — отдельно) |
 | Note | удалена (smoke-тест) |
 
 ---

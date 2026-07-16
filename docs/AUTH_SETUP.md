@@ -12,7 +12,7 @@
 | Переменная | Локально | Vercel Production |
 |------------|----------|-------------------|
 | `AUTH_SECRET` | hex 64 символа | то же |
-| `AUTH_URL` | `http://localhost:3000` | `https://5-razvilka.vercel.app` |
+| `AUTH_URL` | `http://localhost:3015` | `https://5-razvilka.vercel.app` |
 | `GOOGLE_CLIENT_ID` | Google Console | то же |
 | `GOOGLE_CLIENT_SECRET` | Google Console | то же |
 | `DATABASE_URL` / `DIRECT_URL` | Neon | то же |
@@ -28,7 +28,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ## Google — redirect URIs (все три)
 
 ```text
-http://localhost:3000/api/auth/callback/google
+http://localhost:3015/api/auth/callback/google
 https://5-razvilka.vercel.app/api/auth/callback/google
 https://5-razvilka-git-main-evgenyleonovns.vercel.app/api/auth/callback/google
 ```

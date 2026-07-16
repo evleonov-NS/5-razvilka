@@ -9,9 +9,17 @@ export async function Header() {
 
   return (
     <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
-      <Link href="/" className="text-lg font-semibold tracking-tight">
-        Развилка
-      </Link>
+      <nav className="flex flex-wrap items-center gap-4">
+        <Link href="/" className="text-lg font-semibold tracking-tight">
+          Развилка
+        </Link>
+        <Link
+          href="/explore"
+          className="text-sm text-[var(--muted)] transition hover:text-[var(--foreground)]"
+        >
+          Сообщество
+        </Link>
+      </nav>
 
       {session?.user ? (
         <div className="flex items-center gap-3">

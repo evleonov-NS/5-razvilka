@@ -1,5 +1,6 @@
 import type { DecisionStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getLikedDecisionIds } from "@/lib/public-decisions";
 
 export const DECISIONS_PAGE_SIZE = 10;
 
@@ -9,6 +10,9 @@ export type DecisionListItem = {
   context: string;
   horizon: string;
   status: string;
+  isPublic: boolean;
+  likesCount: number;
+  likedByMe: boolean;
   createdAt: Date;
 };
 
@@ -57,14 +61,31 @@ export async function listUserDecisions(
         context: true,
         horizon: true,
         status: true,
+        isPublic: true,
         createdAt: true,
+        _count: { select: { likes: true } },
       },
     }),
     prisma.decision.count({ where }),
   ]);
 
+  const likedIds = await getLikedDecisionIds(
+    userId,
+    items.map((item) => item.id),
+  );
+
   return {
-    items,
+    items: items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      context: item.context,
+      horizon: item.horizon,
+      status: item.status,
+      isPublic: item.isPublic,
+      likesCount: item._count.likes,
+      likedByMe: likedIds.has(item.id),
+      createdAt: item.createdAt,
+    })),
     total,
     page,
     pageSize: DECISIONS_PAGE_SIZE,

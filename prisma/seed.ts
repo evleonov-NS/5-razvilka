@@ -3,6 +3,7 @@ import { PrismaClient, ScenarioKind, Likelihood } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.decisionLike.deleteMany();
   await prisma.failureMode.deleteMany();
   await prisma.scenario.deleteMany();
   await prisma.decision.deleteMany();
@@ -23,6 +24,7 @@ async function main() {
     data: {
       userId: user.id,
       title: "Сменить работу в течение года",
+      isPublic: true,
       context:
         "Работаю на текущем месте, но чувствую потолок по развитию и доходу. " +
         "Есть страх потерять стабильность. Семья и финансовые обязательства. " +

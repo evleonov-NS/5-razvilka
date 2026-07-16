@@ -8,6 +8,7 @@ import {
   Clock,
   CheckCircle,
   Settings,
+  Users,
 } from "lucide-react";
 import { SignOutButton } from "@/components/SignOutButton";
 
@@ -21,6 +22,7 @@ const NAV = [
   { href: "/cabinet", label: "Журнал", icon: GitBranch, exact: true },
   { href: "/cabinet/open", label: "Открытые", icon: Clock, exact: false },
   { href: "/cabinet/resolved", label: "Решённые", icon: CheckCircle, exact: false },
+  { href: "/explore", label: "Сообщество", icon: Users, exact: false },
   { href: "/cabinet/settings", label: "Настройки", icon: Settings, exact: false },
 ] as const;
 
