@@ -3,7 +3,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getCabinetCounts } from "@/lib/cabinet-counts";
 import { CabinetShell } from "@/components/cabinet/CabinetShell";
 
-export default async function CabinetLayout({
+/** Форма и результат — тот же сайдбар, без скачка вёрстки. */
+export default async function DecisionsLayout({
   children,
 }: {
   children: React.ReactNode;

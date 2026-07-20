@@ -63,35 +63,38 @@ export async function CabinetJournal({
   const isPristineJournal = section === "journal" && isEmpty && !q;
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8 md:px-8 md:py-10">
-        <header className="mb-8">
-          <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text md:text-3xl">
-            {meta.title}
-          </h1>
-          <p className="mt-2 text-sm text-text-muted">{meta.description}</p>
-        </header>
-
+    <div className="flex flex-1 flex-col bg-bg text-text">
+      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
+        {/* Пустой журнал — без дубля «Журнал» / «С чего начнём?» */}
         {!isPristineJournal ? (
-          <div className="mb-6 flex flex-wrap items-center gap-3">
-            {showSearch ? (
-              <Suspense
-                fallback={
-                  <div className="h-10 max-w-md flex-1 rounded-md bg-surface-2" />
-                }
+          <>
+            <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text md:text-3xl">
+                  {meta.title}
+                </h1>
+                <p className="mt-2 text-sm text-text-muted">{meta.description}</p>
+              </div>
+              <Link
+                href="/decisions/new"
+                className={`inline-flex h-10 w-full shrink-0 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 sm:w-auto ${landingFocus}`}
               >
-                <DecisionSearchInput />
-              </Suspense>
-            ) : (
-              <div className="flex-1" />
-            )}
-            <Link
-              href="/decisions/new"
-              className={`inline-flex h-10 shrink-0 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 ${landingFocus}`}
-            >
-              Новое решение
-            </Link>
-          </div>
+                Новое решение
+              </Link>
+            </header>
+
+            {showSearch ? (
+              <div className="mb-6">
+                <Suspense
+                  fallback={
+                    <div className="h-10 max-w-md rounded-md bg-surface-2" />
+                  }
+                >
+                  <DecisionSearchInput />
+                </Suspense>
+              </div>
+            ) : null}
+          </>
         ) : null}
 
         {isPristineJournal ? (
@@ -102,15 +105,15 @@ export async function CabinetJournal({
           </p>
         ) : isEmpty && section === "open" ? (
           <FilterEmptyState
+            variant="open"
             title="Пока нет открытых разборов"
-            description="Здесь будут решения, исход которых ещё не известен."
-            hint="Открытым считается решение, пока вы не отметили, что вышло по факту."
+            description="Решение считается открытым, пока вы не отметили, что вышло по факту."
           />
         ) : isEmpty && section === "resolved" ? (
           <FilterEmptyState
+            variant="resolved"
             title="Пока нет разборов с исходом"
-            description="Здесь появятся решения с известным исходом."
-            hint="Когда отметите факт, сервис сверит его с прогнозом и выделит один урок."
+            description="Когда отметите факт, сервис сверит его с прогнозом и выделит один урок."
           />
         ) : isEmpty ? (
           <JournalEmptyState />
@@ -138,7 +141,7 @@ export async function CabinetJournal({
       </div>
 
       <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
-        v{versionLabel}
+        <div className="mx-auto w-full max-w-4xl">v{versionLabel}</div>
       </footer>
     </div>
   );

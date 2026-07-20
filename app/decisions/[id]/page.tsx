@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { versionLabel } from "@/lib/version";
@@ -15,7 +15,7 @@ type PageProps = {
 export default async function DecisionDetailPage({ params }: PageProps) {
   const user = await getCurrentUser();
   if (!user) {
-    redirect("/login");
+    notFound();
   }
 
   const { id } = await params;
@@ -44,8 +44,8 @@ export default async function DecisionDetailPage({ params }: PageProps) {
     : null;
 
   return (
-    <div className="min-h-screen bg-bg text-text">
-      <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-6 py-10 md:px-8 md:py-12">
+    <div className="flex flex-1 flex-col bg-bg text-text">
+      <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-8 md:px-8 md:py-10">
         <Link
           href="/cabinet"
           className={`mb-8 inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-text ${landingFocus}`}
@@ -81,8 +81,8 @@ export default async function DecisionDetailPage({ params }: PageProps) {
         ) : null}
 
         <p className="mt-4 text-sm text-text-muted">
-          Экран результата (сценарии, pre-mortem, дерево) — следующий этап. Карточка
-          решения уже в журнале.
+          Экран результата (сценарии, pre-mortem, дерево) — следующий этап.
+          Карточка решения уже в журнале.
         </p>
 
         <div className="mt-8 rounded-lg border border-border bg-surface px-6 py-12 text-center">
@@ -91,12 +91,18 @@ export default async function DecisionDetailPage({ params }: PageProps) {
             Здесь появятся три сценария, pre-mortem и дерево развилок — после
             подключения LLM-слоя.
           </p>
+          <Link
+            href="/demo"
+            className={`mt-6 inline-block text-sm text-accent-ink hover:underline ${landingFocus}`}
+          >
+            Посмотреть пример целиком
+          </Link>
         </div>
-
-        <footer className="mt-auto pt-12 text-sm text-text-muted">
-          v{versionLabel}
-        </footer>
       </div>
+
+      <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
+        <div className="mx-auto w-full max-w-2xl">v{versionLabel}</div>
+      </footer>
     </div>
   );
 }

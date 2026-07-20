@@ -20,8 +20,8 @@ export async function ExploreDetail({ decision }: Props) {
   const resolved = decision.status === "RESOLVED";
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8 md:px-8 md:py-10">
+    <div className="flex flex-1 flex-col bg-bg text-text">
+      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
         <Link
           href="/explore"
           className={`mb-6 inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-text ${landingFocus}`}

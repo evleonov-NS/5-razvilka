@@ -16,6 +16,10 @@ export function DecisionCard({ decision }: { decision: DecisionListItem }) {
     decision.context.split(/\n/)[0]?.trim() ||
     "";
 
+  const hints: string[] = [];
+  if (!decision.hasTree) hints.push("Дерево не построено");
+  if (!decision.hasOutcome) hints.push("Исход не отмечен");
+
   return (
     <article className="group relative rounded-lg border border-border bg-surface p-5 transition-colors hover:border-border-strong">
       <Link
@@ -57,6 +61,10 @@ export function DecisionCard({ decision }: { decision: DecisionListItem }) {
 
         {preview ? (
           <p className="mt-3 line-clamp-1 text-sm text-text-muted">{preview}</p>
+        ) : null}
+
+        {hints.length > 0 ? (
+          <p className="mt-2 text-xs text-text-faint">{hints.join(" · ")}</p>
         ) : null}
       </div>
 

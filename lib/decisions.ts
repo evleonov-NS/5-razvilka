@@ -16,6 +16,8 @@ export type DecisionListItem = {
   likedByMe: boolean;
   /** Первая строка базового сценария, если есть. */
   baseScenarioPreview: string | null;
+  hasTree: boolean;
+  hasOutcome: boolean;
   createdAt: Date;
 };
 
@@ -67,6 +69,8 @@ export async function listUserDecisions(
         status: true,
         isPublic: true,
         createdAt: true,
+        tree: true,
+        outcome: true,
         _count: { select: { likes: true } },
         scenarios: {
           where: { kind: "BASE" },
@@ -95,6 +99,8 @@ export async function listUserDecisions(
       likesCount: item._count.likes,
       likedByMe: likedIds.has(item.id),
       baseScenarioPreview: item.scenarios[0]?.narrative ?? null,
+      hasTree: item.tree != null,
+      hasOutcome: Boolean(item.outcome) || item.status === "RESOLVED",
       createdAt: item.createdAt,
     })),
     total,

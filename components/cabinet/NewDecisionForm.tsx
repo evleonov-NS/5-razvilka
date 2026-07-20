@@ -34,6 +34,7 @@ type Props = {
 export function NewDecisionForm({ presetId }: Props) {
   const router = useRouter();
   const preset = useMemo(() => getPreset(presetId), [presetId]);
+  const titleRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState(preset?.title ?? "");
   const [context, setContext] = useState(preset?.context ?? "");
@@ -42,11 +43,39 @@ export function NewDecisionForm({ presetId }: Props) {
   const [generating, setGenerating] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const abortRef = useRef(false);
+  const [dirty, setDirty] = useState(false);
 
   const canSubmit = title.trim().length > 0 && context.trim().length > 0;
   const contextLen = context.trim().length;
   const contextShort = contextLen > 0 && contextLen < 80;
+
+  const missingHint = !title.trim()
+    ? !context.trim()
+      ? "Укажите название и контекст"
+      : "Укажите название"
+    : !context.trim()
+      ? "Опишите контекст"
+      : null;
+
+  // Автофокус только без пресета
+  useEffect(() => {
+    if (!preset) {
+      titleRef.current?.focus();
+    }
+  }, [preset]);
+
+  // beforeunload при реальных правках
+  useEffect(() => {
+    if (!dirty || generating) return;
+
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty, generating]);
 
   useEffect(() => {
     if (!generating) return;
@@ -60,6 +89,10 @@ export function NewDecisionForm({ presetId }: Props) {
     return () => window.clearInterval(id);
   }, [generating]);
 
+  function markDirty() {
+    if (!dirty) setDirty(true);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit || generating) return;
@@ -67,7 +100,6 @@ export function NewDecisionForm({ presetId }: Props) {
     setError(null);
     setGenerating(true);
     setStepIndex(0);
-    abortRef.current = false;
     const started = Date.now();
 
     try {
@@ -95,19 +127,16 @@ export function NewDecisionForm({ presetId }: Props) {
         throw new Error("Сервер не вернул идентификатор решения");
       }
 
-      // Дождаться минимума ожидания, чтобы шаги не мелькали
       const elapsed = Date.now() - started;
       if (elapsed < MIN_WAIT_MS) {
         await new Promise((r) => setTimeout(r, MIN_WAIT_MS - elapsed));
       }
 
-      if (abortRef.current) return;
-
+      setDirty(false);
       setStepIndex(GEN_STEPS.length - 1);
       router.push(`/decisions/${body.id}`);
       router.refresh();
     } catch (err) {
-      if (abortRef.current) return;
       setError(err instanceof Error ? err.message : "Ошибка запроса");
       setGenerating(false);
     }
@@ -121,7 +150,7 @@ export function NewDecisionForm({ presetId }: Props) {
             Готовим разбор
           </h2>
           <p className="mt-2 text-sm text-text-muted">
-            Обычно это занимает полминуты. Не закрывайте страницу.
+            Не закрывайте страницу — шаги ниже показывают ход ожидания.
           </p>
         </div>
 
@@ -158,11 +187,14 @@ export function NewDecisionForm({ presetId }: Props) {
           })}
         </ol>
 
-        <ul className="grid gap-4 md:grid-cols-3" aria-hidden="true">
+        <ul
+          className="grid grid-cols-1 gap-4 md:grid-cols-3"
+          aria-hidden="true"
+        >
           {["Оптимистичный", "Базовый", "Пессимистичный"].map((label) => (
             <li
               key={label}
-              className="rounded-lg border border-border bg-surface p-4"
+              className="min-h-[140px] rounded-lg border border-border bg-surface p-4"
             >
               <div className="h-4 w-24 animate-pulse rounded bg-surface-2" />
               <div className="mt-3 h-3 w-12 animate-pulse rounded bg-surface-2" />
@@ -191,10 +223,14 @@ export function NewDecisionForm({ presetId }: Props) {
           Название
         </label>
         <input
+          ref={titleRef}
           id="title"
           name="title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            markDirty();
+          }}
           placeholder="Например: сменить работу в течение года"
           className={`mt-2 h-12 w-full rounded-md border border-border bg-surface px-4 text-base text-text outline-none transition placeholder:text-text-faint focus:border-accent-ink ${landingFocus}`}
           autoComplete="off"
@@ -209,18 +245,26 @@ export function NewDecisionForm({ presetId }: Props) {
           id="context"
           name="context"
           value={context}
-          onChange={(e) => setContext(e.target.value)}
+          onChange={(e) => {
+            setContext(e.target.value);
+            markDirty();
+          }}
           rows={8}
           className={`mt-2 min-h-[180px] w-full resize-y rounded-md border border-border bg-surface px-4 py-3 text-base leading-relaxed text-text outline-none transition placeholder:text-text-faint focus:border-accent-ink ${landingFocus}`}
           placeholder="Кратко опишите ситуацию своими словами"
         />
-        <p className="mt-2 text-sm text-text-muted">
-          Что происходит сейчас, что вас держит, чего опасаетесь, какие есть
-          ограничения.
-        </p>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-2">
+          <p className="max-w-[48ch] text-sm text-text-muted">
+            Что происходит сейчас, что вас держит, чего опасаетесь, какие есть
+            ограничения.
+          </p>
+          <p className="shrink-0 tabular-nums text-xs text-text-faint">
+            {contextLen} символов
+          </p>
+        </div>
         {contextShort ? (
-          <p className="mt-1 text-sm text-accent-ink">
-            Коротковато, добавьте деталей — разбор будет точнее
+          <p className="mt-1 text-sm text-text-muted">
+            Коротковато, добавьте деталей: разбор будет точнее
           </p>
         ) : null}
       </div>
@@ -234,7 +278,10 @@ export function NewDecisionForm({ presetId }: Props) {
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => setHorizon(opt.value)}
+                onClick={() => {
+                  setHorizon(opt.value);
+                  markDirty();
+                }}
                 aria-pressed={active}
                 className={`h-10 rounded-md border text-sm transition-colors ${landingFocus} ${
                   active
@@ -258,7 +305,10 @@ export function NewDecisionForm({ presetId }: Props) {
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => setType(opt.value)}
+                onClick={() => {
+                  setType(opt.value);
+                  markDirty();
+                }}
                 aria-pressed={active}
                 className={`h-10 rounded-md border text-sm transition-colors ${landingFocus} ${
                   active
@@ -276,15 +326,13 @@ export function NewDecisionForm({ presetId }: Props) {
       <div>
         <button
           type="submit"
-          disabled={!canSubmit}
-          className={`flex h-12 w-full items-center justify-center rounded-md bg-accent px-6 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto sm:min-w-[220px] ${landingFocus}`}
+          disabled={!canSubmit || generating}
+          className={`flex h-12 w-full items-center justify-center rounded-md bg-accent px-6 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[220px] ${landingFocus}`}
         >
           Разобрать
         </button>
-        {!canSubmit ? (
-          <p className="mt-2 text-sm text-text-muted">
-            Заполните название и контекст, чтобы продолжить.
-          </p>
+        {missingHint ? (
+          <p className="mt-2 text-sm text-text-muted">{missingHint}</p>
         ) : null}
         {error ? (
           <div className="mt-4 rounded-md border border-border bg-surface-2 p-4">

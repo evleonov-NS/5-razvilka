@@ -1,4 +1,4 @@
-/** Призрачное превью разбора — показать форму результата, не реальные данные. */
+/** Призрачное превью разбора — декорация, не реальные данные. */
 
 type Likelihood = "LOW" | "MEDIUM" | "HIGH";
 
@@ -35,37 +35,43 @@ const likelihoodClass: Record<Likelihood, string> = {
 
 export function GhostResultPreview() {
   return (
-    <div className="pointer-events-none relative mt-12 select-none" aria-hidden="true">
+    <div
+      className="pointer-events-none mt-14 w-full min-w-0 select-none"
+      aria-hidden="true"
+    >
       <p className="mb-4 text-xs uppercase tracking-wider text-text-faint">
         Так выглядит готовый разбор
       </p>
 
-      <ul className="grid gap-4 opacity-60 md:grid-cols-3">
-        {scenarios.map((s) => (
-          <li
-            key={s.label}
-            className="rounded-lg border border-border bg-surface p-4"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="text-sm font-medium text-text">{s.label}</h3>
-              <span
-                className={`inline-block shrink-0 rounded border px-2 py-0.5 text-[10px] uppercase tracking-wider ${likelihoodClass[s.likelihood]}`}
-              >
-                {s.likelihood}
-              </span>
-            </div>
-            <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-text-muted">
-              {s.narrative}
-            </p>
-          </li>
-        ))}
-      </ul>
+      {/* relative только у сетки — градиент не залезает на ссылку под превью */}
+      <div className="relative">
+        <ul className="grid grid-cols-1 gap-4 opacity-60 md:grid-cols-3 md:items-stretch">
+          {scenarios.map((s) => (
+            <li key={s.label} className="min-w-0">
+              <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="min-w-0 text-sm font-medium leading-snug text-text">
+                    {s.label}
+                  </h3>
+                  <span
+                    className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${likelihoodClass[s.likelihood]}`}
+                  >
+                    {s.likelihood}
+                  </span>
+                </div>
+                <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-text-muted">
+                  {s.narrative}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-      {/* Мягкое затухание к фону снизу */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg to-transparent"
-        aria-hidden="true"
-      />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-bg to-transparent"
+          aria-hidden="true"
+        />
+      </div>
     </div>
   );
 }

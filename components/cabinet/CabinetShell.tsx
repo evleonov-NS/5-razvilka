@@ -10,6 +10,7 @@ import {
 } from "react";
 import { CabinetSidebar } from "@/components/cabinet/CabinetSidebar";
 import { landingFocus } from "@/components/landing/landingLayout";
+import type { CabinetCounts } from "@/lib/cabinet-counts";
 
 type CabinetUser = {
   name: string | null;
@@ -19,18 +20,21 @@ type CabinetUser = {
 
 type Props = {
   user: CabinetUser;
+  counts?: CabinetCounts;
   children: ReactNode;
 };
 
-/** Оболочка кабинета: сайдбар + мобильный drawer. */
-export function CabinetShell({ user, children }: Props) {
+/**
+ * Оболочка кабинета: sticky-сайдбар (не app-shell со своим скроллом).
+ * На корне НЕТ overflow — иначе sticky липнет к предку, а не к окну.
+ */
+export function CabinetShell({ user, counts, children }: Props) {
   const [open, setOpen] = useState(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
 
   const close = useCallback(() => {
     setOpen(false);
-    // Фокус обратно на бургер после закрытия drawer
     requestAnimationFrame(() => burgerRef.current?.focus());
   }, []);
 
@@ -54,8 +58,7 @@ export function CabinetShell({ user, children }: Props) {
   }, [open, close]);
 
   return (
-    <div className="flex min-h-screen bg-bg text-text">
-      {/* Мобильная шапка */}
+    <div className="flex min-h-dvh bg-bg text-text">
       <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-bg px-4 md:hidden">
         <button
           ref={burgerRef}
@@ -86,7 +89,6 @@ export function CabinetShell({ user, children }: Props) {
         </span>
       </header>
 
-      {/* Overlay */}
       {open ? (
         <button
           type="button"
@@ -98,12 +100,14 @@ export function CabinetShell({ user, children }: Props) {
 
       <CabinetSidebar
         user={user}
+        counts={counts}
         open={open}
         panelId={titleId}
         onNavigate={close}
       />
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col pt-14 md:pt-0">
+      {/* min-h-dvh + flex-col: страница заполняет высоту, подвал уезжает вниз */}
+      <div className="flex min-h-dvh min-w-0 flex-1 flex-col pt-14 md:pt-0">
         {children}
       </div>
     </div>

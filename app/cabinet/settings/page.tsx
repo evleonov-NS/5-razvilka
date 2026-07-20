@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SignOutButton } from "@/components/SignOutButton";
+import { ProfileAvatar } from "@/components/cabinet/ProfileAvatar";
 import { versionLabel } from "@/lib/version";
 
 export default async function CabinetSettingsPage() {
@@ -14,8 +14,8 @@ export default async function CabinetSettingsPage() {
   const displayName = user.name ?? user.email.split("@")[0];
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8 md:px-8 md:py-10">
+    <div className="flex flex-1 flex-col bg-bg text-text">
+      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
         <header className="mb-8">
           <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text md:text-3xl">
             Настройки
@@ -30,19 +30,7 @@ export default async function CabinetSettingsPage() {
             <h2 className="text-sm font-medium text-text">Профиль</h2>
             <p className="mt-1 text-xs text-text-faint">Только чтение · Google</p>
             <div className="mt-4 flex items-center gap-3">
-              {user.image ? (
-                <Image
-                  src={user.image}
-                  alt=""
-                  width={48}
-                  height={48}
-                  className="rounded-full ring-1 ring-border"
-                />
-              ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-base font-semibold text-accent-ink">
-                  {displayName.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <ProfileAvatar name={displayName} image={user.image} size={48} />
               <div className="min-w-0">
                 <p className="truncate font-medium text-text">{displayName}</p>
                 <p className="truncate text-sm text-text-muted">{user.email}</p>
@@ -69,7 +57,7 @@ export default async function CabinetSettingsPage() {
       </div>
 
       <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
-        v{versionLabel}
+        <div className="mx-auto w-full max-w-4xl">v{versionLabel}</div>
       </footer>
     </div>
   );
