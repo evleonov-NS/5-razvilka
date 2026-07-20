@@ -1,12 +1,23 @@
 import Link from "next/link";
 import { ForkHeroSvg } from "@/components/landing/ForkHeroSvg";
+import {
+  landingContainer,
+  landingFocus,
+} from "@/components/landing/landingLayout";
+
+const branchLabels = [
+  { name: "Оптимистичный", likelihood: "LOW", pos: "left-[2%] top-[2%]" },
+  { name: "Базовый", likelihood: "HIGH", pos: "left-1/2 top-0 -translate-x-1/2" },
+  { name: "Пессимистичный", likelihood: "MEDIUM", pos: "right-[2%] top-[2%]" },
+] as const;
 
 export function LandingHero() {
   return (
-    <section className="relative mx-auto grid w-full max-w-5xl gap-12 px-6 pb-20 pt-10 sm:pb-28 sm:pt-16 lg:grid-cols-[1fr_minmax(240px,320px)] lg:items-center lg:gap-16">
-      {/* фоновый мотив ветвей */}
+    <section
+      className={`relative ${landingContainer} grid items-center gap-12 pt-20 pb-16 md:pt-28 md:pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16`}
+    >
       <svg
-        className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-[var(--landing-line)] opacity-40"
+        className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-border opacity-60"
         viewBox="0 0 800 480"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -33,38 +44,51 @@ export function LandingHero() {
       </svg>
 
       <div>
-        <h1 className="font-[family-name:var(--font-landing-serif)] text-5xl leading-[1.05] tracking-tight text-[var(--landing-fg)] sm:text-6xl lg:text-7xl">
+        <h1 className="font-[family-name:var(--font-landing-serif)] text-6xl leading-[0.95] tracking-tight text-text md:text-7xl lg:text-8xl">
           Развилка
         </h1>
-        <p className="mt-5 max-w-[28rem] font-[family-name:var(--font-landing-serif)] text-xl leading-snug text-[var(--landing-accent)] sm:text-2xl">
+        <p className="mt-3 max-w-[62ch] font-[family-name:var(--font-landing-serif)] text-xl text-accent-ink md:text-2xl">
           Посмотри, куда ведёт каждый выбор
         </p>
-        <p className="mt-6 max-w-[36ch] text-base leading-relaxed text-[var(--landing-muted)] sm:text-lg">
+        <p className="mt-6 max-w-[62ch] text-base leading-relaxed text-text-muted">
           Опиши решение или привычку — увидишь сценарии будущего, узнаешь, где всё
           может сломаться, и что сделать уже сейчас, чтобы этого избежать.
         </p>
 
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href="/register"
-            className="inline-flex justify-center rounded-md bg-[var(--landing-accent)] px-6 py-3 text-sm font-medium text-[var(--landing-accent-fg)] transition-colors duration-200 hover:bg-[var(--landing-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--landing-accent)]"
+            className={`inline-flex h-12 items-center justify-center rounded-md bg-accent px-6 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 ${landingFocus}`}
           >
             Разобрать решение
           </Link>
           <Link
             href="/login"
-            className="inline-flex justify-center rounded-md border border-[var(--landing-border)] px-6 py-3 text-sm text-[var(--landing-fg)] transition-colors duration-200 hover:border-[var(--landing-muted)] hover:bg-[var(--landing-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--landing-accent)]"
+            className={`inline-flex h-12 items-center justify-center rounded-md border border-border px-6 text-sm text-text transition-colors hover:border-border-strong hover:bg-surface ${landingFocus}`}
           >
             Войти
           </Link>
         </div>
-        <p className="mt-4 text-sm text-[var(--landing-muted)]">
+        <p className="mt-4 text-xs uppercase tracking-wider text-text-faint">
           Первый разбор — бесплатно.
         </p>
       </div>
 
-      <div className="flex justify-center lg:justify-end">
-        <ForkHeroSvg className="h-56 w-auto text-[var(--landing-accent)] sm:h-64 lg:h-72" />
+      <div className="relative w-full">
+        <ForkHeroSvg className="h-auto w-full text-accent" />
+        {branchLabels.map((label) => (
+          <div
+            key={label.name}
+            className={`absolute ${label.pos} flex flex-col gap-1`}
+          >
+            <span className="text-xs uppercase tracking-wider text-text">
+              {label.name}
+            </span>
+            <span className="text-xs uppercase tracking-wider text-accent-ink">
+              {label.likelihood}
+            </span>
+          </div>
+        ))}
       </div>
     </section>
   );

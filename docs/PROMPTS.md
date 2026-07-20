@@ -259,6 +259,28 @@ PATCH visibility (владелец), лента app/explore с sort=popular|rece
 - npm run build; обновить CHANGELOG, STATUS, DECISIONS (маршрут `/`), сохранить промпт в PROMPTS.md.
 ```
 
+### Промпт — лендинг: геометрия + система тем (B–F)
+
+```text
+Доработай лендинг «Развилка»: геометрия (раздел A — отдельно) и корректная система светлой/тёмной тем.
+
+РАЗДЕЛ B. Архитектура тем
+- Никаких dark: префиксов. Семантические CSS-переменные.
+- Два токена акцента: --accent (заливка) и --accent-ink (текст); --accent-contrast на кнопке.
+- Токены :root/.light и .dark по спецификации; darkMode: 'class'; Tailwind colors → var(--*).
+
+РАЗДЕЛ C. Переключатель
+- FOUC-скрипт в <head>, suppressHydrationWarning на <html>, localStorage 'theme'.
+- components/ThemeToggle.tsx — единственный client на лендинге; без мерцания (theme-switching).
+- 40x40, слева от «Войти».
+
+РАЗДЕЛ D–F. Светлая тема: border-border, bg-surface, CTA bg-accent + text-accent-contrast,
+accent-ink для текста, SVG через currentColor; метки LOW/MEDIUM/HIGH по насыщенности акцента
+(не красный/зелёный); контраст ≥4.5:1; elevate-card тень только в .light.
+
+После: build, CHANGELOG, STATUS, ADR про токены и accent/accent-ink, промпт в PROMPTS.md.
+```
+
 ---
 
 ## B. Системные промпты LLM (генерация)

@@ -3,19 +3,20 @@ import Image from "next/image";
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/SignOutButton";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export async function Header() {
   const session = await auth();
 
   return (
-    <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
+    <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
       <nav className="flex flex-wrap items-center gap-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
+        <Link href="/" className="text-lg font-semibold tracking-tight text-text">
           Развилка
         </Link>
         <Link
           href="/explore"
-          className="text-sm text-[var(--muted)] transition hover:text-[var(--foreground)]"
+          className="text-sm text-text-muted transition hover:text-text"
         >
           Сообщество
         </Link>
@@ -23,6 +24,7 @@ export async function Header() {
 
       {session?.user ? (
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           {session.user.image ? (
             <Image
               src={session.user.image}
@@ -32,13 +34,14 @@ export async function Header() {
               className="rounded-full"
             />
           ) : null}
-          <span className="text-sm text-[var(--muted)]">
+          <span className="text-sm text-text-muted">
             {session.user.name ?? session.user.email}
           </span>
           <SignOutButton />
         </div>
       ) : (
-        <div className="w-full max-w-xs sm:w-auto">
+        <div className="flex w-full max-w-xs items-center gap-3 sm:w-auto">
+          <ThemeToggle />
           <GoogleSignInButton />
         </div>
       )}

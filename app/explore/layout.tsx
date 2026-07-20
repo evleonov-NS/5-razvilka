@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { CabinetSidebar } from "@/components/cabinet/CabinetSidebar";
 import { ExploreGuestBar } from "@/components/explore/ExploreGuestBar";

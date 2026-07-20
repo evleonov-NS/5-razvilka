@@ -1,28 +1,33 @@
 import Link from "next/link";
+import {
+  landingContainer,
+  landingFocus,
+} from "@/components/landing/landingLayout";
 import { versionLabel } from "@/lib/version";
 
 export function LandingFooter() {
   return (
-    <footer className="mx-auto w-full max-w-5xl border-t border-[var(--landing-border)] px-6 py-10">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="font-[family-name:var(--font-landing-serif)] text-lg text-[var(--landing-fg)]">
+    <footer className={`${landingContainer} border-t border-border py-8`}>
+      <div className="flex flex-col gap-4 text-sm md:flex-row md:items-center md:justify-between">
+        <p className="text-text-muted">
+          <span className="font-[family-name:var(--font-landing-serif)] text-text">
             Развилка
-          </p>
-          <p className="mt-1 text-sm text-[var(--landing-muted)]">
-            v{versionLabel}
-          </p>
-        </div>
-        <nav className="flex gap-5 text-sm" aria-label="Ссылки в футере">
+          </span>
+          <span className="mx-2 text-text-faint" aria-hidden="true">
+            ·
+          </span>
+          <span>v{versionLabel}</span>
+        </p>
+        <nav className="flex gap-5" aria-label="Ссылки в футере">
           <Link
             href="/login"
-            className="text-[var(--landing-muted)] transition-colors duration-200 hover:text-[var(--landing-fg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--landing-accent)]"
+            className={`text-text-muted transition-colors hover:text-text ${landingFocus}`}
           >
             Войти
           </Link>
           <Link
             href="/register"
-            className="text-[var(--landing-muted)] transition-colors duration-200 hover:text-[var(--landing-fg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--landing-accent)]"
+            className={`text-text-muted transition-colors hover:text-text ${landingFocus}`}
           >
             Регистрация
           </Link>

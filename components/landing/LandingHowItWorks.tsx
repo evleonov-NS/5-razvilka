@@ -1,3 +1,9 @@
+import {
+  landingH2,
+  landingLead,
+  landingSection,
+} from "@/components/landing/landingLayout";
+
 const steps = [
   {
     n: "01",
@@ -18,65 +24,57 @@ const steps = [
 
 export function LandingHowItWorks() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">
-      <h2 className="font-[family-name:var(--font-landing-serif)] text-3xl tracking-tight text-[var(--landing-fg)] sm:text-4xl">
-        Как это работает
-      </h2>
-      <p className="mt-4 max-w-[40ch] text-[var(--landing-muted)]">
+    <section className={landingSection}>
+      <h2 className={landingH2}>Как это работает</h2>
+      <p className={landingLead}>
         Три шага от описания выбора до калибровки по факту.
       </p>
 
-      <ol className="relative mt-14 space-y-0">
-        {/* линия-ветка, соединяющая шаги */}
+      <ol className="relative mt-10 space-y-10 md:mt-12">
         <svg
-          className="pointer-events-none absolute left-[1.15rem] top-3 hidden h-[calc(100%-1.5rem)] w-8 text-[var(--landing-line)] sm:block"
-          viewBox="0 0 32 400"
+          className="pointer-events-none absolute left-4 top-2 hidden h-[calc(100%-0.5rem)] w-6 text-border-strong sm:block"
+          viewBox="0 0 24 400"
           preserveAspectRatio="none"
           aria-hidden="true"
           focusable="false"
         >
           <path
-            d="M8 0 V130"
+            d="M6 0 V130"
             stroke="currentColor"
-            strokeWidth="1.25"
+            strokeWidth="0.75"
             fill="none"
           />
           <path
-            d="M8 130 C8 160 24 170 24 200"
+            d="M6 130 C6 160 18 170 18 200"
             stroke="currentColor"
-            strokeWidth="1.25"
+            strokeWidth="0.75"
             fill="none"
           />
           <path
-            d="M24 200 C24 230 8 240 8 270"
+            d="M18 200 C18 230 6 240 6 270"
             stroke="currentColor"
-            strokeWidth="1.25"
+            strokeWidth="0.75"
             fill="none"
           />
           <path
-            d="M8 270 V400"
+            d="M6 270 V400"
             stroke="currentColor"
-            strokeWidth="1.25"
+            strokeWidth="0.75"
             fill="none"
           />
         </svg>
 
         {steps.map((step) => (
-          <li
-            key={step.n}
-            className="relative flex gap-5 py-6 sm:gap-8 sm:py-8"
-          >
+          <li key={step.n} className="relative flex gap-5 sm:gap-8">
             <span
-              className="relative z-10 mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--landing-border)] bg-[var(--landing-bg)] text-xs font-medium text-[var(--landing-accent)]"
+              className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-bg text-sm tabular-nums text-accent-ink"
               aria-hidden="true"
             >
               {step.n}
             </span>
             <div>
-              <h3 className="text-lg font-medium text-[var(--landing-fg)]">
-                {step.title}
-              </h3>
-              <p className="mt-2 max-w-[42ch] text-sm leading-relaxed text-[var(--landing-muted)]">
+              <h3 className="text-lg font-medium text-text">{step.title}</h3>
+              <p className="mt-2 max-w-[62ch] text-base leading-relaxed text-text-muted">
                 {step.body}
               </p>
             </div>

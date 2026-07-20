@@ -16,19 +16,13 @@ export function LandingPage() {
     <LandingShell>
       <main>
         <LandingHero />
-        <BranchDivider />
         <LandingProblem />
-        <BranchDivider />
         <LandingHowItWorks />
-        <BranchDivider />
         <LandingFeatures />
         <BranchDivider />
         <LandingExample />
-        <BranchDivider />
         <LandingHonesty />
-        <BranchDivider />
         <LandingAudience />
-        <BranchDivider />
         <LandingFaq />
         <BranchDivider />
         <LandingCta />

@@ -1,17 +1,14 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingThemeProvider } from "@/components/landing/LandingThemeProvider";
 
-/** Клиентская оболочка лендинга: шапка и тема в одном дереве. */
+/** Оболочка лендинга: тема на <html>, здесь только разметка. */
 export function LandingShell({ children }: { children: ReactNode }) {
   return (
-    <LandingThemeProvider>
+    <div className="bg-bg text-text">
       <LandingHeader />
       {children}
       <LandingFooter />
-    </LandingThemeProvider>
+    </div>
   );
 }

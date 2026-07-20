@@ -13,7 +13,8 @@
 |---------|--------|-------------|
 | Доменная схема Prisma | ✅ Готово | User, Decision, Scenario, FailureMode |
 | Auth (Google OAuth) | ✅ Готово | Auth.js v5, local + Vercel; `/login`, `/register` |
-| Гостевой лендинг `/` | ✅ Готово | `components/landing/*`, ADR-013 |
+| Гостевой лендинг `/` | ✅ Готово | геометрия max-w-6xl; темы ADR-014/015 |
+| Тема UI | ✅ Готово | токены + `ThemeToggle`, без FOUC |
 | Личный кабинет | ✅ Готово | `/cabinet`, журнал, удаление |
 | Социальные механики | ✅ Готово | `/explore`, лайки, isPublic |
 | view-db (dev) | ✅ Готово | `/view-db`, только локально |

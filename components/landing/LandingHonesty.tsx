@@ -1,3 +1,9 @@
+import {
+  landingH2,
+  landingLead,
+  landingSection,
+} from "@/components/landing/landingLayout";
+
 const limits = [
   "Не предсказывает будущее и не обещает точность прогноза.",
   "Не даёт готовый ответ «делай / не делай».",
@@ -7,23 +13,21 @@ const limits = [
 
 export function LandingHonesty() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">
-      <div className="max-w-2xl border-l-2 border-[var(--landing-accent)] pl-6 sm:pl-8">
-        <h2 className="font-[family-name:var(--font-landing-serif)] text-3xl tracking-tight text-[var(--landing-fg)] sm:text-4xl">
-          Честная рамка
-        </h2>
-        <p className="mt-5 max-w-[42ch] text-base leading-relaxed text-[var(--landing-muted)]">
+    <section className={landingSection}>
+      <div className="border-l-2 border-accent pl-6 md:pl-8">
+        <h2 className={landingH2}>Честная рамка</h2>
+        <p className={`${landingLead} mt-3`}>
           Развилка раскладывает варианты и риски. Это инструмент мышления, а не
           оракул и не замена профессиональной экспертизы.
         </p>
-        <ul className="mt-8 space-y-3">
+        <ul className="mt-10 space-y-3 md:mt-12">
           {limits.map((line) => (
             <li
               key={line}
-              className="flex gap-3 text-sm leading-relaxed text-[var(--landing-fg)]"
+              className="flex max-w-[62ch] gap-3 text-base leading-relaxed text-text"
             >
               <span
-                className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[var(--landing-accent)]"
+                className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-accent"
                 aria-hidden="true"
               />
               {line}

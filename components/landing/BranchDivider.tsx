@@ -1,31 +1,34 @@
-/** Тонкий разделитель-ветка между секциями. */
+/** Разделитель-ветка: длиннее, тоньше, по левому краю контейнера. */
 export function BranchDivider() {
   return (
-    <div className="mx-auto flex max-w-3xl justify-center px-6 py-2" aria-hidden="true">
+    <div
+      className="mx-auto w-full max-w-6xl px-6 py-1 md:px-10"
+      aria-hidden="true"
+    >
       <svg
-        viewBox="0 0 200 24"
-        className="h-6 w-48 text-[var(--landing-line)]"
+        viewBox="0 0 420 16"
+        className="h-3.5 w-full max-w-lg text-border-strong"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         focusable="false"
       >
         <path
-          d="M10 12 H90"
+          d="M0 8 H220"
           stroke="currentColor"
-          strokeWidth="1"
+          strokeWidth="0.75"
           strokeLinecap="round"
         />
-        <circle cx="100" cy="12" r="2.5" fill="currentColor" />
+        <circle cx="228" cy="8" r="2" fill="currentColor" />
         <path
-          d="M110 12 C130 12 145 6 190 4"
+          d="M236 8 C280 8 320 3 400 1"
           stroke="currentColor"
-          strokeWidth="1"
+          strokeWidth="0.75"
           strokeLinecap="round"
         />
         <path
-          d="M110 12 C130 12 145 18 190 20"
+          d="M236 8 C280 8 320 13 400 15"
           stroke="currentColor"
-          strokeWidth="1"
+          strokeWidth="0.75"
           strokeLinecap="round"
         />
       </svg>

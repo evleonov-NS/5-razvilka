@@ -1,3 +1,10 @@
+import {
+  landingCard,
+  landingH2,
+  landingLead,
+  landingSection,
+} from "@/components/landing/landingLayout";
+
 type Likelihood = "LOW" | "MEDIUM" | "HIGH";
 
 const scenarios: {
@@ -42,9 +49,17 @@ const preMortem = [
   },
 ] as const;
 
+const likelihoodClass: Record<Likelihood, string> = {
+  LOW: "border-border text-text-muted",
+  MEDIUM: "border-accent text-accent-ink",
+  HIGH: "border-accent bg-accent/15 text-accent-ink",
+};
+
 function LikelihoodBadge({ value }: { value: Likelihood }) {
   return (
-    <span className="inline-block rounded border border-[var(--landing-border)] px-2 py-0.5 text-[11px] font-medium tracking-wide text-[var(--landing-accent)]">
+    <span
+      className={`inline-block rounded border px-2 py-0.5 text-xs uppercase tracking-wider ${likelihoodClass[value]}`}
+    >
       {value}
     </span>
   );
@@ -52,47 +67,39 @@ function LikelihoodBadge({ value }: { value: Likelihood }) {
 
 export function LandingExample() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">
-      <h2 className="font-[family-name:var(--font-landing-serif)] text-3xl tracking-tight text-[var(--landing-fg)] sm:text-4xl">
-        Пример разбора
-      </h2>
-      <p className="mt-4 max-w-[48ch] text-[var(--landing-muted)]">
+    <section className={landingSection}>
+      <h2 className={landingH2}>Пример разбора</h2>
+      <p className={landingLead}>
         Демо-кейс: «Сменить работу в течение года». Контекст — потолок по развитию и
         доходу, страх потерять стабильность, семья и обязательства.
       </p>
 
-      <ul className="mt-12 grid gap-6 lg:grid-cols-3">
+      <ul className="mt-10 grid gap-6 md:mt-12 lg:grid-cols-3">
         {scenarios.map((s) => (
-          <li
-            key={s.kind}
-            className="border border-[var(--landing-border)] bg-[var(--landing-surface)] p-5"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-medium text-[var(--landing-fg)]">
-                {s.label}
-              </h3>
+          <li key={s.kind} className={landingCard}>
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-base font-medium text-text">{s.label}</h3>
               <LikelihoodBadge value={s.likelihood} />
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-[var(--landing-muted)]">
+            <p className="mt-4 text-base leading-relaxed text-text-muted">
               {s.narrative}
             </p>
           </li>
         ))}
       </ul>
 
-      <div className="mt-10 border border-[var(--landing-border)] bg-[var(--landing-surface)] p-5 sm:p-6">
-        <h3 className="text-sm font-medium text-[var(--landing-fg)]">
+      <div className={`mt-6 ${landingCard}`}>
+        <h3 className="text-base font-medium text-text">
           Pre-mortem — почему может провалиться
         </h3>
         <ul className="mt-5 space-y-5">
           {preMortem.map((item) => (
-            <li key={item.cause} className="text-sm leading-relaxed">
-              <p className="text-[var(--landing-fg)]">
-                <span className="text-[var(--landing-accent)]">Причина.</span>{" "}
-                {item.cause}
+            <li key={item.cause} className="text-base leading-relaxed">
+              <p className="text-text">
+                <span className="text-accent-ink">Причина.</span> {item.cause}
               </p>
-              <p className="mt-2 text-[var(--landing-muted)]">
-                <span className="text-[var(--landing-fg)]">Сейчас.</span>{" "}
+              <p className="mt-2 text-text-muted">
+                <span className="text-accent-ink">Сейчас.</span>{" "}
                 {item.prevention}
               </p>
             </li>

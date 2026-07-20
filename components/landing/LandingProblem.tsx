@@ -1,3 +1,9 @@
+import {
+  landingH2,
+  landingLead,
+  landingSection,
+} from "@/components/landing/landingLayout";
+
 const theses = [
   {
     title: "Решения вслепую",
@@ -15,24 +21,17 @@ const theses = [
 
 export function LandingProblem() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">
-      <h2 className="font-[family-name:var(--font-landing-serif)] text-3xl tracking-tight text-[var(--landing-fg)] sm:text-4xl">
-        В чём проблема
-      </h2>
-      <p className="mt-4 max-w-[40ch] text-[var(--landing-muted)]">
+    <section className={landingSection}>
+      <h2 className={landingH2}>В чём проблема</h2>
+      <p className={landingLead}>
         Три причины, из‑за которых развилки остаются непрозрачными.
       </p>
-      <ul className="mt-12 grid gap-10 sm:grid-cols-3 sm:gap-8">
+      <ul className="mt-10 grid gap-8 md:mt-12 md:grid-cols-3 md:gap-6">
         {theses.map((item) => (
           <li key={item.title}>
-            <div
-              className="mb-4 h-px w-10 bg-[var(--landing-accent)]"
-              aria-hidden="true"
-            />
-            <h3 className="text-base font-medium text-[var(--landing-fg)]">
-              {item.title}
-            </h3>
-            <p className="mt-3 max-w-[32ch] text-sm leading-relaxed text-[var(--landing-muted)]">
+            <div className="mb-4 h-px w-10 bg-accent" aria-hidden="true" />
+            <h3 className="text-base font-medium text-text">{item.title}</h3>
+            <p className="mt-3 max-w-[62ch] text-base leading-relaxed text-text-muted">
               {item.body}
             </p>
           </li>

@@ -9,15 +9,16 @@
 ### Planned (MVP)
 - LLM-слой, создание решения, экран результата, дерево, ревью
 
-### Added
-- **Лендинг (редизайн):** полноценный гостевой лендинг на `/` — секции в `components/landing/*`, тёмный графит + янтарный акцент, SVG-развилка, FAQ на `<details>`, `/register` для CTA; шрифты Source Serif 4 / Source Sans 3 через `next/font`.
-- **Лендинг (ранее):** превью публичных разборов «Новые» и «Популярные» (`LandingPreviewSection`, лимит `take` в `listPublicDecisions`) — компонент сохранён, с гостевой `/` снят в пользу продуктового лендинга.
-
 ### Changed
 - **`/`:** без сессии — новый лендинг; с сессией — редирект в `/cabinet` через `getCurrentUser()` (ADR-013).
-- **Лендинг:** переключатель светлой/тёмной темы (`data-theme`, localStorage, `LandingThemeToggle`).
+- **Тема:** семантические CSS-токены (`--bg`, `--accent`, `--accent-ink`…) + класс `.dark`/`.light` на `<html>`; `ThemeToggle` без FOUC; без `dark:` в разметке (ADR-014, ADR-015).
+- **Лендинг:** геометрия max-w-6xl, ритм секций, 2 разделителя; метки LOW/MEDIUM/HIGH по насыщенности акцента.
+
+### Added
+- **Лендинг (редизайн):** полноценный гостевой лендинг на `/` — секции в `components/landing/*`, FAQ на `<details>`, `/register` для CTA; шрифты Source Serif 4 / Source Sans 3 через `next/font`.
+- **Лендинг (ранее):** превью публичных разборов (`LandingPreviewSection`) — компонент сохранён, с гостевой `/` снят.
 - **Социальные механики:** `isPublic` на Decision, `DecisionLike`, лента `/explore`, toggle лайков и публикации.
-- **Личный кабинет:** `/cabinet` (журнал, открытые, решённые), лендинг `/`, `DELETE /api/decisions/[id]`.
+- **Личный кабинет:** `/cabinet` (журнал, открытые, решённые), `DELETE /api/decisions/[id]`.
 - Компоненты кабинета, `lucide-react`, заглушки `/decisions/new`, `/decisions/[id]`.
 
 ---
