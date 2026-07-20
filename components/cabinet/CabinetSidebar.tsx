@@ -3,14 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import {
-  GitBranch,
-  Clock,
-  CheckCircle,
-  Settings,
-  Users,
-} from "lucide-react";
+import { GitBranch, Clock, CheckCircle } from "lucide-react";
 import { SignOutButton } from "@/components/SignOutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type CabinetUser = {
   name: string | null;
@@ -21,9 +17,12 @@ type CabinetUser = {
 const NAV = [
   { href: "/cabinet", label: "Журнал", icon: GitBranch, exact: true },
   { href: "/cabinet/open", label: "Открытые", icon: Clock, exact: false },
-  { href: "/cabinet/resolved", label: "Решённые", icon: CheckCircle, exact: false },
-  { href: "/explore", label: "Сообщество", icon: Users, exact: false },
-  { href: "/cabinet/settings", label: "Настройки", icon: Settings, exact: false },
+  {
+    href: "/cabinet/resolved",
+    label: "Решённые",
+    icon: CheckCircle,
+    exact: false,
+  },
 ] as const;
 
 function isActive(pathname: string, href: string, exact: boolean): boolean {
@@ -31,54 +30,90 @@ function isActive(pathname: string, href: string, exact: boolean): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function CabinetSidebar({ user }: { user: CabinetUser }) {
+type Props = {
+  user: CabinetUser;
+  open?: boolean;
+  panelId?: string;
+  onNavigate?: () => void;
+};
+
+export function CabinetSidebar({ user, open = false, panelId, onNavigate }: Props) {
   const pathname = usePathname();
   const displayName = user.name ?? user.email.split("@")[0];
 
   return (
-    <aside className="flex w-[280px] shrink-0 flex-col bg-gradient-to-b from-sky-50 to-sky-100/80 px-4 py-6">
-      <Link href="/cabinet" className="mb-8 flex items-center gap-3 px-2">
-        {user.image ? (
-          <Image
-            src={user.image}
-            alt=""
-            width={44}
-            height={44}
-            className="rounded-full ring-2 ring-white/80"
-          />
-        ) : (
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-sky-200 text-sm font-semibold text-sky-800">
-            {displayName.charAt(0).toUpperCase()}
+    <aside
+      id={panelId}
+      className={[
+        "fixed inset-y-0 left-0 z-50 flex h-screen w-64 flex-col border-r border-border bg-surface",
+        "transition-transform duration-200 ease-out md:sticky md:top-0 md:z-auto md:translate-x-0",
+        open ? "translate-x-0" : "-translate-x-full",
+      ].join(" ")}
+      aria-label="Навигация кабинета"
+    >
+      <div className="flex flex-1 flex-col px-3 py-5">
+        <Link
+          href="/"
+          onClick={onNavigate}
+          className={`mb-6 px-2 font-[family-name:var(--font-landing-serif)] text-lg tracking-tight text-text transition-colors hover:text-accent-ink ${landingFocus}`}
+        >
+          Развилка
+        </Link>
+
+        <Link
+          href="/cabinet/settings"
+          onClick={onNavigate}
+          className={`mb-6 flex items-center gap-3 rounded-md px-2 py-1 transition-colors hover:bg-surface-2 ${landingFocus}`}
+        >
+          {user.image ? (
+            <Image
+              src={user.image}
+              alt=""
+              width={40}
+              height={40}
+              className="rounded-full ring-1 ring-border"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-sm font-semibold text-accent-ink">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-text">{displayName}</p>
+            <p className="truncate text-xs text-text-muted">{user.email}</p>
           </div>
-        )}
-        <div className="min-w-0">
-          <p className="truncate font-semibold text-sky-950">{displayName}</p>
-          <p className="truncate text-xs text-sky-700/80">{user.email}</p>
+        </Link>
+
+        <nav className="flex flex-1 flex-col gap-1">
+          {NAV.map(({ href, label, icon: Icon, exact }) => {
+            const active = isActive(pathname, href, exact);
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={onNavigate}
+                className={[
+                  "relative flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
+                  landingFocus,
+                  active
+                    ? "bg-surface-2 text-text before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:bg-accent"
+                    : "text-text-muted hover:bg-surface-2/70 hover:text-text",
+                ].join(" ")}
+              >
+                <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="mt-4 space-y-3 border-t border-border pt-4">
+          <div className="flex items-center justify-between gap-2 px-1">
+            <span className="text-xs text-text-faint">Тема</span>
+            <ThemeToggle />
+          </div>
+          <SignOutButton />
         </div>
-      </Link>
-
-      <nav className="flex flex-1 flex-col gap-1">
-        {NAV.map(({ href, label, icon: Icon, exact }) => {
-          const active = isActive(pathname, href, exact);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                active
-                  ? "bg-white text-sky-900 shadow-sm"
-                  : "text-sky-800/90 hover:bg-white/60 hover:text-sky-900"
-              }`}
-            >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden />
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="mt-6 border-t border-sky-200/80 pt-4 px-2">
-        <SignOutButton />
       </div>
     </aside>
   );

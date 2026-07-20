@@ -9,7 +9,7 @@ type PageProps = {
 export default function CabinetOpenPage({ searchParams }: PageProps) {
   return (
     <CabinetJournal
-      sectionTitle="Открытые"
+      section="open"
       basePath="/cabinet/open"
       statusFilter="OPEN"
       searchParams={searchParams}

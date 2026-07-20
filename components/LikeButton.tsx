@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThumbsUp } from "lucide-react";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
   decisionId: string;
@@ -34,12 +35,16 @@ export function LikeButton({ decisionId, initialLiked, initialCount }: Props) {
       if (res.status === 401) {
         setLiked(prevLiked);
         setCount(prevCount);
-        router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+        router.push(
+          `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`,
+        );
         return;
       }
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        const body = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
         throw new Error(body?.error ?? "Не удалось поставить лайк");
       }
 
@@ -63,10 +68,10 @@ export function LikeButton({ decisionId, initialLiked, initialCount }: Props) {
         onClick={handleClick}
         disabled={loading}
         aria-pressed={liked}
-        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm transition disabled:opacity-50 ${
+        className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm transition-colors disabled:opacity-50 ${landingFocus} ${
           liked
-            ? "bg-sky-50 text-sky-700"
-            : "text-[var(--muted)] hover:bg-neutral-100 hover:text-[var(--foreground)]"
+            ? "bg-accent/15 text-accent-ink"
+            : "text-text-muted hover:bg-surface-2 hover:text-text"
         }`}
       >
         <ThumbsUp
@@ -74,7 +79,9 @@ export function LikeButton({ decisionId, initialLiked, initialCount }: Props) {
           aria-hidden
         />
         <span>{count}</span>
-        <span className="sr-only">{liked ? "Убрать лайк" : "Поставить лайк"}</span>
+        <span className="sr-only">
+          {liked ? "Убрать лайк" : "Поставить лайк"}
+        </span>
       </button>
       {error ? <span className="mt-1 text-xs text-red-600">{error}</span> : null}
     </div>

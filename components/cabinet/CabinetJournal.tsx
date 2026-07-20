@@ -1,24 +1,45 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import type { DecisionStatus } from "@prisma/client";
-import { Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { listUserDecisions } from "@/lib/decisions";
 import { versionLabel } from "@/lib/version";
 import { DecisionCard } from "@/components/cabinet/DecisionCard";
 import { DecisionPagination } from "@/components/cabinet/DecisionPagination";
 import { DecisionSearchInput } from "@/components/cabinet/DecisionSearchInput";
-import { EmptyState } from "@/components/EmptyState";
+import { FilterEmptyState } from "@/components/cabinet/FilterEmptyState";
+import { JournalEmptyState } from "@/components/cabinet/JournalEmptyState";
+import { landingFocus } from "@/components/landing/landingLayout";
+
+export type CabinetSection = "journal" | "open" | "resolved";
 
 type Props = {
-  sectionTitle: string;
+  section: CabinetSection;
   basePath: string;
   statusFilter?: DecisionStatus;
   searchParams: Promise<{ q?: string; page?: string }>;
 };
 
+const SECTION_META: Record<
+  CabinetSection,
+  { title: string; description: string }
+> = {
+  journal: {
+    title: "Журнал",
+    description: "Все ваши разборы — открытые и с известным исходом.",
+  },
+  open: {
+    title: "Открытые",
+    description: "Решения, исход которых ещё не известен.",
+  },
+  resolved: {
+    title: "Решённые",
+    description: "Разборы с отмеченным фактическим исходом.",
+  },
+};
+
 export async function CabinetJournal({
-  sectionTitle,
+  section,
   basePath,
   statusFilter,
   searchParams,
@@ -35,50 +56,71 @@ export async function CabinetJournal({
     { status: statusFilter, q, page },
   );
 
-  const emptyTitle =
-    q
-      ? "Ничего не найдено"
-      : statusFilter === "OPEN"
-        ? "Нет открытых решений"
-        : statusFilter === "RESOLVED"
-          ? "Нет решённых решений"
-          : "У вас пока нет решений";
-
-  const emptyDescription =
-    q
-      ? "Попробуйте другой запрос или сбросьте поиск."
-      : "Разберите первое решение — увидите сценарии и риски.";
+  const meta = SECTION_META[section];
+  const showSearch = total >= 5 || Boolean(q);
+  const isEmpty = items.length === 0;
+  const isSearchEmpty = isEmpty && Boolean(q);
+  const isPristineJournal = section === "journal" && isEmpty && !q;
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <div className="flex-1 px-8 py-8">
+    <div className="flex min-h-screen flex-col bg-bg text-text">
+      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8 md:px-8 md:py-10">
         <header className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight">Личный кабинет</h1>
-          <h2 className="mt-1 text-lg text-[var(--muted)]">{sectionTitle}</h2>
+          <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text md:text-3xl">
+            {meta.title}
+          </h1>
+          <p className="mt-2 text-sm text-text-muted">{meta.description}</p>
         </header>
 
-        <div className="mb-6 flex flex-wrap items-center gap-4">
-          <Suspense fallback={<div className="h-10 max-w-md flex-1 rounded-lg bg-neutral-100" />}>
-            <DecisionSearchInput />
-          </Suspense>
-          <Link
-            href="/decisions/new"
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4" aria-hidden />
-            Новое решение
-          </Link>
-        </div>
+        {!isPristineJournal ? (
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            {showSearch ? (
+              <Suspense
+                fallback={
+                  <div className="h-10 max-w-md flex-1 rounded-md bg-surface-2" />
+                }
+              >
+                <DecisionSearchInput />
+              </Suspense>
+            ) : (
+              <div className="flex-1" />
+            )}
+            <Link
+              href="/decisions/new"
+              className={`inline-flex h-10 shrink-0 items-center justify-center rounded-md bg-accent px-4 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 ${landingFocus}`}
+            >
+              Новое решение
+            </Link>
+          </div>
+        ) : null}
 
-        {items.length === 0 ? (
-          <EmptyState title={emptyTitle} description={emptyDescription} />
+        {isPristineJournal ? (
+          <JournalEmptyState />
+        ) : isSearchEmpty ? (
+          <p className="py-12 text-sm text-text-muted">
+            Ничего не найдено по запросу «{q}». Попробуйте другой запрос.
+          </p>
+        ) : isEmpty && section === "open" ? (
+          <FilterEmptyState
+            title="Пока нет открытых разборов"
+            description="Здесь будут решения, исход которых ещё не известен."
+            hint="Открытым считается решение, пока вы не отметили, что вышло по факту."
+          />
+        ) : isEmpty && section === "resolved" ? (
+          <FilterEmptyState
+            title="Пока нет разборов с исходом"
+            description="Здесь появятся решения с известным исходом."
+            hint="Когда отметите факт, сервис сверит его с прогнозом и выделит один урок."
+          />
+        ) : isEmpty ? (
+          <JournalEmptyState />
         ) : (
           <>
-            <p className="mb-4 text-sm text-[var(--muted)]">
+            <p className="mb-4 text-sm text-text-muted">
               {total === 1 ? "1 решение" : `${total} решений`}
               {q ? ` по запросу «${q}»` : ""}
             </p>
-            <ul className="flex flex-col gap-3">
+            <ul className="space-y-3">
               {items.map((decision) => (
                 <li key={decision.id}>
                   <DecisionCard decision={decision} />
@@ -95,7 +137,7 @@ export async function CabinetJournal({
         )}
       </div>
 
-      <footer className="border-t border-[var(--border)] px-8 py-4 text-sm text-[var(--muted)]">
+      <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
         v{versionLabel}
       </footer>
     </div>

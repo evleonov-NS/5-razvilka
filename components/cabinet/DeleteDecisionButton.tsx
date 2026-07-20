@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
   decisionId: string;
@@ -14,7 +15,10 @@ export function DeleteDecisionButton({ decisionId, decisionTitle }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleDelete() {
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+
     const confirmed = window.confirm(
       `Удалить решение «${decisionTitle}»? Это действие нельзя отменить.`,
     );
@@ -44,13 +48,15 @@ export function DeleteDecisionButton({ decisionId, decisionTitle }: Props) {
         onClick={handleDelete}
         disabled={loading}
         title="Удалить"
-        className="rounded-lg p-2 text-[var(--muted)] transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+        className={`rounded-md p-2 text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 disabled:opacity-50 ${landingFocus}`}
       >
         <Trash2 className="h-4 w-4" aria-hidden />
         <span className="sr-only">Удалить</span>
       </button>
       {error ? (
-        <span className="mt-1 max-w-[10rem] text-right text-xs text-red-600">{error}</span>
+        <span className="mt-1 max-w-[10rem] text-right text-xs text-red-600">
+          {error}
+        </span>
       ) : null}
     </div>
   );

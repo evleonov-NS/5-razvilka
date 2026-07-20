@@ -9,7 +9,7 @@ type PageProps = {
 export default function CabinetResolvedPage({ searchParams }: PageProps) {
   return (
     <CabinetJournal
-      sectionTitle="Решённые"
+      section="resolved"
       basePath="/cabinet/resolved"
       statusFilter="RESOLVED"
       searchParams={searchParams}

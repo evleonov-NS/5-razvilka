@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
   placeholder?: string;
@@ -46,7 +47,7 @@ export function DecisionSearchInput({
   return (
     <div className="relative max-w-md flex-1">
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]"
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted"
         aria-hidden
       />
       <input
@@ -54,7 +55,7 @@ export function DecisionSearchInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-[var(--border)] bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-[var(--accent)] focus:ring-2 focus:ring-blue-100"
+        className={`w-full rounded-md border border-border bg-surface py-2.5 pl-10 pr-4 text-sm text-text outline-none transition placeholder:text-text-faint focus:border-accent-ink ${landingFocus}`}
       />
     </div>
   );

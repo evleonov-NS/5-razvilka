@@ -5,8 +5,8 @@ export const HORIZON_LABELS: Record<string, string> = {
 };
 
 export const STATUS_LABELS: Record<string, string> = {
-  OPEN: "открыто",
-  RESOLVED: "решено",
+  OPEN: "Открыто",
+  RESOLVED: "Решено",
 };
 
 export const TYPE_LABELS: Record<string, string> = {

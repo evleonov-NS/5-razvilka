@@ -9,10 +9,13 @@ export type DecisionListItem = {
   title: string;
   context: string;
   horizon: string;
+  type: string;
   status: string;
   isPublic: boolean;
   likesCount: number;
   likedByMe: boolean;
+  /** Первая строка базового сценария, если есть. */
+  baseScenarioPreview: string | null;
   createdAt: Date;
 };
 
@@ -60,10 +63,16 @@ export async function listUserDecisions(
         title: true,
         context: true,
         horizon: true,
+        type: true,
         status: true,
         isPublic: true,
         createdAt: true,
         _count: { select: { likes: true } },
+        scenarios: {
+          where: { kind: "BASE" },
+          select: { narrative: true },
+          take: 1,
+        },
       },
     }),
     prisma.decision.count({ where }),
@@ -80,10 +89,12 @@ export async function listUserDecisions(
       title: item.title,
       context: item.context,
       horizon: item.horizon,
+      type: item.type,
       status: item.status,
       isPublic: item.isPublic,
       likesCount: item._count.likes,
       likedByMe: likedIds.has(item.id),
+      baseScenarioPreview: item.scenarios[0]?.narrative ?? null,
       createdAt: item.createdAt,
     })),
     total,

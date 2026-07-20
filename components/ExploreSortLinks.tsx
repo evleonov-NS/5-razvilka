@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PublicDecisionSort } from "@/lib/public-decisions";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
   current: PublicDecisionSort;
@@ -17,10 +18,10 @@ export function ExploreSortLinks({ current }: Props) {
         <Link
           key={option.value}
           href={`/explore?sort=${option.value}`}
-          className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+          className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${landingFocus} ${
             current === option.value
-              ? "bg-[var(--accent)] text-white"
-              : "border border-[var(--border)] bg-white text-[var(--muted)] hover:bg-neutral-50"
+              ? "bg-accent text-accent-contrast"
+              : "border border-border bg-surface text-text-muted hover:border-border-strong hover:bg-surface-2 hover:text-text"
           }`}
         >
           {option.label}

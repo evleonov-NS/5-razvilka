@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 export function SignOutButton() {
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export function SignOutButton() {
       type="button"
       onClick={handleSignOut}
       disabled={loading}
-      className="w-full rounded-lg border border-sky-200 bg-white/80 px-3 py-2 text-sm font-medium text-sky-900 transition hover:bg-white disabled:opacity-50"
+      className={`w-full rounded-md border border-border bg-bg px-3 py-2 text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-2 disabled:opacity-50 ${landingFocus}`}
     >
       {loading ? "Выход…" : "Выйти"}
     </button>

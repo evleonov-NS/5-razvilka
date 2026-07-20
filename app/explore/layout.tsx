@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/auth";
-import { CabinetSidebar } from "@/components/cabinet/CabinetSidebar";
+import { CabinetShell } from "@/components/cabinet/CabinetShell";
 import { ExploreGuestBar } from "@/components/explore/ExploreGuestBar";
 
 export default async function ExploreLayout({
@@ -10,16 +10,11 @@ export default async function ExploreLayout({
   const user = await getCurrentUser();
 
   if (user) {
-    return (
-      <div className="flex min-h-screen bg-[var(--background)]">
-        <CabinetSidebar user={user} />
-        <div className="flex min-h-screen flex-1 flex-col">{children}</div>
-      </div>
-    );
+    return <CabinetShell user={user}>{children}</CabinetShell>;
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--background)]">
+    <div className="flex min-h-screen flex-col bg-bg text-text">
       <ExploreGuestBar />
       <div className="flex flex-1 flex-col">{children}</div>
     </div>

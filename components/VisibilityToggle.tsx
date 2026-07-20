@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Globe, Lock } from "lucide-react";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
   decisionId: string;
@@ -37,7 +38,9 @@ export function VisibilityToggle({ decisionId, initialIsPublic }: Props) {
       });
 
       if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        const body = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
         throw new Error(body?.error ?? "Не удалось изменить видимость");
       }
 
@@ -57,10 +60,10 @@ export function VisibilityToggle({ decisionId, initialIsPublic }: Props) {
         type="button"
         onClick={handleToggle}
         disabled={loading}
-        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition disabled:opacity-50 ${
+        className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors disabled:opacity-50 ${landingFocus} ${
           isPublic
-            ? "border-sky-200 bg-sky-50 text-sky-800"
-            : "border-[var(--border)] bg-white text-[var(--muted)] hover:bg-neutral-50"
+            ? "border-accent bg-accent/15 text-accent-ink"
+            : "border-border bg-surface text-text-muted hover:border-border-strong hover:bg-surface-2"
         }`}
       >
         {isPublic ? (
