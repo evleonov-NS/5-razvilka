@@ -2,6 +2,11 @@ import { prisma } from "@/lib/prisma";
 
 export type PublicDecisionSort = "popular" | "recent";
 
+export type ListPublicDecisionsOptions = {
+  /** Лимит записей; без значения — вся выборка (лента /explore). */
+  take?: number;
+};
+
 export type PublicDecisionItem = {
   id: string;
   title: string;
@@ -37,6 +42,7 @@ export async function getLikedDecisionIds(
 export async function listPublicDecisions(
   sort: PublicDecisionSort = "recent",
   currentUserId?: string | null,
+  options?: ListPublicDecisionsOptions,
 ): Promise<PublicDecisionItem[]> {
   const decisions = await prisma.decision.findMany({
     where: { isPublic: true },
@@ -44,6 +50,7 @@ export async function listPublicDecisions(
       sort === "popular"
         ? { likes: { _count: "desc" } }
         : { createdAt: "desc" },
+    ...(options?.take != null ? { take: options.take } : {}),
     select: {
       id: true,
       title: true,
