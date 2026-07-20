@@ -1,7 +1,7 @@
 /** Общие классы геометрии лендинга. */
 export const landingContainer = "mx-auto w-full max-w-6xl px-6 md:px-10";
 
-export const landingSection = `${landingContainer} py-16 md:py-24`;
+export const landingSection = `${landingContainer} scroll-mt-24 py-16 md:py-24`;
 
 export const landingH2 =
   "font-[family-name:var(--font-landing-serif)] text-3xl md:text-4xl tracking-tight text-text";

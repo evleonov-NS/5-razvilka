@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { AuthShell } from "@/components/AuthShell";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
-import { versionLabel } from "@/lib/version";
 
 type PageProps = {
   searchParams: Promise<{ callbackUrl?: string }>;
@@ -17,17 +17,17 @@ export default async function LoginPage({ searchParams }: PageProps) {
   const callbackUrl = params.callbackUrl ?? "/cabinet";
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-      <h1 className="text-2xl font-bold tracking-tight">Вход в Развилку</h1>
-      <p className="mt-2 text-sm text-[var(--muted)]">
+    <AuthShell>
+      <h1 className="font-[family-name:var(--font-landing-serif)] text-3xl tracking-tight text-text">
+        Вход в Развилку
+      </h1>
+      <p className="mt-2 text-sm text-text-muted">
         Войдите через Google, чтобы сохранять решения в своём журнале.
       </p>
 
       <div className="mt-8">
         <GoogleSignInButton callbackUrl={callbackUrl} />
       </div>
-
-      <footer className="mt-12 text-sm text-[var(--muted)]">v{versionLabel}</footer>
-    </div>
+    </AuthShell>
   );
 }

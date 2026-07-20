@@ -16,6 +16,12 @@ export function LandingPage() {
     <LandingShell>
       <main>
         <LandingHero />
+        {/* sentinel для ScrollToTop: пока в зоне видимости — кнопка скрыта */}
+        <div
+          data-scroll-top-sentinel
+          className="h-px w-full"
+          aria-hidden="true"
+        />
         <LandingProblem />
         <LandingHowItWorks />
         <LandingFeatures />

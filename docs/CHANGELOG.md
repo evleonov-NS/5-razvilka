@@ -13,6 +13,8 @@
 - **`/`:** без сессии — новый лендинг; с сессией — редирект в `/cabinet` через `getCurrentUser()` (ADR-013).
 - **Тема:** семантические CSS-токены (`--bg`, `--accent`, `--accent-ink`…) + класс `.dark`/`.light` на `<html>`; `ThemeToggle` без FOUC; без `dark:` в разметке (ADR-014, ADR-015).
 - **Лендинг:** геометрия max-w-6xl, ритм секций, 2 разделителя; метки LOW/MEDIUM/HIGH по насыщенности акцента.
+- **Шапка:** sticky + матовое стекло (`--bg-rgb`), скрытие при скролле вниз; кнопка «наверх» (ADR-016).
+- **Auth:** login/register в `AuthShell` (общая шапка/футер); контраст кнопки Google исправлен.
 
 ### Added
 - **Лендинг (редизайн):** полноценный гостевой лендинг на `/` — секции в `components/landing/*`, FAQ на `<details>`, `/register` для CTA; шрифты Source Serif 4 / Source Sans 3 через `next/font`.

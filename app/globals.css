@@ -1,11 +1,13 @@
 @import "tailwindcss";
 @config "../tailwind.config.mjs";
 
-/* Семантические токены темы (РАЗДЕЛ B) */
+/* Семантические токены темы */
 :root,
 .light {
-  --bg: #faf8f4;
-  --surface: #ffffff;
+  --bg-rgb: 250 248 244;
+  --surface-rgb: 255 255 255;
+  --bg: rgb(var(--bg-rgb));
+  --surface: rgb(var(--surface-rgb));
   --surface-2: #f2efe8;
   --border: #e2ded5;
   --border-strong: #cfc9bd;
@@ -17,15 +19,16 @@
   --accent-contrast: #1c1a17;
   color-scheme: light;
 
-  /* совместимость со страницами вне лендинга */
   --background: var(--bg);
   --foreground: var(--text);
   --muted: var(--text-muted);
 }
 
 .dark {
-  --bg: #171614;
-  --surface: #1e1d1a;
+  --bg-rgb: 23 22 20;
+  --surface-rgb: 30 29 26;
+  --bg: rgb(var(--bg-rgb));
+  --surface: rgb(var(--surface-rgb));
   --surface-2: #262420;
   --border: #302e2a;
   --border-strong: #403d38;
@@ -42,7 +45,7 @@
   --muted: var(--text-muted);
 }
 
-/* Отключение transition на время смены темы (без мерцания) */
+/* Отключение transition на время смены темы */
 html.theme-switching *,
 html.theme-switching *::before,
 html.theme-switching *::after {
@@ -64,6 +67,29 @@ body {
 
 .light .elevate-card {
   box-shadow: 0 1px 2px rgb(28 26 23 / 0.06);
+}
+
+/* Липкая шапка: blur без анимации самого filter */
+.site-header-glass {
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header-glass {
+    background-color: rgb(var(--bg-rgb) / 0.97) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Кнопка «наверх»: тень только в светлой теме */
+.scroll-top-btn {
+  box-shadow: none;
+}
+
+.light .scroll-top-btn {
+  box-shadow: 0 1px 3px rgb(28 26 23 / 0.1);
 }
 
 @media (prefers-reduced-motion: reduce) {

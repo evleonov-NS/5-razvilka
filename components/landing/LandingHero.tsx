@@ -14,7 +14,7 @@ const branchLabels = [
 export function LandingHero() {
   return (
     <section
-      className={`relative ${landingContainer} grid items-center gap-12 pt-20 pb-16 md:pt-28 md:pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16`}
+      className={`relative ${landingContainer} scroll-mt-24 grid items-center gap-12 pt-20 pb-16 md:pt-28 md:pb-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-16`}
     >
       <svg
         className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-border opacity-60"

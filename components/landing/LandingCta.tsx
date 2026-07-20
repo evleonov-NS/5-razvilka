@@ -6,7 +6,7 @@ import {
 
 export function LandingCta() {
   return (
-    <section className={`${landingContainer} py-16 md:py-24`}>
+    <section className={`${landingContainer} scroll-mt-24 py-16 md:py-24`}>
       <div className="elevate-card rounded-lg border border-border bg-surface p-10 md:p-16">
         <h2 className="font-[family-name:var(--font-landing-serif)] text-4xl tracking-tight text-text md:text-5xl">
           Разберите следующее решение

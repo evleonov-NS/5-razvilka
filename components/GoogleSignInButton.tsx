@@ -1,17 +1,22 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
   callbackUrl?: string;
 };
 
+/**
+ * Кнопка Google: белый фон в обеих темах — текст зафиксирован тёмным (#1c1a17),
+ * не через --text-muted (иначе в тёмной теме нечитаемо).
+ */
 export function GoogleSignInButton({ callbackUrl = "/" }: Props) {
   return (
     <button
       type="button"
       onClick={() => signIn("google", { callbackUrl })}
-      className="flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-medium shadow-sm transition hover:bg-neutral-50"
+      className={`flex w-full items-center justify-center gap-3 rounded-lg border border-[#dadce0] bg-white px-4 py-3 text-sm font-medium text-[#1c1a17] transition hover:bg-[#f8f9fa] ${landingFocus}`}
     >
       <GoogleIcon />
       Войти через Google

@@ -1,14 +1,16 @@
 import type { ReactNode } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { LandingHeader } from "@/components/landing/LandingHeader";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { SiteHeader } from "@/components/SiteHeader";
 
-/** Оболочка лендинга: тема на <html>, здесь только разметка. */
+/** Оболочка лендинга: липкая шапка, футер, кнопка «наверх». */
 export function LandingShell({ children }: { children: ReactNode }) {
   return (
     <div className="bg-bg text-text">
-      <LandingHeader />
+      <SiteHeader variant="full" />
       {children}
       <LandingFooter />
+      <ScrollToTop />
     </div>
   );
 }
