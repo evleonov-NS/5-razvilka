@@ -6,11 +6,49 @@
   --muted: #737373;
   --border: #e5e5e5;
   --accent: #2563eb;
+
+  /* дефолт лендинга (dark), пока JS не выставил inline-переменные */
+  --landing-bg: #1a1b1d;
+  --landing-fg: #ebe8e3;
+  --landing-muted: #9c9891;
+  --landing-border: #2e3034;
+  --landing-surface: #222326;
+  --landing-line: #3a3c40;
+  --landing-accent: #d4a35c;
+  --landing-accent-hover: #e0b36e;
+  --landing-accent-fg: #1a1b1d;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-landing-sans), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
   line-height: 1.6;
+}
+
+.landing {
+  font-family: var(--font-landing-sans), system-ui, sans-serif;
+  /* явные цвета — не зависим от того, подхватил ли Tailwind var() в utilities */
+  background-color: var(--landing-bg);
+  color: var(--landing-fg);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.landing--dark {
+  color-scheme: dark;
+}
+
+.landing--light {
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing,
+  .landing *,
+  .landing *::before,
+  .landing *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

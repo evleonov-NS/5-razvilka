@@ -10,7 +10,12 @@
 - LLM-слой, создание решения, экран результата, дерево, ревью
 
 ### Added
-- **Лендинг:** превью публичных разборов «Новые» и «Популярные» на `/`, `LandingPreviewSection`, лимит `take` в `listPublicDecisions`.
+- **Лендинг (редизайн):** полноценный гостевой лендинг на `/` — секции в `components/landing/*`, тёмный графит + янтарный акцент, SVG-развилка, FAQ на `<details>`, `/register` для CTA; шрифты Source Serif 4 / Source Sans 3 через `next/font`.
+- **Лендинг (ранее):** превью публичных разборов «Новые» и «Популярные» (`LandingPreviewSection`, лимит `take` в `listPublicDecisions`) — компонент сохранён, с гостевой `/` снят в пользу продуктового лендинга.
+
+### Changed
+- **`/`:** без сессии — новый лендинг; с сессией — редирект в `/cabinet` через `getCurrentUser()` (ADR-013).
+- **Лендинг:** переключатель светлой/тёмной темы (`data-theme`, localStorage, `LandingThemeToggle`).
 - **Социальные механики:** `isPublic` на Decision, `DecisionLike`, лента `/explore`, toggle лайков и публикации.
 - **Личный кабинет:** `/cabinet` (журнал, открытые, решённые), лендинг `/`, `DELETE /api/decisions/[id]`.
 - Компоненты кабинета, `lucide-react`, заглушки `/decisions/new`, `/decisions/[id]`.
