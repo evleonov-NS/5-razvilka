@@ -1,9 +1,9 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
-**Обновлено:** 2026-07-20  
+**Обновлено:** 2026-07-23  
 **Версия приложения:** 0.1.0 (`lib/version.ts`)  
-**Последний коммит:** (локально) полировка кабинета + `/demo`  
-**Текущий этап:** 3 — LLM-слой (следующий); 2а — демо в настройках (запланирован)
+**Последний коммит:** 9698f1a (кабинет + /demo)  
+**Текущий этап:** 4 — создание решения (ядро); 2а — демо в настройках (запланирован)
 
 ---
 
@@ -11,16 +11,10 @@
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
-| Доменная схема Prisma | ✅ Готово | User, Decision, Scenario, FailureMode |
-| Auth (Google OAuth) | ✅ Готово | Auth.js v5, local + Vercel; `/login`, `/register` |
-| Гостевой лендинг `/` | ✅ Готово | sticky-шапка, ScrollToTop, max-w-6xl |
-| Тема UI | ✅ Готово | токены RGB/`--bg-rgb`, ThemeToggle в лендинге и кабинете |
-| Auth UI | ✅ Готово | AuthShell на login/register |
-| Личный кабинет | ✅ Готово | max-w-4xl, сайдбар на форме/demo, пресеты, `/demo` |
-| Социальные механики | ✅ Готово | `/explore` есть; вне nav кабинета (ADR-018) |
-| view-db (dev) | ✅ Готово | `/view-db`, только локально |
-| docs/AUTH_GOOGLE_VERCEL.md | ✅ Готово | полная инструкция OAuth |
-| LLM / OpenAI | ⏳ Следующий | Этап 3 — сценарии ещё не генерируются |
+| Доменная схема Prisma | ✅ Готово | + `LlmUsage`, поля LLM у User |
+| Auth (Google OAuth) | ✅ Готово | Auth.js v5 |
+| LLM / провайдеры | ✅ Слой + настройки | DeepSeek по умолчанию; BYOK DeepSeek/Qwen/OpenAI; квоты; стоимость |
+| Личный кабинет | ✅ Готово | настройки API в `/cabinet/settings` |
 | Деплой Vercel | ✅ | https://5-razvilka.vercel.app |
 
 ---
@@ -32,8 +26,8 @@
 | 0 | Каркас + smoke-тест деплоя | ✅ Завершён |
 | 1 | Доменная схема | ✅ Завершён |
 | 2 | Авторизация (Google) | ✅ Завершён |
-| 3 | LLM-слой и валидация | 🔵 Следующий |
-| 4 | Создание решения (ядро) | 🟡 Частично | форма + `POST /api/decisions`, без LLM |
+| 3 | LLM-слой и валидация | ✅ Завершён |
+| 4 | Создание решения (ядро) | 🟡 Частично | форма + `POST /api/decisions`, без LLM-сохранения Scenario |
 | 5 | Экран результата | ⚪ Ожидает |
 | 6 | Журнал (главная) | ✅ Готово | кабинет; `/` — лендинг гостя |
 | 7 | Дерево развилок | ⚪ Ожидает |
@@ -41,6 +35,27 @@
 | 9 | Полировка и деплой | ⚪ Ожидает |
 | 2а | Настройки: демо-данные (UI) | ⚪ Запланирован |
 | 10 | Социальные механики | ✅ Завершён |
+
+---
+
+## Готово (LLM: провайдеры + квоты + стоимость, 2026-07-23)
+
+- [x] Платформа по умолчанию — DeepSeek (`DEEPSEEK_API_KEY`)
+- [x] `/cabinet/settings` — провайдер / модель / свой ключ; блок стоимости запросов
+- [x] Квоты: `OWNER_EMAIL` (evleonov79@…) безлимит; остальные — 1 бесплатный разбор
+- [x] `LlmUsage` + оценка USD; ключ AES-GCM (`AUTH_SECRET`)
+- [x] Миграция `user_llm_settings` (нужен `migrate deploy`)
+- [x] ADR-022
+
+Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER`, `LLM_MODEL`, `OWNER_EMAIL` — см. `.env.example`.
+
+## Готово (Этап 3 — LLM-слой, 2026-07-23)
+
+- [x] `lib/json.ts` — срез markdown-fence, `parseJsonSafe`
+- [x] `lib/llm/*` — клиент, провайдеры, квоты, usage
+- [x] `lib/validators.ts` — `CreateDecisionInputSchema`, `ScenarioResponseSchema`, заготовки Tree/Review
+- [x] `scripts/verify-llm-layer.ts` + `npm run llm:verify`
+- [x] `POST /api/decisions` — валидация + квота (генерация Scenario — этап 4)
 
 ---
 
@@ -82,14 +97,13 @@
 
 ## Следующий шаг
 
-**Этап 3 — LLM-слой** (критический путь): подключить генерацию сценариев к форме `/decisions/new` и экрану `/decisions/[id]`.
+**Этап 4 — создание решения:** промпт 9.1 → `ScenarioResponseSchema` → транзакция Decision + Scenario[] + FailureMode[]; экран `/decisions/[id]` с данными из БД.
 
 Параллельно **этап 2а** — кнопки «Загрузить / удалить демо-данные» в `/cabinet/settings`.
 
-- `lib/llm.ts`, `lib/json.ts`, `lib/validators.ts`
-- env: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `LLM_MODEL`
+Проверка слоя: `npm run llm:verify` (smoke LLM — если ключ в `.env`).
 
-Подробности: [PLAN.md](./PLAN.md) § сводка этапов, [PROMPTS.md](./PROMPTS.md).
+Подробности: [PLAN.md](./PLAN.md), [PROMPTS.md](./PROMPTS.md).
 
 ---
 

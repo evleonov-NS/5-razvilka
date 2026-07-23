@@ -58,14 +58,18 @@
 
 ## ADR-005: OpenAI-совместимый LLM-клиент
 
-**Решение:** npm-пакет `openai` с настраиваемым `OPENAI_BASE_URL`.
+**Решение:** npm-пакет `openai` с настраиваемым `OPENAI_BASE_URL`. Реализация: `lib/llm.ts` (`chatCompletion`, `isLlmConfigured`).
+
+**Env:** `OPENAI_API_KEY` (обязателен для вызова), `OPENAI_BASE_URL` (опционально), `LLM_MODEL` (обязателен для вызова).
 
 **Причина:**
 - prod на Vercel — прямой OpenAI;
 - локально из РФ — агрегатор/прокси без смены кода;
 - один интерфейс для разных провайдеров.
 
-**Правило:** вызовы LLM только на сервере, ключ из `process.env`.
+**Правило:** вызовы LLM только на сервере, ключ из `process.env`. Не импортировать `lib/llm.ts` в Client Components.
+
+**Примечание (2026-07-23):** peerOptional `zod@^3` у `openai@5` конфликтует с Zod 4 проекта — установка через `npm install openai --legacy-peer-deps` (Zod helpers пакета не используем).
 
 ---
 
@@ -225,6 +229,21 @@
 - app-shell (`h-screen` + отдельный скролл контента) отклонены: проблемы 100vh на мобильных, вложенные скроллбары, ломается восстановление позиции при «назад».
 
 **Отклонено:** `overflow-x-hidden` на корне кабинета; app-shell с внутренним скроллом контента; `position: fixed` панели на десктопе.
+
+---
+
+## ADR-022: Multi-provider LLM + квоты + стоимость (2026-07-23)
+
+**Решение:**
+- Платформа по умолчанию — **DeepSeek** (`DEEPSEEK_API_KEY`, `LLM_DEFAULT_PROVIDER=DEEPSEEK`).
+- В `/cabinet/settings` пользователь выбирает провайдера (DeepSeek / Qwen / OpenAI), модель и свой API-ключ.
+- Ключ хранится в `User.llmApiKeyEnc` (AES-256-GCM от `AUTH_SECRET`), в UI только маска.
+- Квоты: `OWNER_EMAIL` (по умолчанию `evleonov79@gmail.com`) — безлимит на платформенном ключе; остальные — `FREE_PLATFORM_CREDITS=1`, затем свой ключ.
+- Стоимость: таблица `LlmUsage` (токены + оценка USD по прайсу каталога `lib/llm/providers.ts`).
+
+**Причина:** свой BYOK снимает стоимость с сервиса; один тестовый разбор снижает барьер входа.
+
+**Связанные файлы:** `lib/llm/*`, `GET|PUT /api/settings/llm`, миграция `user_llm_settings`.
 
 ---
 

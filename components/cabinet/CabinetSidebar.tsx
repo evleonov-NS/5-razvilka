@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GitBranch, Clock, CheckCircle } from "lucide-react";
+import { GitBranch, Clock, CheckCircle, Settings } from "lucide-react";
 import { SignOutButton } from "@/components/SignOutButton";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProfileAvatar } from "@/components/cabinet/ProfileAvatar";
 import { landingFocus } from "@/components/landing/landingLayout";
 import type { CabinetCounts } from "@/lib/cabinet-counts";
@@ -31,6 +30,13 @@ const NAV = [
     exact: false,
     countKey: "resolved" as const,
   },
+  {
+    href: "/cabinet/settings",
+    label: "Настройки",
+    icon: Settings,
+    exact: false,
+    countKey: null,
+  },
 ] as const;
 
 function isActive(pathname: string, href: string, exact: boolean): boolean {
@@ -48,7 +54,7 @@ type Props = {
 
 /**
  * Панель: на md+ sticky + self-start + h-[100dvh].
- * transform только на mobile (drawer); на md — transform-none, иначе sticky ломается.
+ * Тема — только в /cabinet/settings; здесь выход.
  */
 export function CabinetSidebar({
   user,
@@ -81,17 +87,13 @@ export function CabinetSidebar({
           Развилка
         </Link>
 
-        <Link
-          href="/cabinet/settings"
-          onClick={onNavigate}
-          className={`mb-6 flex items-center gap-3 rounded-md px-2 py-1 transition-colors hover:bg-surface-2 ${landingFocus}`}
-        >
+        <div className="mb-6 flex items-center gap-3 px-2 py-1">
           <ProfileAvatar name={displayName} image={user.image} size={40} />
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-text">{displayName}</p>
             <p className="truncate text-xs text-text-muted">{user.email}</p>
           </div>
-        </Link>
+        </div>
 
         <nav className="flex flex-col gap-1" aria-label="Разделы кабинета">
           {NAV.map(({ href, label, icon: Icon, exact, countKey }) => {
@@ -123,11 +125,7 @@ export function CabinetSidebar({
           })}
         </nav>
 
-        <div className="mt-auto space-y-3 border-t border-border pt-4">
-          <div className="flex items-center justify-between gap-2 px-1">
-            <span className="text-xs text-text-faint">Тема</span>
-            <ThemeToggle />
-          </div>
+        <div className="mt-auto border-t border-border pt-4">
           <SignOutButton />
         </div>
       </div>

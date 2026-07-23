@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { DecisionType, Horizon } from "@prisma/client";
 import { getPreset } from "@/lib/presets";
 import { landingFocus } from "@/components/landing/landingLayout";
@@ -43,6 +44,7 @@ export function NewDecisionForm({ presetId }: Props) {
   const [generating, setGenerating] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [needApiKey, setNeedApiKey] = useState(false);
   const [dirty, setDirty] = useState(false);
 
   const canSubmit = title.trim().length > 0 && context.trim().length > 0;
@@ -98,6 +100,7 @@ export function NewDecisionForm({ presetId }: Props) {
     if (!canSubmit || generating) return;
 
     setError(null);
+    setNeedApiKey(false);
     setGenerating(true);
     setStepIndex(0);
     const started = Date.now();
@@ -117,9 +120,18 @@ export function NewDecisionForm({ presetId }: Props) {
       const body = (await res.json().catch(() => null)) as {
         id?: string;
         error?: string;
+        code?: string;
+        settingsPath?: string;
       } | null;
 
       if (!res.ok) {
+        if (body?.code === "NEED_API_KEY") {
+          setNeedApiKey(true);
+          throw new Error(
+            body.error ??
+              "Бесплатный разбор использован. Добавьте API-ключ в настройках.",
+          );
+        }
         throw new Error(body?.error ?? "Не удалось разобрать решение");
       }
 
@@ -337,16 +349,29 @@ export function NewDecisionForm({ presetId }: Props) {
         {error ? (
           <div className="mt-4 rounded-md border border-border bg-surface-2 p-4">
             <p className="text-sm text-text">{error}</p>
-            <p className="mt-1 text-xs text-text-muted">
-              Введённые данные сохранены — можно отправить снова.
-            </p>
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className={`mt-3 text-sm text-accent-ink hover:underline disabled:opacity-40 ${landingFocus}`}
-            >
-              Попробовать снова
-            </button>
+            {needApiKey ? (
+              <p className="mt-2 text-sm">
+                <Link
+                  href="/cabinet/settings"
+                  className={`text-accent-ink hover:underline ${landingFocus}`}
+                >
+                  Открыть настройки API
+                </Link>
+              </p>
+            ) : (
+              <>
+                <p className="mt-1 text-xs text-text-muted">
+                  Введённые данные сохранены — можно отправить снова.
+                </p>
+                <button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className={`mt-3 text-sm text-accent-ink hover:underline disabled:opacity-40 ${landingFocus}`}
+                >
+                  Попробовать снова
+                </button>
+              </>
+            )}
           </div>
         ) : null}
       </div>

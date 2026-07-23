@@ -30,13 +30,13 @@
 
 | Демо-данные (CLI) | ✅ `npm run db:seed-demo` |
 
-| LLM / ядро продукта | ⏳ Этапы 3–5 — **следующие** |
+| LLM / ядро продукта | ⏳ Этапы 4–5 — **следующие** (слой 3 ✅) |
 
 | Production Neon | ⚠️ `migrate deploy` вручную или в Build Command |
 
 
 
-**Следующий шаг:** **Этап 3** — LLM-слой (`lib/llm.ts`, `lib/json.ts`, `lib/validators.ts`).
+**Следующий шаг:** **Этап 4** — создание решения (промпт 9.1 → Scenario + FailureMode).
 
 
 
@@ -164,9 +164,9 @@
 
 | **2а** | **Настройки: демо-данные** | ⏳ | **0.5–1 д** |
 
-| **3** | **LLM-слой** | 🔵 **следующий** | **0.5–1 д** |
+| **3** | **LLM-слой** | ✅ | ~~0.5–1 д~~ |
 
-| 4 | Создание решения | ⏳ | 1.5–2 д |
+| **4** | **Создание решения** | 🔵 **следующий** | **1.5–2 д** |
 
 | 5 | Экран результата | ⏳ | 1–1.5 д |
 
@@ -314,7 +314,7 @@
 
 
 
-### Этап 3 — LLM-слой и валидация 🔵
+### Этап 3 — LLM-слой и валидация ✅
 
 **Промпт 3** · **Оценка:** 0.5–1 д
 
@@ -322,21 +322,21 @@
 
 #### Задачи
 
-- [ ] `lib/json.ts` — срез markdown, безопасный parse
+- [x] `lib/json.ts` — срез markdown, безопасный parse
 
-- [ ] `lib/llm.ts` — OpenAI client, env config
+- [x] `lib/llm.ts` — OpenAI client, env config
 
-- [ ] `lib/validators.ts` — Scenario/Tree/Review + input schemas
+- [x] `lib/validators.ts` — Scenario/Tree/Review + input schemas
 
-- [ ] `scripts/verify-llm-layer.ts` + `npm run llm:verify`
+- [x] `scripts/verify-llm-layer.ts` + `npm run llm:verify`
 
 
 
 #### Проверка
 
-- [ ] Парсинг валидного/невалидного JSON
+- [x] Парсинг валидного/невалидного JSON
 
-- [ ] LLM-ключ не утекает на клиент
+- [x] LLM-ключ не утекает на клиент
 
 
 
@@ -494,11 +494,11 @@
 
 **Ближайшие 3 шага:**
 
-1. **Этап 3** — LLM-слой (блокирует всё ядро)
+1. **Этап 4** — промпт 9.1 + сохранение Scenario/FailureMode
 
-2. **Этап 2а** — кнопки демо в `/cabinet/settings` (удобно тестировать без CLI)
+2. **Этап 5** — экран результата `/decisions/[id]`
 
-3. **Этап 4** — форма + `POST /api/decisions`
+3. **Этап 2а** — кнопки демо в `/cabinet/settings` (удобно тестировать без CLI)
 
 
 

@@ -7,10 +7,20 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- LLM-слой (сценарии), экран результата, дерево, ревью
+- Этап 4: генерация сценариев + pre-mortem в `POST /api/decisions`
+- Экран результата, дерево, ревью
+
+### Added
+- **LLM multi-provider (ADR-022):** DeepSeek по умолчанию; в `/cabinet/settings` — DeepSeek / Qwen / OpenAI, выбор модели, свой API-ключ (AES-GCM); квоты (`OWNER_EMAIL` безлимит, остальные 1 бесплатный разбор); учёт стоимости в `LlmUsage`.
+- **`GET|PUT /api/settings/llm`**, `components/cabinet/LlmSettingsPanel.tsx`.
+- Миграция `user_llm_settings` (`llmProvider`, `llmModel`, `llmApiKeyEnc`, `platformCreditsUsed`, `LlmUsage`).
+- **Этап 3 — LLM-слой:** `lib/json.ts`, `lib/llm/*`, `lib/validators.ts`, `npm run llm:verify`.
 
 ### Changed
-- **Сайдбар:** sticky + `self-start` + `h-[100dvh]`; снят `overflow-x-hidden` с предков (ADR-021); Theme/Выйти через `mt-auto`.
+- **Сайдбар:** пункт «Настройки»; тема светлая/тёмная только на `/cabinet/settings` (убрана из футера сайдбара).
+- **`POST /api/decisions`:** проверка квоты; списание бесплатного кредита; ответ `llmReady` / `quota`.
+- Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OWNER_EMAIL`, `LLM_DEFAULT_PROVIDER` (см. `.env.example`).
+- **Сайдбар (ранее):** sticky + `self-start` + `h-[100dvh]`; снят `overflow-x-hidden` с предков (ADR-021); Theme/Выйти через `mt-auto`.
 - **Демо `/demo`:** единые h2 снаружи секций; дерево — метка у узла, линия/точка вложенности; pre-mortem парами; ревью с выделенным уроком; sticky-плашка CTA.
 - **Кабинет (полировка):** центрирование `max-w-4xl`, единая шапка с «Новое решение», сайдбар на `/decisions/*` и `/demo` (ADR-019); счётчики открытых/решённых; превью-сетка без переполнения.
 - **Кабинет (UI):** единые семантические токены с лендингом; сайдбар `bg-surface` + ThemeToggle; тёмная тема; мобильный drawer.
@@ -24,6 +34,7 @@
 - **Auth:** login/register в `AuthShell` (общая шапка/футер); контраст кнопки Google исправлен.
 
 ### Added
+- Зависимость `openai` (peer zod@3 optional); `.npmrc` с `legacy-peer-deps=true` для установки без конфликта Zod 4.
 - **`/demo`:** полный статический пример разбора (ADR-020), `lib/demo-decision.ts`.
 - **Форма `/decisions/new`:** поля + сегменты горизонта/типа, пресеты `?preset=`, шаги ожидания генерации, beforeunload; `POST /api/decisions` (пока без LLM).
 - **`lib/presets.ts`:** стартовые заготовки для первого разбора.

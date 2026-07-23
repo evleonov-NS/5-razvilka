@@ -36,6 +36,13 @@ enum Likelihood {
   HIGH
 }
 
+/// Провайдер LLM (OpenAI-совместимый API).
+enum LlmProviderKind {
+  DEEPSEEK
+  QWEN
+  OPENAI
+}
+
 model User {
   id            String         @id @default(uuid()) @db.Uuid
   name          String?
@@ -43,10 +50,38 @@ model User {
   emailVerified DateTime?
   image         String?
   createdAt     DateTime       @default(now())
+  /// Предпочитаемый провайдер (свой ключ или отображение в настройках).
+  llmProvider   LlmProviderKind @default(DEEPSEEK)
+  /// Модель провайдера (id из каталога lib/llm/providers).
+  llmModel      String          @default("deepseek-chat")
+  /// Свой API-ключ (AES-GCM). null — платформенный ключ / нет ключа.
+  llmApiKeyEnc  String?
+  /// Сколько разборов сделано за счёт платформы (лимит для обычных пользователей).
+  platformCreditsUsed Int       @default(0)
   accounts      Account[]
   sessions      Session[]
   decisions     Decision[]
   likes         DecisionLike[]
+  llmUsages     LlmUsage[]
+}
+
+/// Учёт токенов и оценочной стоимости LLM-запросов.
+model LlmUsage {
+  id               String          @id @default(uuid()) @db.Uuid
+  userId           String          @db.Uuid
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider         LlmProviderKind
+  model            String
+  promptTokens     Int             @default(0)
+  completionTokens Int             @default(0)
+  /// Микродоллары (1 USD = 1_000_000) — оценка по прайсу каталога.
+  costUsdMicros    Int             @default(0)
+  /// PLATFORM — платформенный ключ; USER — ключ пользователя.
+  billedTo         String
+  decisionId       String?         @db.Uuid
+  createdAt        DateTime        @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Account {
