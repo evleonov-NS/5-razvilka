@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getViewDbClient } from "@/lib/view-db/client";
-import { isViewDbEnabled, viewDbDisabledResponse } from "@/lib/view-db/guard";
+import { viewDbAccessDeniedResponse } from "@/lib/view-db/guard";
 import { resolveDbProfile } from "@/lib/view-db/request";
 import { paginationSchema, rowPayloadSchema } from "@/lib/view-db/schemas";
 import {
@@ -18,7 +18,8 @@ export const runtime = "nodejs";
 type RouteContext = { params: Promise<{ table: string }> };
 
 export async function GET(request: NextRequest, context: RouteContext) {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   try {
     const { table } = await context.params;
@@ -42,7 +43,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
 }
 
 export async function POST(request: NextRequest, context: RouteContext) {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   try {
     const { table } = await context.params;
@@ -62,7 +64,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   try {
     const { table } = await context.params;
@@ -88,7 +91,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 }
 
 export async function DELETE(request: NextRequest, context: RouteContext) {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   try {
     const { table } = await context.params;

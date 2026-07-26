@@ -67,7 +67,7 @@ Auth.js с `session: { strategy: "database" }` пишет сессии в Neon �
 | Переменная | Комментарий |
 |------------|-------------|
 | `JWT_SECRET` | Устарело (была собственная auth). Можно удалить из `.env` |
-| `DATABASE_URL_PROD` | Только для dev-утилиты `view-db` |
+| `DATABASE_URL_PROD` | Только для dev-утилиты `view-db` (доступ — только owner, ADR-031) |
 | `VIEW_DB_ENABLED` | Не ставить на production |
 
 ### Как сгенерировать `AUTH_SECRET`

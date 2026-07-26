@@ -336,4 +336,18 @@
 
 ---
 
+## ADR-031: Security post-MVP — view-db owner + rate-limit ОС (2026-07-26)
+
+**Решение:**
+- `/view-db` и `/api/view-db/*` — только `requireOwner` / `getOwnerUser` (профиль local/prod в UI сохранён; на Vercel `VIEW_DB_ENABLED` не включать).
+- `POST /api/feedback` — honeypot (ADR-030) + in-memory rate-limit 5 сообщ./час/IP (`lib/rate-limit.ts`); при лимите — 429.
+- Публичный контекст: в ленте обрезка CSS, на `/explore/[id]` — полный текст; предупреждение в `VisibilityToggle` честное.
+- Чужие BYOK-ключи: API настроек отдаёт только ключ текущего пользователя (маска); plaintext чужих ключей в UI нет.
+
+**Отложено:** отдельный cap на LLM follow-up (`tree`/`resolve`) — при квоте «1 бесплатный разбор» риск низкий; security headers (P3).
+
+**Связанные файлы:** `lib/view-db/guard.ts`, `app/view-db/layout.tsx`, `app/api/view-db/**`, `lib/rate-limit.ts`, `app/api/feedback/route.ts`.
+
+---
+
 *Новые ADR добавлять с номером, датой и кратким обоснованием.*

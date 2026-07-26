@@ -10,18 +10,19 @@
 
 | Параметр | Значение |
 |----------|----------|
-| Версия | 0.1.3 (`lib/version.ts`) |
+| Версия | 0.1.4 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | `4fc2d3f` (ops 2а+/honeypot/кабинет) — см. `docs/STATUS.md` |
+| Последний коммит | см. `docs/STATUS.md` / git log |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Этап 9 | ✅ закрыт (UI + Vercel LLM/hash/rate + Build Command + ручная проверка 2а+) |
-| Текущий фокус | **Прогон проверок/тестов → аудит безопасности → предложения и правки** |
+| Этап 9 | ✅ закрыт |
+| Текущий фокус | Security v0.1.4 внедрён; при необходимости — `build` после паузы `dev`, kip |
 
 ## Что уже сделано (не переделывать)
 
 - Этапы 0–10 + 2а+: полный цикл решения, кабинет, explore, демо, аналитика, ОС, стоимость $/₽, owner hash, toggle платф. ключа
 - `vercel.json` → `npm run vercel-build`; Neon-миграции актуальны
-- Антиспам ОС: `react-honeypot-field` (ADR-030)
+- Антиспам ОС: honeypot (ADR-030) + rate-limit 5/ч/IP (ADR-031)
+- `view-db` — только owner (ADR-031); профиль prod сохранён
 - Автотестов (Jest/Vitest/Playwright) **пока нет**; есть `npm run build`, `npm run llm:verify`, `npm run db:verify`
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.

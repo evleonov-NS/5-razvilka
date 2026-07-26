@@ -8,9 +8,10 @@
 
 ### Planned (MVP)
 - ~~Этап 9~~ ✅ закрыт
-- Post-MVP: прогон build/verify + security-аудит (новый чат, см. корневой `PROMPT.md`)
+- ~~Post-MVP: прогон + security~~ → частично: verify ✅, security-фиксы v0.1.4; build локально — при свободном `dev`
 
 ### Added
+- **Security-аудит v0.1.4:** `view-db` только для owner (API + UI); rate-limit `POST /api/feedback` (5/час/IP); честный копирайт публичного контекста; 401 на `/api/settings/app` без сессии (ADR-031).
 - **Ops после 2а+ (v0.1.3):** `vercel.json` с Build Command `npm run vercel-build`; локально `OWNER_EMAIL_HASH` + `USD_RUB_RATE`; миграция `analytics_feedback_settings` подтверждена на Neon; обновлены `PROMPT.md` / STATUS / PLAN.
 - **Антиспам `/feedback`:** `react-honeypot-field` (honeypot + time-threshold, ADR-030).
 - **Пакет 2а+ (v0.1.2):** демо в `/cabinet/settings` (`POST|DELETE /api/user/demo-data`); аналитика `VisitSession`/`AnalyticsEvent` + `/cabinet/stats` (owner); ОС `/feedback` + inbox; стоимость сутки/7д/30д в $ и ₽; toggle платформенного ключа (`AppSettings`); `OWNER_EMAIL_HASH` (ADR-027…029).
@@ -28,7 +29,8 @@
 - В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel.
 
 ### Changed
-- Версия **0.1.3** (`lib/version.ts`).
+- Версия **0.1.4** (`lib/version.ts`).
+- Текст предупреждения `VisibilityToggle` и описание `/explore`: полный контекст на детальной странице.
 - `/cabinet/settings`: единая правая колонка одинаковой ширины (убраны `display:contents` / `col-span-2` / `max-w-xl`); карточка стоимости в том же стиле, что остальные.
 - Owner email: убран hardcoded default; проверка через `lib/owner.ts` (hash или env).
 - Лендинг и `/demo` используют общий `LikelihoodBadge` (без локальных копий).

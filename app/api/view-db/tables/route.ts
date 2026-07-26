@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getViewDbClient } from "@/lib/view-db/client";
 import { getDatabaseUrl, maskDatabaseUrl } from "@/lib/view-db/config";
-import { isViewDbEnabled, viewDbDisabledResponse } from "@/lib/view-db/guard";
+import { viewDbAccessDeniedResponse } from "@/lib/view-db/guard";
 import { resolveDbProfile } from "@/lib/view-db/request";
 import { apiErrorMessage, listPublicTables } from "@/lib/view-db/sql";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   try {
     const profile = await resolveDbProfile(

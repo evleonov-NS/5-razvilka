@@ -2,19 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getDbProfileInfos } from "@/lib/view-db/config";
 import { dbProfileCookieOptions } from "@/lib/view-db/cookies";
-import { isViewDbEnabled, viewDbDisabledResponse } from "@/lib/view-db/guard";
+import { viewDbAccessDeniedResponse } from "@/lib/view-db/guard";
 import { parseDbProfile } from "@/lib/view-db/schemas";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   return NextResponse.json({ profiles: getDbProfileInfos() });
 }
 
 export async function POST(request: NextRequest) {
-  if (!isViewDbEnabled()) return viewDbDisabledResponse();
+  const denied = await viewDbAccessDeniedResponse();
+  if (denied) return denied;
 
   try {
     const body = await request.json();

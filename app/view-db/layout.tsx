@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getOwnerUser } from "@/lib/owner";
 import { isViewDbEnabled } from "@/lib/view-db/guard";
 
-export default function ViewDbLayout({
+export default async function ViewDbLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Скрываем утилиту от всех, кроме владельца (и при выключенном флаге)
   if (!isViewDbEnabled()) {
+    notFound();
+  }
+  const owner = await getOwnerUser();
+  if (!owner) {
     notFound();
   }
 

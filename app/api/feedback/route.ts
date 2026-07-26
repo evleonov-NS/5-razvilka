@@ -5,8 +5,13 @@ import { trackEvent } from "@/lib/analytics";
 import { getCurrentUser } from "@/lib/auth";
 import { forbiddenResponse, requireOwner } from "@/lib/owner";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, clientIpFromHeaders } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
+
+/** Не больше 5 сообщений с одного IP за час (после honeypot). */
+const FEEDBACK_LIMIT = 5;
+const FEEDBACK_WINDOW_MS = 60 * 60 * 1000;
 
 const postSchema = z.object({
   message: z.string().trim().min(1, "Сообщение обязательно").max(5000),
@@ -49,6 +54,25 @@ export async function POST(request: Request) {
     });
     if (!hp.ok) {
       return NextResponse.json({ ok: true });
+    }
+
+    const ip = clientIpFromHeaders(request.headers);
+    const limited = checkRateLimit(
+      `feedback:${ip}`,
+      FEEDBACK_LIMIT,
+      FEEDBACK_WINDOW_MS,
+    );
+    if (!limited.ok) {
+      return NextResponse.json(
+        {
+          error: "Слишком много сообщений. Попробуйте позже.",
+          retryAfterSec: limited.retryAfterSec,
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSec) },
+        },
+      );
     }
 
     const user = await getCurrentUser();

@@ -25,6 +25,9 @@ export async function GET() {
     if (err instanceof Error && err.message === "FORBIDDEN") {
       return forbiddenResponse();
     }
+    if (err instanceof Error && err.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
+    }
     console.error("GET /api/settings/app:", err);
     return NextResponse.json(
       { error: "Не удалось загрузить настройки" },
@@ -59,6 +62,9 @@ export async function PUT(request: Request) {
   } catch (err) {
     if (err instanceof Error && err.message === "FORBIDDEN") {
       return forbiddenResponse();
+    }
+    if (err instanceof Error && err.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
     }
     console.error("PUT /api/settings/app:", err);
     return NextResponse.json(

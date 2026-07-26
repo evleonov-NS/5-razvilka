@@ -1,9 +1,9 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
 **Обновлено:** 2026-07-26  
-**Версия приложения:** 0.1.3 (`lib/version.ts`)  
-**Последний коммит:** `4fc2d3f` — ops после 2а+ (см. git log)  
-**Текущий этап:** этап 9 ✅ закрыт; следующий пакет — прогон проверок + security-аудит (см. корневой `PROMPT.md`)  
+**Версия приложения:** 0.1.4 (`lib/version.ts`)  
+**Последний коммит:** `4fc2d3f` — ops после 2а+ (см. git log; security-фиксы ещё локально)  
+**Текущий этап:** этап 9 ✅; security-фиксы v0.1.4 внедрены; хвост — локальный `build` при свободном Prisma  
 **Dev-log:** [26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md](./26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md)
 
 ---
@@ -13,9 +13,9 @@
 | Вопрос | Ответ |
 |--------|--------|
 | Что умеет продукт сейчас | Полный цикл MVP + 2а+ (демо, stats, ОС, $/₽, toggle, owner hash) |
-| Чего ещё нет | Автотесты (Jest/Vitest/e2e); формальный security-проход с фиксами |
+| Чего ещё нет | Автотесты; security headers (P3); локальный build подтвердить после EPERM |
 | Где смотреть | Локально + prod: https://5-razvilka.vercel.app |
-| Риск для prod | Низкий операционный; дальше — abuse ОС / IDOR / утечки — в новом чате |
+| Риск для prod | Снижен: view-db owner-only; rate-limit ОС; чужие BYOK-ключи в UI не отдаются |
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
@@ -30,6 +30,7 @@
 | Личный кабинет | ✅ Готово | настройки API + демо в `/cabinet/settings` |
 | Пакет 2а+ | ✅ Код + Neon + prod | демо, stats, feedback, $/₽, toggle, owner hash |
 | Деплой Vercel | ✅ | `vercel.json` + LLM/hash/rate env + Redeploy |
+| Security | ✅ v0.1.4 | view-db owner; feedback 5/ч/IP; копирайт explore |
 
 ---
 
@@ -49,9 +50,18 @@
 | 9 | Полировка и деплой | ✅ Завершён | UI + Vercel + ручная проверка 2а+ |
 | 2а | Настройки: демо-данные | ✅ | + аналитика, ОС, стоимость $/₽, toggle, OWNER_EMAIL_HASH |
 | 10 | Социальные механики | ✅ Завершён |
-| — | Прогон + security | ⬜ | новый чат: `PROMPT.md` |
+| — | Прогон + security | 🟡 | verify ✅; фиксы ✅; build — после EPERM |
 
 ---
+
+## Готово (security v0.1.4, 2026-07-26)
+
+- [x] `npm run db:verify` / `npm run llm:verify` — OK
+- [x] `view-db`: `requireOwner` на API + layout (профиль prod сохранён)
+- [x] `POST /api/feedback`: rate-limit 5/час/IP (+ honeypot)
+- [x] Честный текст про публичный контекст (VisibilityToggle, /explore)
+- [x] `/api/settings/app` — 401 без сессии
+- [ ] Локальный `npm run build` — EPERM при занятом Prisma/`dev`
 
 ## Готово (ops после 2а+, 2026-07-26)
 

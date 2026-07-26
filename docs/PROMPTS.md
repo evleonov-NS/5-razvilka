@@ -206,11 +206,11 @@ ReviewResponseSchema, сохранить outcome, reviewClosestScenario, reviewM
 
 Актуальная выжимка: корневой **[PROMPT.md](../PROMPT.md)**.
 
+Статус: verify ✅; фиксы ADR-031 (v0.1.4) внедрены; локальный build — при свободном `dev`.
+
 ```text
-Этап 9 закрыт. Новый пакет: (1) прогон npm run build / llm:verify / db:verify
-и фиксация результата; при необходимости предложить минимальные автотесты.
-(2) Security-аудит: auth, ownership API, feedback abuse, LLM-секреты, PII —
-таблица «дыра → риск → фикс»; без эксплойтов. По согласованию — внедрить фиксы.
+Этап 9 закрыт. Пакет: (1) прогон build / llm:verify / db:verify.
+(2) Security: view-db owner, feedback rate-limit, копирайт explore — сделано.
 Docs + kip по запросу. PowerShell.
 ```
 
