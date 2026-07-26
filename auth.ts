@@ -1,6 +1,11 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import {
+  endVisitSessions,
+  startVisitSession,
+  trackEvent,
+} from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -25,6 +30,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = user.id;
       }
       return session;
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (!user.id) return;
+      await startVisitSession(user.id);
+      await trackEvent("LOGIN", user.id);
+    },
+    async signOut(message) {
+      const session = "session" in message ? message.session : null;
+      const userId =
+        session && typeof session === "object" && "userId" in session
+          ? String((session as { userId?: string }).userId ?? "")
+          : "";
+      if (!userId) return;
+      await endVisitSessions(userId);
+      await trackEvent("LOGOUT", userId);
     },
   },
 });

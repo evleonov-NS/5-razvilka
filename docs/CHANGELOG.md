@@ -7,10 +7,10 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Пакет 2а+: демо в settings, аналитика интереса, обратная связь, стоимость день/неделя/месяц $/₽, toggle платформенного ключа, owner email без plaintext (см. корневой `PROMPT.md`)
 - Этап 9 — Build Command `vercel-build` на Vercel (если ещё не) + финальная отметка в STATUS
 
 ### Added
+- **Пакет 2а+ (v0.1.2):** демо в `/cabinet/settings` (`POST|DELETE /api/user/demo-data`); аналитика `VisitSession`/`AnalyticsEvent` + `/cabinet/stats` (owner); ОС `/feedback` + inbox; стоимость сутки/7д/30д в $ и ₽; toggle платформенного ключа (`AppSettings`); `OWNER_EMAIL_HASH` (ADR-027…029).
 - **Этап 9 (полировка UI):** единые `LoadingState` / `EmptyState` / `ErrorMessage` на кабинете, `/decisions/new`, ревью; скелетон generating в `ReviewSection`.
 - **`npm run vercel-build`** — `prisma migrate deploy && prisma generate && next build` (ADR-026).
 - **Этап 8 — ревью по исходу:** `POST /api/decisions/[id]/resolve` — `{ outcome }` → промпт 9.3 → `ReviewResponseSchema` → `outcome` / `reviewClosestScenario` / `reviewMissed` / `lesson`, `status=RESOLVED`.
@@ -25,7 +25,8 @@
 - В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel.
 
 ### Changed
-- Версия **0.1.1** (`lib/version.ts`).
+- Версия **0.1.2** (`lib/version.ts`).
+- Owner email: убран hardcoded default; проверка через `lib/owner.ts` (hash или env).
 - Лендинг и `/demo` используют общий `LikelihoodBadge` (без локальных копий).
 - `NewDecisionForm` — ошибки через `ErrorMessage`.
 - **`POST /api/decisions`:** безопасный parse JSON тела → 400.

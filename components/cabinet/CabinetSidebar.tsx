@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GitBranch, Clock, CheckCircle, Settings } from "lucide-react";
+import { GitBranch, Clock, CheckCircle, Settings, BarChart3 } from "lucide-react";
 import { SignOutButton } from "@/components/SignOutButton";
 import { ProfileAvatar } from "@/components/cabinet/ProfileAvatar";
 import { landingFocus } from "@/components/landing/landingLayout";
@@ -47,6 +47,7 @@ function isActive(pathname: string, href: string, exact: boolean): boolean {
 type Props = {
   user: CabinetUser;
   counts?: CabinetCounts;
+  isOwner?: boolean;
   open?: boolean;
   panelId?: string;
   onNavigate?: () => void;
@@ -59,12 +60,25 @@ type Props = {
 export function CabinetSidebar({
   user,
   counts,
+  isOwner = false,
   open = false,
   panelId,
   onNavigate,
 }: Props) {
   const pathname = usePathname();
   const displayName = user.name ?? user.email.split("@")[0];
+  const navItems = isOwner
+    ? [
+        ...NAV,
+        {
+          href: "/cabinet/stats",
+          label: "Статистика",
+          icon: BarChart3,
+          exact: false,
+          countKey: null,
+        } as const,
+      ]
+    : NAV;
 
   return (
     <aside
@@ -96,7 +110,7 @@ export function CabinetSidebar({
         </div>
 
         <nav className="flex flex-col gap-1" aria-label="Разделы кабинета">
-          {NAV.map(({ href, label, icon: Icon, exact, countKey }) => {
+          {navItems.map(({ href, label, icon: Icon, exact, countKey }) => {
             const active = isActive(pathname, href, exact);
             const count = countKey && counts ? counts[countKey] : 0;
             return (
@@ -125,7 +139,14 @@ export function CabinetSidebar({
           })}
         </nav>
 
-        <div className="mt-auto border-t border-border pt-4">
+        <div className="mt-auto space-y-3 border-t border-border pt-4">
+          <Link
+            href="/feedback"
+            onClick={onNavigate}
+            className={`block px-3 text-sm text-text-muted transition-colors hover:text-text ${landingFocus}`}
+          >
+            Обратная связь
+          </Link>
           <SignOutButton />
         </div>
       </div>

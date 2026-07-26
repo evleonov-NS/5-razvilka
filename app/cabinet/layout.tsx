@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getCabinetCounts } from "@/lib/cabinet-counts";
 import { CabinetShell } from "@/components/cabinet/CabinetShell";
+import { isOwnerEmail } from "@/lib/owner";
 
 export default async function CabinetLayout({
   children,
@@ -16,7 +17,11 @@ export default async function CabinetLayout({
   const counts = await getCabinetCounts(user.id);
 
   return (
-    <CabinetShell user={user} counts={counts}>
+    <CabinetShell
+      user={user}
+      counts={counts}
+      isOwner={isOwnerEmail(user.email)}
+    >
       {children}
     </CabinetShell>
   );

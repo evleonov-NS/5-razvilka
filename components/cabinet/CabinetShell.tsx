@@ -21,6 +21,8 @@ type CabinetUser = {
 type Props = {
   user: CabinetUser;
   counts?: CabinetCounts;
+  /** Показывать ссылку на статистику (только владелец). */
+  isOwner?: boolean;
   children: ReactNode;
 };
 
@@ -28,7 +30,7 @@ type Props = {
  * Оболочка кабинета: sticky-сайдбар (не app-shell со своим скроллом).
  * На корне НЕТ overflow — иначе sticky липнет к предку, а не к окну.
  */
-export function CabinetShell({ user, counts, children }: Props) {
+export function CabinetShell({ user, counts, isOwner = false, children }: Props) {
   const [open, setOpen] = useState(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
@@ -101,6 +103,7 @@ export function CabinetShell({ user, counts, children }: Props) {
       <CabinetSidebar
         user={user}
         counts={counts}
+        isOwner={isOwner}
         open={open}
         panelId={titleId}
         onNavigate={close}

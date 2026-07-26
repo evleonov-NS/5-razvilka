@@ -1,24 +1,19 @@
 /**
- * Квоты платформенного LLM: владелец — безлимит; остальные — FREE_PLATFORM_CREDITS.
+ * Квоты платформенного LLM: владелец — безлимит; остальные — FREE_PLATFORM_CREDITS
+ * (если платформенный ключ разрешён в AppSettings).
  */
 import { FREE_PLATFORM_CREDITS } from "@/lib/llm/providers";
-
-export const OWNER_EMAIL_DEFAULT = "evleonov79@gmail.com";
-
-export function getOwnerEmail(): string {
-  return (
-    process.env.OWNER_EMAIL?.trim().toLowerCase() || OWNER_EMAIL_DEFAULT
-  );
-}
-
-export function isOwnerEmail(email: string): boolean {
-  return email.trim().toLowerCase() === getOwnerEmail();
-}
+import { isOwnerEmail } from "@/lib/owner";
 
 export type QuotaUser = {
   email: string;
   llmApiKeyEnc: string | null;
   platformCreditsUsed: number;
+};
+
+export type QuotaOptions = {
+  /** false — обычным юзерам без своего ключа генерация недоступна (даже 1 кредит). */
+  platformKeyEnabled?: boolean;
 };
 
 export type QuotaStatus = {
@@ -28,16 +23,22 @@ export type QuotaStatus = {
   freeLimit: number;
   /** Можно ли сейчас вызвать LLM (свой ключ / owner / остался бесплатный кредит). */
   canGenerate: boolean;
-  /** Осталось бесплатных разборов за счёт платформы (0 у owner с безлимитом — Infinity в UI как null). */
+  /** Осталось бесплатных разборов за счёт платформы (null у owner = безлимит). */
   freeRemaining: number | null;
   reason?: "NEED_API_KEY" | "NO_PLATFORM_KEY";
   message?: string;
+  platformKeyEnabled: boolean;
 };
 
-export function getQuotaStatus(user: QuotaUser): QuotaStatus {
+export function getQuotaStatus(
+  user: QuotaUser,
+  options: QuotaOptions = {},
+): QuotaStatus {
+  const platformKeyEnabled = options.platformKeyEnabled ?? true;
   const isOwner = isOwnerEmail(user.email);
   const hasOwnKey = Boolean(user.llmApiKeyEnc);
-  const freeLimit = FREE_PLATFORM_CREDITS;
+  const freeLimit =
+    !platformKeyEnabled && !isOwner ? 0 : FREE_PLATFORM_CREDITS;
   const freeRemaining = isOwner
     ? null
     : Math.max(0, freeLimit - user.platformCreditsUsed);
@@ -50,6 +51,7 @@ export function getQuotaStatus(user: QuotaUser): QuotaStatus {
       freeLimit,
       canGenerate: true,
       freeRemaining,
+      platformKeyEnabled,
     };
   }
 
@@ -62,6 +64,7 @@ export function getQuotaStatus(user: QuotaUser): QuotaStatus {
         freeLimit,
         canGenerate: false,
         freeRemaining,
+        platformKeyEnabled,
         reason: "NO_PLATFORM_KEY",
         message:
           "Платформенный ключ не настроен (DEEPSEEK_API_KEY). Добавьте свой API в настройках.",
@@ -74,11 +77,12 @@ export function getQuotaStatus(user: QuotaUser): QuotaStatus {
       freeLimit,
       canGenerate: true,
       freeRemaining,
+      platformKeyEnabled,
     };
   }
 
   // Обычный пользователь без своего ключа
-  if (user.platformCreditsUsed >= freeLimit) {
+  if (!platformKeyEnabled || user.platformCreditsUsed >= freeLimit) {
     return {
       isOwner,
       hasOwnKey,
@@ -86,9 +90,11 @@ export function getQuotaStatus(user: QuotaUser): QuotaStatus {
       freeLimit,
       canGenerate: false,
       freeRemaining: 0,
+      platformKeyEnabled,
       reason: "NEED_API_KEY",
-      message:
-        "Бесплатный тестовый разбор уже использован. Добавьте свой API-ключ в настройках (DeepSeek, Qwen или OpenAI).",
+      message: !platformKeyEnabled
+        ? "Платформенный ключ отключён. Добавьте свой API-ключ в настройках (DeepSeek, Qwen или OpenAI)."
+        : "Бесплатный тестовый разбор уже использован. Добавьте свой API-ключ в настройках (DeepSeek, Qwen или OpenAI).",
     };
   }
 
@@ -100,6 +106,7 @@ export function getQuotaStatus(user: QuotaUser): QuotaStatus {
       freeLimit,
       canGenerate: false,
       freeRemaining,
+      platformKeyEnabled,
       reason: "NO_PLATFORM_KEY",
       message:
         "Сервис временно без платформенного ключа. Добавьте свой API в настройках.",
@@ -113,6 +120,7 @@ export function getQuotaStatus(user: QuotaUser): QuotaStatus {
     freeLimit,
     canGenerate: true,
     freeRemaining,
+    platformKeyEnabled,
   };
 }
 
@@ -124,3 +132,6 @@ export function isPlatformLlmConfigured(): boolean {
       process.env.OPENAI_API_KEY?.trim(),
   );
 }
+
+/** @deprecated используйте isOwnerEmail из lib/owner */
+export { isOwnerEmail };

@@ -9,7 +9,9 @@ import {
   getModel,
   getProvider,
 } from "@/lib/llm/providers";
-import { getQuotaStatus, isOwnerEmail } from "@/lib/llm/quota";
+import { getPlatformKeyEnabled } from "@/lib/app-settings";
+import { getQuotaStatus } from "@/lib/llm/quota";
+import { isOwnerEmail } from "@/lib/owner";
 
 export type LlmCredentials = {
   provider: LlmProviderKind;
@@ -87,18 +89,23 @@ export type ResolveLlmOptions = {
    * бесплатного кредита — кредит уже списан при создании разбора.
    */
   skipFreeCreditCheck?: boolean;
+  /** Если не передан — читается из AppSettings. */
+  platformKeyEnabled?: boolean;
 };
 
 /**
  * Credentials для вызова LLM от имени пользователя.
  * Бросает LlmResolveError, если генерировать нельзя.
  */
-export function resolveLlmCredentials(
+export async function resolveLlmCredentials(
   user: ResolveUser,
   options: ResolveLlmOptions = {},
-): LlmCredentials {
+): Promise<LlmCredentials> {
+  const platformKeyEnabled =
+    options.platformKeyEnabled ?? (await getPlatformKeyEnabled());
+
   if (!options.skipFreeCreditCheck) {
-    const quota = getQuotaStatus(user);
+    const quota = getQuotaStatus(user, { platformKeyEnabled });
     if (!quota.canGenerate) {
       throw new LlmResolveError(
         quota.reason ?? "NEED_API_KEY",

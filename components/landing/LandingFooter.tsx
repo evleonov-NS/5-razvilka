@@ -18,7 +18,13 @@ export function LandingFooter() {
           </span>
           <span>v{versionLabel}</span>
         </p>
-        <nav className="flex gap-5" aria-label="Ссылки в футере">
+        <nav className="flex flex-wrap gap-5" aria-label="Ссылки в футере">
+          <Link
+            href="/feedback"
+            className={`text-text-muted transition-colors hover:text-text ${landingFocus}`}
+          >
+            Обратная связь
+          </Link>
           <Link
             href="/login"
             className={`text-text-muted transition-colors hover:text-text ${landingFocus}`}

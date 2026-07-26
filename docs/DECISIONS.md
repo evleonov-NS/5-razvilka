@@ -117,6 +117,8 @@
 
 **Причина:** не дублировать номер версии по файлам; использовать в футере, логах, dev-log.
 
+**Дополнение (2026-07-26):** при каждом значимом пакете сразу обновлять `version` и `date`/`time` в `lib/version.ts` (иначе футер остаётся со старым номером). Правило в `.cursor/rules/project.mdc` и `PROJECT.md` §19.
+
 ---
 
 ## ADR-011: Smoke-тест деплоя перед доменной разработкой
@@ -288,6 +290,39 @@
 **Причина:** `migrate deploy` на каждом локальном build ломает/замедляет разработку без доступа к Neon; на Vercel миграции должны применяться до `next build`.
 
 **Связанные файлы:** `package.json`, `docs/PLAN.md` § этап 9.
+
+---
+
+## ADR-027: Стоимость LLM — скользящие окна 24ч / 7д / 30д + RUB (2026-07-26)
+
+**Решение:** в `/cabinet/settings` показывать агрегаты `LlmUsage` за последние 24 часа, 7 дней и 30 дней (не календарные месяц/неделя). USD — из микродолларов каталога; RUB — `USD_RUB_RATE` из env с подписью «оценка». Для владельца дополнительно сумма `billedTo=PLATFORM` за те же окна.
+
+**Причина:** календарные периоды сложнее для «сколько сожгли недавно»; фиксированный курс из env без live-биржи.
+
+**Связанные файлы:** `lib/llm/usage.ts`, `components/cabinet/LlmSettingsPanel.tsx`.
+
+---
+
+## ADR-028: Owner email — HMAC hash, без plaintext в коде (2026-07-26)
+
+**Решение:** `isOwnerEmail` в `lib/owner.ts` сравнивает email с `OWNER_EMAIL_HASH` = HMAC-SHA256(email_lower, AUTH_SECRET). Fallback — `OWNER_EMAIL` только из env. Hardcoded default email удалён. В JSON клиенту уходит лишь `quota.isOwner: boolean`.
+
+**Причина:** plaintext владельца в репозитории светился в бандле/git history рисках.
+
+**Связанные файлы:** `lib/owner.ts`, `scripts/hash-owner-email.ts`, `.env.example`.
+
+---
+
+## ADR-029: Toggle платформенного ключа + аналитика + ОС (2026-07-26)
+
+**Решение:**
+- `AppSettings.platformKeyEnabled` (singleton): если false — обычный пользователь без своего ключа не получает бесплатный кредит; **владелец всегда** может платформенный ключ.
+- Аналитика: `VisitSession` + `AnalyticsEvent`; страница `/cabinet/stats` (owner-only, иначе 404).
+- Обратная связь: `FeedbackMessage`, `POST /api/feedback` без обязательного auth; inbox на `/cabinet/stats`.
+
+**Причина:** контроль расхода платформы, понимание интереса к продукту, канал ОС без публичного inbox.
+
+**Связанные файлы:** `lib/app-settings.ts`, `lib/analytics.ts`, `app/cabinet/stats`, `app/feedback`, миграция `analytics_feedback_settings`.
 
 ---
 

@@ -43,6 +43,19 @@ enum LlmProviderKind {
   OPENAI
 }
 
+/// Тип события интереса / использования (аналитика владельца).
+enum AnalyticsEventType {
+  LOGIN
+  LOGOUT
+  CREATE_DECISION
+  GENERATE_TREE
+  RESOLVE
+  OPEN_SETTINGS
+  SUBMIT_FEEDBACK
+  LOAD_DEMO
+  DELETE_DEMO
+}
+
 model User {
   id            String         @id @default(uuid()) @db.Uuid
   name          String?
@@ -63,6 +76,57 @@ model User {
   decisions     Decision[]
   likes         DecisionLike[]
   llmUsages     LlmUsage[]
+  feedbackMessages FeedbackMessage[]
+  visitSessions VisitSession[]
+  analyticsEvents AnalyticsEvent[]
+}
+
+/// Singleton-настройки приложения (id = "default").
+model AppSettings {
+  id                 String   @id @default("default")
+  /// Если false — обычным пользователям недоступен бесплатный платформенный разбор.
+  platformKeyEnabled Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
+}
+
+/// Обратная связь с лендинга / кабинета (читать может только владелец).
+model FeedbackMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  message   String   @db.Text
+  email     String?
+  userId    String?  @db.Uuid
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+/// Визит авторизованного пользователя (для статистики длительности).
+model VisitSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  endedAt    DateTime?
+
+  @@index([userId, startedAt])
+  @@index([startedAt])
+}
+
+/// Событие использования продукта (лог интереса).
+model AnalyticsEvent {
+  id        String             @id @default(uuid()) @db.Uuid
+  userId    String?            @db.Uuid
+  user      User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      AnalyticsEventType
+  meta      Json?
+  createdAt DateTime           @default(now())
+
+  @@index([type, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }
 
 /// Учёт токенов и оценочной стоимости LLM-запросов.

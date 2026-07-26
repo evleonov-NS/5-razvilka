@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { trackEvent } from "@/lib/analytics";
 import { requireUser, unauthorizedResponse } from "@/lib/auth";
 import { parseJsonSafe } from "@/lib/json";
 import {
@@ -150,7 +151,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     let credentials;
     try {
-      credentials = resolveLlmCredentials(dbUser, {
+      credentials = await resolveLlmCredentials(dbUser, {
         skipFreeCreditCheck: true,
       });
     } catch (err) {
@@ -262,6 +263,8 @@ export async function POST(request: Request, context: RouteContext) {
       billedTo: llmResult.billedTo,
       decisionId,
     });
+
+    await trackEvent("RESOLVE", sessionUser.id, { decisionId });
 
     return NextResponse.json({
       outcome,

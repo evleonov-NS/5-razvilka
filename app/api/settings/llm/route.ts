@@ -1,12 +1,16 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
 import type { LlmProviderKind } from "@prisma/client";
+import { trackEvent } from "@/lib/analytics";
+import { getPlatformKeyEnabled } from "@/lib/app-settings";
 import { requireUser, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isOwnerEmail } from "@/lib/owner";
 import {
   encryptSecret,
   getQuotaStatus,
   getUsageSummary,
+  getUsagePeriodsSummary,
   listProvidersPublic,
   maskApiKey,
   decryptSecret,
@@ -32,6 +36,22 @@ function keyPreview(enc: string | null): string | null {
   }
 }
 
+function quotaDto(
+  quota: ReturnType<typeof getQuotaStatus>,
+) {
+  return {
+    isOwner: quota.isOwner,
+    hasOwnKey: quota.hasOwnKey,
+    canGenerate: quota.canGenerate,
+    freeLimit: quota.freeLimit,
+    freeRemaining: quota.freeRemaining,
+    platformCreditsUsed: quota.platformCreditsUsed,
+    message: quota.message ?? null,
+    reason: quota.reason ?? null,
+    platformKeyEnabled: quota.platformKeyEnabled,
+  };
+}
+
 export async function GET() {
   try {
     const sessionUser = await requireUser();
@@ -46,8 +66,15 @@ export async function GET() {
       },
     });
 
-    const quota = getQuotaStatus(user);
-    const usage = await getUsageSummary(sessionUser.id);
+    const platformKeyEnabled = await getPlatformKeyEnabled();
+    const quota = getQuotaStatus(user, { platformKeyEnabled });
+    const isOwner = isOwnerEmail(user.email);
+    const [usage, periods] = await Promise.all([
+      getUsageSummary(sessionUser.id),
+      getUsagePeriodsSummary(sessionUser.id, { includePlatform: isOwner }),
+    ]);
+
+    await trackEvent("OPEN_SETTINGS", sessionUser.id);
 
     return NextResponse.json({
       providers: listProvidersPublic(),
@@ -57,17 +84,10 @@ export async function GET() {
         hasApiKey: Boolean(user.llmApiKeyEnc),
         apiKeyPreview: keyPreview(user.llmApiKeyEnc),
       },
-      quota: {
-        isOwner: quota.isOwner,
-        hasOwnKey: quota.hasOwnKey,
-        canGenerate: quota.canGenerate,
-        freeLimit: quota.freeLimit,
-        freeRemaining: quota.freeRemaining,
-        platformCreditsUsed: quota.platformCreditsUsed,
-        message: quota.message ?? null,
-        reason: quota.reason ?? null,
-      },
+      quota: quotaDto(quota),
       usage,
+      periods,
+      appSettings: isOwner ? { platformKeyEnabled } : null,
     });
   } catch (err) {
     if (err instanceof Error && err.message === "UNAUTHORIZED") {
@@ -135,7 +155,8 @@ export async function PUT(request: Request) {
       },
     });
 
-    const quota = getQuotaStatus(updated);
+    const platformKeyEnabled = await getPlatformKeyEnabled();
+    const quota = getQuotaStatus(updated, { platformKeyEnabled });
 
     return NextResponse.json({
       ok: true,
@@ -145,16 +166,7 @@ export async function PUT(request: Request) {
         hasApiKey: Boolean(updated.llmApiKeyEnc),
         apiKeyPreview: keyPreview(updated.llmApiKeyEnc),
       },
-      quota: {
-        isOwner: quota.isOwner,
-        hasOwnKey: quota.hasOwnKey,
-        canGenerate: quota.canGenerate,
-        freeLimit: quota.freeLimit,
-        freeRemaining: quota.freeRemaining,
-        platformCreditsUsed: quota.platformCreditsUsed,
-        message: quota.message ?? null,
-        reason: quota.reason ?? null,
-      },
+      quota: quotaDto(quota),
     });
   } catch (err) {
     if (err instanceof Error && err.message === "UNAUTHORIZED") {

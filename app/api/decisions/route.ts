@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import type { ScenarioKind } from "@prisma/client";
+import { trackEvent } from "@/lib/analytics";
+import { getPlatformKeyEnabled } from "@/lib/app-settings";
 import { requireUser, unauthorizedResponse } from "@/lib/auth";
 import { parseJsonSafe } from "@/lib/json";
 import {
@@ -68,7 +70,8 @@ export async function POST(request: Request) {
       },
     });
 
-    const quota = getQuotaStatus(dbUser);
+    const platformKeyEnabled = await getPlatformKeyEnabled();
+    const quota = getQuotaStatus(dbUser, { platformKeyEnabled });
     if (!quota.canGenerate) {
       return NextResponse.json(
         {
@@ -82,7 +85,7 @@ export async function POST(request: Request) {
 
     let credentials;
     try {
-      credentials = resolveLlmCredentials(dbUser);
+      credentials = await resolveLlmCredentials(dbUser, { platformKeyEnabled });
     } catch (err) {
       if (err instanceof LlmResolveError) {
         return NextResponse.json(
@@ -256,6 +259,10 @@ export async function POST(request: Request) {
         (kindRank.get(a.kind as (typeof SCENARIO_KIND_ORDER)[number]) ?? 99) -
         (kindRank.get(b.kind as (typeof SCENARIO_KIND_ORDER)[number]) ?? 99),
     );
+
+    await trackEvent("CREATE_DECISION", sessionUser.id, {
+      decisionId: decision.id,
+    });
 
     return NextResponse.json({
       id: decision.id,

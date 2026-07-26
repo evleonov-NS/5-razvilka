@@ -26,7 +26,6 @@ export {
 } from "@/lib/llm/providers";
 
 export {
-  getOwnerEmail,
   getQuotaStatus,
   isOwnerEmail,
   isPlatformLlmConfigured,
@@ -42,9 +41,14 @@ export {
 
 export {
   getUsageSummary,
+  getUsagePeriodsSummary,
+  getUsdRubRate,
+  formatRub,
   recordLlmUsage,
   consumePlatformCredit,
   type UsageSummary,
+  type UsagePeriodsSummary,
+  type PeriodCost,
 } from "@/lib/llm/usage";
 
 export { encryptSecret, decryptSecret, maskApiKey } from "@/lib/llm/crypto";

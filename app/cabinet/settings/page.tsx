@@ -3,8 +3,11 @@ import { redirect } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SignOutButton } from "@/components/SignOutButton";
 import { ProfileAvatar } from "@/components/cabinet/ProfileAvatar";
+import { DemoDataPanel } from "@/components/cabinet/DemoDataPanel";
 import { LlmSettingsPanel } from "@/components/cabinet/LlmSettingsPanel";
+import { isOwnerEmail } from "@/lib/owner";
 import { versionLabel } from "@/lib/version";
+import Link from "next/link";
 
 export default async function CabinetSettingsPage() {
   const user = await getCurrentUser();
@@ -13,6 +16,7 @@ export default async function CabinetSettingsPage() {
   }
 
   const displayName = user.name ?? user.email.split("@")[0];
+  const isOwner = isOwnerEmail(user.email);
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
@@ -22,7 +26,7 @@ export default async function CabinetSettingsPage() {
             Настройки
           </h1>
           <p className="mt-2 text-sm text-text-muted">
-            Профиль, API для разборов, стоимость запросов и тема.
+            Профиль, API для разборов, демо-данные, стоимость запросов и тема.
           </p>
         </header>
 
@@ -52,12 +56,27 @@ export default async function CabinetSettingsPage() {
               </div>
             </div>
 
+            {isOwner ? (
+              <div className="rounded-lg border border-border bg-surface p-5">
+                <h2 className="text-sm font-medium text-text">Владелец</h2>
+                <Link
+                  href="/cabinet/stats"
+                  className="mt-3 inline-block text-sm text-accent-ink underline-offset-2 hover:underline"
+                >
+                  Статистика и обратная связь
+                </Link>
+              </div>
+            ) : null}
+
             <div className="max-w-xs">
               <SignOutButton />
             </div>
           </section>
 
-          <LlmSettingsPanel />
+          <div className="space-y-8">
+            <DemoDataPanel />
+            <LlmSettingsPanel />
+          </div>
         </div>
       </div>
 
