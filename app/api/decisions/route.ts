@@ -34,7 +34,17 @@ const SCENARIO_ORDER_IDX: Record<ScenarioKind, number> = {
 export async function POST(request: Request) {
   try {
     const sessionUser = await requireUser();
-    const body: unknown = await request.json();
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Ожидается JSON-тело запроса" },
+        { status: 400 },
+      );
+    }
+
     const parsed = CreateDecisionInputSchema.safeParse(body);
 
     if (!parsed.success) {

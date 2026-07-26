@@ -4,7 +4,7 @@ import {
   landingLead,
   landingSection,
 } from "@/components/landing/landingLayout";
-import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
+import { LikelihoodBadge } from "@/components/LikelihoodBadge";
 
 type Likelihood = "LOW" | "MEDIUM" | "HIGH";
 
@@ -49,22 +49,6 @@ const preMortem = [
       "Записать заранее: что обязательно должно измениться (задачи, рост, среда) и что можно уступить.",
   },
 ] as const;
-
-const likelihoodClass: Record<Likelihood, string> = {
-  LOW: "border-border text-text-muted",
-  MEDIUM: "border-accent text-accent-ink",
-  HIGH: "border-accent bg-accent/15 text-accent-ink",
-};
-
-function LikelihoodBadge({ value }: { value: Likelihood }) {
-  return (
-    <span
-      className={`inline-block rounded border px-2 py-0.5 text-xs tracking-wide ${likelihoodClass[value]}`}
-    >
-      {LIKELIHOOD_LABELS[value]}
-    </span>
-  );
-}
 
 export function LandingExample() {
   return (

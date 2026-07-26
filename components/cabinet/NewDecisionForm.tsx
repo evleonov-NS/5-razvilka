@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { DecisionType, Horizon } from "@prisma/client";
 import { getPreset } from "@/lib/presets";
+import { ErrorMessage } from "@/components/ErrorMessage";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 const HORIZON_OPTIONS: { value: Horizon; label: string }[] = [
@@ -351,10 +352,26 @@ export function NewDecisionForm({ presetId }: Props) {
           <p className="mt-2 text-sm text-text-muted">{missingHint}</p>
         ) : null}
         {error ? (
-          <div className="mt-4 rounded-md border border-border bg-surface-2 p-4">
-            <p className="text-sm text-text">{error}</p>
+          <div className="mt-4 space-y-3">
+            <ErrorMessage
+              title="Не удалось разобрать решение"
+              message={
+                needApiKey
+                  ? error
+                  : `${error} Введённые данные сохранены — можно отправить снова.`
+              }
+              actionLabel={needApiKey ? undefined : "Попробовать снова"}
+              onAction={
+                needApiKey
+                  ? undefined
+                  : () => {
+                      setError(null);
+                      setNeedApiKey(false);
+                    }
+              }
+            />
             {needApiKey ? (
-              <p className="mt-2 text-sm">
+              <p className="text-center text-sm text-text-muted">
                 <Link
                   href="/cabinet/settings"
                   className={`text-accent-ink hover:underline ${landingFocus}`}
@@ -362,20 +379,7 @@ export function NewDecisionForm({ presetId }: Props) {
                   Открыть настройки API
                 </Link>
               </p>
-            ) : (
-              <>
-                <p className="mt-1 text-xs text-text-muted">
-                  Введённые данные сохранены — можно отправить снова.
-                </p>
-                <button
-                  type="submit"
-                  disabled={!canSubmit}
-                  className={`mt-3 text-sm text-accent-ink hover:underline disabled:opacity-40 ${landingFocus}`}
-                >
-                  Попробовать снова
-                </button>
-              </>
-            )}
+            ) : null}
           </div>
         ) : null}
       </div>

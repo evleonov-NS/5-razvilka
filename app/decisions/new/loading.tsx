@@ -1,9 +1,9 @@
 import { LoadingState } from "@/components/LoadingState";
 
-export default function CabinetLoading() {
+export default function NewDecisionLoading() {
   return (
     <div className="flex flex-1 bg-bg">
-      <LoadingState label="Загрузка журнала…" />
+      <LoadingState label="Открываем форму…" />
     </div>
   );
 }

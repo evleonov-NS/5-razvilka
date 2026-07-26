@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { versionLabel } from "@/lib/version";
 import { NewDecisionForm } from "@/components/cabinet/NewDecisionForm";
 import { landingFocus } from "@/components/landing/landingLayout";
@@ -17,21 +18,7 @@ export default async function NewDecisionPage({ searchParams }: PageProps) {
           href="/cabinet"
           className={`mb-8 inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-text ${landingFocus}`}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M10 3 L5 8 L10 13"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <ArrowLeft className="h-4 w-4" aria-hidden />
           В журнал
         </Link>
 

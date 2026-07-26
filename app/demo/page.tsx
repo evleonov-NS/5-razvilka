@@ -4,28 +4,12 @@ import { getCurrentUser } from "@/lib/auth";
 import { getCabinetCounts } from "@/lib/cabinet-counts";
 import { DEMO_DECISION, type DemoLikelihood } from "@/lib/demo-decision";
 import { versionLabel } from "@/lib/version";
-import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
 import { CabinetShell } from "@/components/cabinet/CabinetShell";
+import { LikelihoodBadge } from "@/components/LikelihoodBadge";
 import { landingFocus } from "@/components/landing/landingLayout";
 import { HORIZON_LABELS, TYPE_LABELS } from "@/lib/decision-labels";
 
 const MAX_TREE_DEPTH = 3;
-
-const likelihoodClass: Record<DemoLikelihood, string> = {
-  LOW: "border-border text-text-muted",
-  MEDIUM: "border-accent text-accent-ink",
-  HIGH: "border-accent bg-accent/15 text-accent-ink",
-};
-
-function LikelihoodBadge({ value }: { value: DemoLikelihood }) {
-  return (
-    <span
-      className={`inline-block shrink-0 rounded border px-2 py-0.5 text-xs tracking-wide ${likelihoodClass[value]}`}
-    >
-      {LIKELIHOOD_LABELS[value]}
-    </span>
-  );
-}
 
 type TreeNode = {
   label: string;

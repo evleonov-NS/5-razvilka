@@ -10,41 +10,28 @@
 
 | Параметр | Значение |
 |----------|----------|
-| Версия | 0.1.0 (`lib/version.ts`) |
+| Версия | 0.1.1 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | этап 8 — ревью по исходу (см. `docs/STATUS.md`) |
+| Последний коммит | этап 9 полировка UI (см. `docs/STATUS.md`) |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Текущий этап | **9 — полировка и деплой** |
+| Текущий этап | **9 — ключи LLM в Vercel + prod-тест** (код полировки готов) |
 
 ## Что уже сделано
 
-### Этапы 0–3
-- Каркас, домен Prisma, Auth.js + Google, кабинет, лендинг, `/explore`
-- LLM-слой: `lib/json.ts`, `lib/llm/*` (DeepSeek по умолчанию, BYOK DeepSeek/Qwen/OpenAI)
-- Квоты: `OWNER_EMAIL` безлимит; остальные 1 бесплатный разбор; `LlmUsage`; `/cabinet/settings`
+### Этапы 0–8 ✅
+- Каркас, Prisma, Auth.js + Google, кабинет, лендинг, `/explore`
+- LLM: DeepSeek по умолчанию, BYOK, квоты, `LlmUsage`
+- Создание решения (9.1), экран результата, дерево (9.2), ревью (9.3) → RESOLVED
 
-### Этап 4 ✅ (ядро)
-- `POST /api/decisions`: промпт 9.1 → `ScenarioResponseSchema` → транзакция Decision + Scenario[3] + FailureMode[3–5]
-- Невалидный LLM → без записи (ADR-023)
-
-### Этап 5 ✅ (экран результата)
-- `/decisions/[id]`: сценарии, pre-mortem, `LoadingState` / `ErrorMessage`, `loading.tsx` / `error.tsx`
-- Кнопки «В журнал», «Что получилось?» / «Итог и урок» → `/decisions/[id]/review`
-
-### Этап 7 ✅ (дерево)
-- `POST /api/decisions/[id]/tree`: промпт 9.2 → `TreeResponseSchema` → `Decision.tree`
-- `DecisionTree` + `TreeSection` (tree_idle / generating / ready / error)
-- Follow-up без повторного списания кредита (`skipFreeCreditCheck`); идемпотентность если tree уже есть
-
-### Этап 8 ✅ (ревью)
-- `POST /api/decisions/[id]/resolve`: `{ outcome }` → промпт 9.3 → `ReviewResponseSchema`
-- Сохраняет `outcome`, `reviewClosestScenario`, `reviewMissed`, `lesson`; `status=RESOLVED`, `resolvedAt`
-- `ReviewSection` на `/decisions/[id]/review`; идемпотентность при уже RESOLVED (ADR-025)
-- Follow-up: `skipFreeCreditCheck`
+### Этап 9 — полировка кода ✅
+- Единые `LoadingState` / `EmptyState` / `ErrorMessage`
+- Общий `LikelihoodBadge` (лендинг, demo, карточки)
+- `npm run vercel-build` = migrate deploy + generate + next build (ADR-026)
+- Версия 0.1.1
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
-## Env (локально уже есть; на Vercel — на этапе 9)
+## Env (локально уже есть; на Vercel — сейчас)
 
 ```env
 DATABASE_URL=   DIRECT_URL=
@@ -59,31 +46,14 @@ DEEPSEEK_API_KEY=
 
 Не коммитить `.env`.
 
-## Следующий шаг — Этап 9: полировка и деплой
+## Осталось по этапу 9 (вручную в Vercel)
 
-См. `docs/PROMPTS.md` Промпт 9, `docs/PLAN.md` § этап 9.
+См. `docs/PLAN.md` § этап 9.
 
-- Единые состояния UI, likelihood-бейджи
-- Ошибки LLM/БД, prod-тест §16
-- `migrate deploy` в Build Command (опционально)
-- STATUS, CHANGELOG, версия
-- **Обязательно:** внести LLM-ключи в Vercel Environment Variables
-
-### Vercel Environment Variables (обязательно)
-
-- Ссылка: https://vercel.com/dashboard → проект **5-razvilka** → **Settings** → **Environment Variables**
-- Добавить (Production + Preview по необходимости), значения как в локальном `.env`, **без кавычек**:
-
-| Key | Пример / форма | Обязательно |
-|-----|----------------|-------------|
-| `DEEPSEEK_API_KEY` | `sk-...` (ключ DeepSeek) | да (платформа по умолчанию) |
-| `LLM_DEFAULT_PROVIDER` | `DEEPSEEK` | желательно |
-| `LLM_MODEL` | `deepseek-chat` | желательно |
-| `OWNER_EMAIL` | `evleonov79@gmail.com` | да (безлимит владельца) |
-| `QWEN_API_KEY` | ключ Qwen | опционально |
-| `OPENAI_API_KEY` | `sk-...` | опционально |
-
-После сохранения — **Redeploy**. Auth/DB переменные уже должны быть (см. `docs/AUTH_GOOGLE_VERCEL.md`).
+1. Environment Variables (Production): `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, желательно `LLM_DEFAULT_PROVIDER`, `LLM_MODEL`
+2. Build Command → `npm run vercel-build`
+3. Redeploy
+4. Prod-тест §16: войти → `/decisions/new` → разобрать → дерево → ревью
 
 ```powershell
 npm run build
@@ -94,7 +64,7 @@ npm run build
 
 | Этап | Что |
 |------|-----|
-| 9 | Полировка + **ключи LLM в Vercel** + migrate deploy |
+| 9 | Ключи LLM в Vercel + vercel-build + prod-тест |
 | 2а | Демо-кнопки в `/cabinet/settings` |
 
 ## Правила
@@ -106,9 +76,8 @@ npm run build
 
 ## Известные нюансы
 - Старые Decision без Scenario → «Разбор ещё не готов» (ожидаемо)
-- На Windows `build` рядом с `dev` допустим; при EPERM агент ретраит сам, не просит остановить `dev`
-- Перегенерации пустой карточки нет — только новое решение
-- Дерево / ревью: повторный POST при уже сохранённых данных отдаёт существующее без LLM
-- Повторно сменить исход у RESOLVED через UI нельзя (показываем итог)
+- На Windows `build` рядом с `dev` допустим; при EPERM агент ретраит сам
+- Дерево / ревью: повторный POST при уже сохранённых данных без LLM
+- Повторно сменить исход у RESOLVED через UI нельзя
 
-Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 9), `docs/PROMPTS.md` (Промпт 9).
+Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 9 — чеклист Vercel).

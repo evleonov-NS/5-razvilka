@@ -183,9 +183,22 @@ export function ReviewSection({ decisionId, initialReview }: Props) {
       </form>
 
       {state === "generating" ? (
-        <p className="text-sm text-text-muted" aria-live="polite">
-          Модель сравнивает факт с тремя сценариями и формулирует один урок…
-        </p>
+        <div
+          className="rounded-lg border border-border bg-surface px-6 py-8"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <p className="text-sm text-text-muted">
+            Модель сравнивает факт с тремя сценариями и формулирует один урок…
+          </p>
+          <div className="mt-6 space-y-4">
+            <div className="h-4 w-1/3 max-w-xs animate-pulse rounded-md bg-surface-2" />
+            <div className="h-16 w-full animate-pulse rounded-md bg-surface-2" />
+            <div className="h-4 w-1/4 max-w-[8rem] animate-pulse rounded-md bg-surface-2" />
+            <div className="h-12 w-full animate-pulse rounded-md bg-surface-2" />
+          </div>
+        </div>
       ) : null}
 
       {state === "error" && error ? (

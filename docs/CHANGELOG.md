@@ -7,29 +7,34 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этап 9 — полировка + ключи LLM в Vercel
+- Этап 9 — ключи LLM в Vercel + Build Command `vercel-build` + prod-тест §16
+- Этап 2а — демо-кнопки в `/cabinet/settings`
 
 ### Added
+- **Этап 9 (полировка UI):** единые `LoadingState` / `EmptyState` / `ErrorMessage` на кабинете, `/decisions/new`, ревью; скелетон generating в `ReviewSection`.
+- **`npm run vercel-build`** — `prisma migrate deploy && prisma generate && next build` (ADR-026).
 - **Этап 8 — ревью по исходу:** `POST /api/decisions/[id]/resolve` — `{ outcome }` → промпт 9.3 → `ReviewResponseSchema` → `outcome` / `reviewClosestScenario` / `reviewMissed` / `lesson`, `status=RESOLVED`.
 - **`buildReviewSystemPrompt`** в `lib/prompts.ts`; компонент `ReviewSection` (idle/generating/ready/error).
-- **`/decisions/[id]/review`:** форма факта → ближайший сценарий + упущение + 1 урок (вместо заглушки).
-- **Этап 7 — дерево развилок (ADR-008):** `POST /api/decisions/[id]/tree` — промпт 9.2 → `TreeResponseSchema` → `Decision.tree`; компоненты `DecisionTree`, `TreeSection` (idle/generating/ready/error).
+- **`/decisions/[id]/review`:** форма факта → ближайший сценарий + упущение + 1 урок.
+- **Этап 7 — дерево развилок (ADR-008):** `POST /api/decisions/[id]/tree` — промпт 9.2 → `TreeResponseSchema` → `Decision.tree`; компоненты `DecisionTree`, `TreeSection`.
 - **`buildTreeSystemPrompt`** в `lib/prompts.ts`.
-- **Этап 5 — экран результата:** `LoadingState`, `ErrorMessage`; `loading.tsx` / `error.tsx` на `/decisions/[id]`; кнопка «Что получилось?» → `/decisions/[id]/review`.
-- **Этап 4 — ядро создания решения (ADR-023):** `POST /api/decisions` вызывает промпт 9.1, валидирует через `ScenarioResponseSchema`, сохраняет `Decision` + 3 сценария + 3–5 failure modes в одной транзакции.
-- **`lib/prompts.ts`** — сборка system-промпта 9.1.
-- **`ScenarioCard`**, **`FailureModeList`**, **`LikelihoodBadge`** — экран `/decisions/[id]` показывает сценарии и pre-mortem из БД.
-- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`; обновлён корневой `PROMPT.md` (этап 9).
-- В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel (ссылка, таблица Key/значение).
+- **Этап 5 — экран результата:** `LoadingState`, `ErrorMessage`; `loading.tsx` / `error.tsx` на `/decisions/[id]`.
+- **Этап 4 — ядро создания решения (ADR-023):** `POST /api/decisions` → `ScenarioResponseSchema` → транзакция Decision + Scenario[3] + FailureMode[3–5].
+- **`lib/prompts.ts`**, **`ScenarioCard`**, **`FailureModeList`**, **`LikelihoodBadge`**.
+- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`.
+- В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel.
 
 ### Changed
-- **`resolveLlmCredentials`:** опция `skipFreeCreditCheck` для follow-up (дерево и ревью без повторного списания кредита).
-- **`/decisions/[id]`:** секция дерева; CTA «Что получилось?» / «Итог и урок» при RESOLVED; пустое состояние через `EmptyState`.
-- **ADR-024:** при EPERM Prisma на Windows агент ретраит `build` сам; `dev` не останавливать по умолчанию (правила + `PROMPT.md`).
-- **ADR-025:** повторный `POST …/resolve` при уже RESOLVED отдаёт сохранённое ревью без LLM.
-- **`POST /api/decisions`:** генерация до записи; при невалидном LLM — без сохранения, лог raw, 502/422; кредит списывается только после успеха на платформенном ключе.
-- Форма `/decisions/new`: обработка кодов `NO_PLATFORM_KEY` / `INVALID_KEY` со ссылкой в настройки.
-- **PLAN этап 9:** явный шаг «внести `DEEPSEEK_API_KEY` / `OWNER_EMAIL` / … в Vercel Environment Variables».
+- Версия **0.1.1** (`lib/version.ts`).
+- Лендинг и `/demo` используют общий `LikelihoodBadge` (без локальных копий).
+- `NewDecisionForm` — ошибки через `ErrorMessage`.
+- **`POST /api/decisions`:** безопасный parse JSON тела → 400.
+- **`resolveLlmCredentials`:** `skipFreeCreditCheck` для follow-up (дерево и ревью).
+- **`/decisions/[id]`:** секция дерева; CTA «Что получилось?» / «Итог и урок» при RESOLVED.
+- **ADR-024:** EPERM Prisma — ретрай build; `dev` не останавливать.
+- **ADR-025:** повторный `POST …/resolve` при RESOLVED без LLM.
+- **ADR-026:** локальный `build` без migrate; prod — `vercel-build`.
+- Форма `/decisions/new`: коды `NO_PLATFORM_KEY` / `INVALID_KEY` со ссылкой в настройки.
 
 ### Added (ранее)
 - **LLM multi-provider (ADR-022):** DeepSeek по умолчанию; в `/cabinet/settings` — DeepSeek / Qwen / OpenAI, выбор модели, свой API-ключ (AES-GCM); квоты (`OWNER_EMAIL` безлимит, остальные 1 бесплатный разбор); учёт стоимости в `LlmUsage`.

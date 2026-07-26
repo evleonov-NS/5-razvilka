@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { versionLabel } from "@/lib/version";
+import { EmptyState } from "@/components/EmptyState";
 import { landingFocus } from "@/components/landing/landingLayout";
 import {
   ReviewSection,
@@ -78,17 +79,13 @@ export default async function DecisionReviewPage({ params }: PageProps) {
         </header>
 
         {!hasScenarios ? (
-          <div className="rounded-lg border border-border bg-surface px-6 py-10">
-            <p className="text-lg font-medium text-text">Разбор ещё не готов</p>
-            <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-text-muted">
-              Сначала нужны три сценария — без них не с чем сверять исход.
-            </p>
-            <Link
-              href={`/decisions/${decision.id}`}
-              className={`mt-6 inline-flex h-11 items-center justify-center rounded-md bg-accent px-6 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 ${landingFocus}`}
-            >
-              К разбору
-            </Link>
+          <div className="rounded-lg border border-border bg-surface">
+            <EmptyState
+              title="Разбор ещё не готов"
+              description="Сначала нужны три сценария — без них не с чем сверять исход."
+              actionLabel="К разбору"
+              actionHref={`/decisions/${decision.id}`}
+            />
           </div>
         ) : (
           <ReviewSection

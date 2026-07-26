@@ -281,4 +281,14 @@
 
 ---
 
+## ADR-026: Локальный build без migrate; Vercel — `vercel-build` (2026-07-26)
+
+**Решение:** `npm run build` остаётся `prisma generate && next build` (удобно локально рядом с `dev`). Для Production на Vercel — `npm run vercel-build` = `prisma migrate deploy && prisma generate && next build`. В Dashboard → Settings → General → **Build Command** указать `npm run vercel-build` (или оставить migrate вручную).
+
+**Причина:** `migrate deploy` на каждом локальном build ломает/замедляет разработку без доступа к Neon; на Vercel миграции должны применяться до `next build`.
+
+**Связанные файлы:** `package.json`, `docs/PLAN.md` § этап 9.
+
+---
+
 *Новые ADR добавлять с номером, датой и кратким обоснованием.*

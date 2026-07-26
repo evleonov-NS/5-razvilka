@@ -32,7 +32,7 @@
 
 | LLM / ядро продукта | ✅ Этапы 4–5, 7–8; далее полировка (9) |
 
-| Production Neon | ⚠️ `migrate deploy` вручную или в Build Command |
+| Production Neon | ⚠️ Build Command: `npm run vercel-build` (migrate deploy + build) |
 
 
 
@@ -132,7 +132,7 @@
 
 | Runtime API | Node (не Edge) |
 
-| Деплой | Vercel; `build = prisma generate && next build` (миграции — отдельно) |
+| Деплой | Vercel; локально `npm run build`; prod Build Command — `npm run vercel-build` (ADR-026) |
 
 
 
@@ -172,13 +172,13 @@
 
 | 6 | Журнал | ✅ | — |
 
-| 7 | Дерево развилок | ⏳ | 1–1.5 д |
+| 7 | Дерево развилок | ✅ | ~~1–1.5 д~~ |
 
-| 8 | Ревью по исходу | ⏳ | 1 д |
+| 8 | Ревью по исходу | ✅ | ~~1 д~~ |
 
-| 9 | Полировка и деплой | ⏳ | 1–2 д |
+| 9 | Полировка и деплой | 🔄 | 1–2 д |
 
-| | **Итого осталось** | | **~8–12 д** |
+| | **Итого осталось** | | **~1–2 д** (ключ и prod-проверка) |
 
 
 
@@ -458,15 +458,17 @@
 
 
 
-- [ ] Единые состояния UI, likelihood-бейджи
+- [x] Единые состояния UI (`LoadingState` / `EmptyState` / `ErrorMessage`), общий `LikelihoodBadge`
 
-- [ ] Ошибки LLM/БД, prod-тест §16
+- [x] Ошибки LLM/БД без падения UI (create / tree / resolve + error.tsx)
 
-- [ ] `migrate deploy` в Build Command (опционально): `npx prisma migrate deploy && npm run build`
+- [x] `npm run vercel-build` = migrate deploy + generate + next build (ADR-026); в Vercel Build Command — вручную
 
-- [ ] STATUS, CHANGELOG, версия
+- [x] STATUS, CHANGELOG, версия `0.1.1`
 
 - [ ] **Vercel: платформенные LLM API-ключи** (локальный `.env` на prod не попадает)
+
+- [ ] Prod-тест §16 после ключей + Redeploy
 
 
 

@@ -1,33 +1,34 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
 **Обновлено:** 2026-07-26  
-**Версия приложения:** 0.1.0 (`lib/version.ts`)  
-**Последний коммит:** этап 8 (ревью по исходу) — см. git log  
-**Текущий этап:** 9 — полировка и деплой  
+**Версия приложения:** 0.1.1 (`lib/version.ts`)  
+**Последний коммит:** этап 8 (ревью) / полировка этапа 9 в работе — см. git log  
+**Текущий этап:** 9 — полировка и деплой (код UI готов; остались ключи LLM в Vercel + prod-тест)  
 **Dev-log:** [26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md](./26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md)
 
 ---
 
-## Сводка (этап 8 закрыт)
+## Сводка (этап 9 — полировка кода)
 
 | Вопрос | Ответ |
 |--------|--------|
-| Что умеет продукт сейчас | Войти → описать решение → 3 сценария + pre-mortem → дерево → «Что получилось?» → ревью (ближайший сценарий + упущение + урок), status=RESOLVED |
-| Чего ещё нет | Полировка prod + ключи LLM в Vercel (9) |
-| Где смотреть | Локально: `/decisions/[id]/review`; prod: https://5-razvilka.vercel.app |
-| Риск для prod | Без `DEEPSEEK_API_KEY` в Vercel генерация на платформенном ключе не работает — **внести на этапе 9** (чеклист в PLAN) |
+| Что умеет продукт сейчас | Войти → описать решение → 3 сценария + pre-mortem → дерево → «Что получилось?» → ревью → RESOLVED |
+| Чего ещё нет | Ключи LLM в Vercel + prod-прогон §16; этап 2а (демо-кнопки в settings) |
+| Где смотреть | Локально: полный цикл; prod: https://5-razvilka.vercel.app |
+| Риск для prod | Без `DEEPSEEK_API_KEY` в Vercel генерация на платформенном ключе не работает — **внести сейчас** (чеклист в PLAN § этап 9) |
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
 | Доменная схема Prisma | ✅ Готово | + `LlmUsage`, поля LLM у User |
 | Auth (Google OAuth) | ✅ Готово | Auth.js v5 |
-| LLM / провайдеры | ✅ Слой + настройки | DeepSeek по умолчанию; BYOK; квоты; стоимость |
+| LLM / провайдеры | ✅ Слой + настройки | DeepSeek по умолчанию; BYOK; квоты |
 | Создание решения | ✅ Этап 4 | промпт 9.1 → Scenario + FailureMode |
 | Экран результата | ✅ Этап 5 | Loading/Error, CTA на ревью |
 | Дерево развилок | ✅ Этап 7 | `POST …/tree`, `DecisionTree`, `TreeSection` |
 | Ревью по исходу | ✅ Этап 8 | `POST …/resolve`, `ReviewSection`, OPEN → RESOLVED |
+| Полировка UI | ✅ Этап 9 (код) | единые состояния, LikelihoodBadge, vercel-build |
 | Личный кабинет | ✅ Готово | настройки API в `/cabinet/settings` |
-| Деплой Vercel | ✅ сайт | LLM-ключи в env — чеклист этапа 9 |
+| Деплой Vercel | ⚠️ сайт есть | LLM-ключи + Build Command `vercel-build` — вручную |
 
 ---
 
@@ -44,11 +45,24 @@
 | 6 | Журнал (главная) | ✅ Готово | кабинет; `/` — лендинг гостя |
 | 7 | Дерево развилок | ✅ Завершён |
 | 8 | Ревью по исходу | ✅ Завершён | OPEN → RESOLVED |
-| 9 | Полировка и деплой | ⚪ Ожидает | + **API-ключи LLM в Vercel** |
+| 9 | Полировка и деплой | 🔄 В работе | код UI ✅; ключи Vercel + prod-тест ⬜ |
 | 2а | Настройки: демо-данные (UI) | ⚪ Запланирован |
 | 10 | Социальные механики | ✅ Завершён |
 
 ---
+
+## Готово (Этап 9 — полировка кода, 2026-07-26)
+
+- [x] Общий `LikelihoodBadge` на лендинге и `/demo` (без локальных копий)
+- [x] `NewDecisionForm` — ошибки через `ErrorMessage`
+- [x] `cabinet/loading.tsx` → `LoadingState`; `cabinet/error.tsx`
+- [x] `loading.tsx` / `error.tsx` для `/decisions/new`
+- [x] Review empty → `EmptyState`; generating — скелетон как у дерева
+- [x] `POST /api/decisions` — безопасный parse JSON тела (400)
+- [x] `npm run vercel-build` (ADR-026); версия `0.1.1`
+- [ ] Vercel Environment Variables: `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, …
+- [ ] Vercel Build Command → `npm run vercel-build`
+- [ ] Redeploy + prod-тест §16
 
 ## Готово (Этап 8 — ревью по исходу, 2026-07-26)
 
@@ -73,7 +87,7 @@
 
 - [x] `LoadingState`, `ErrorMessage`
 - [x] `app/decisions/[id]/loading.tsx`, `error.tsx`
-- [x] Кнопка «Что получилось?» → `/decisions/[id]/review` (заглушка до этапа 8)
+- [x] Кнопка «Что получилось?» → `/decisions/[id]/review`
 - [x] Пустое состояние разбора через `EmptyState`
 
 ## Готово (Этап 4 — ядро создания решения, 2026-07-26)
@@ -84,16 +98,14 @@
 - [x] `recordLlmUsage`; `consumePlatformCredit` только при платформенном ключе (не owner)
 - [x] `/decisions/[id]`: `ScenarioCard`, `FailureModeList` из БД
 - [x] `lib/prompts.ts` (промпт 9.1); ADR-023
-- [x] Ручная проверка: разбор «проверка» — 3 сценария + pre-mortem
-- [x] `npm run build` ок; dev-log + `PROMPT.md` для следующего чата
 
 ## Готово (LLM: провайдеры + квоты + стоимость, 2026-07-23)
 
 - [x] Платформа по умолчанию — DeepSeek (`DEEPSEEK_API_KEY`)
 - [x] `/cabinet/settings` — провайдер / модель / свой ключ; блок стоимости запросов
-- [x] Квоты: `OWNER_EMAIL` (evleonov79@…) безлимит; остальные — 1 бесплатный разбор
+- [x] Квоты: `OWNER_EMAIL` безлимит; остальные — 1 бесплатный разбор
 - [x] `LlmUsage` + оценка USD; ключ AES-GCM (`AUTH_SECRET`)
-- [x] Миграция `user_llm_settings` (нужен `migrate deploy`)
+- [x] Миграция `user_llm_settings`
 - [x] ADR-022
 
 Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER`, `LLM_MODEL`, `OWNER_EMAIL` — см. `.env.example`.
@@ -145,9 +157,10 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 
 ## Следующий шаг
 
-**Этап 8** — ревью по исходу (`POST /api/decisions/[id]/resolve`, промпт 9.3, `status=RESOLVED`).
-
-Затем **9** полировка + **внести LLM-ключи в Vercel** (чеклист в [PLAN.md](./PLAN.md) § этап 9).
+1. **Внести LLM-ключи в Vercel** (таблица в [PLAN.md](./PLAN.md) § этап 9) → Redeploy  
+2. Build Command: `npm run vercel-build`  
+3. Prod-тест §16 на https://5-razvilka.vercel.app  
+4. Затем **этап 2а** — демо-кнопки в `/cabinet/settings`
 
 Промпт для нового чата: корневой [PROMPT.md](../PROMPT.md).
 
