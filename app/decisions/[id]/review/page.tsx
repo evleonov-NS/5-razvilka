@@ -5,13 +5,17 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { versionLabel } from "@/lib/version";
 import { landingFocus } from "@/components/landing/landingLayout";
+import {
+  ReviewSection,
+  type ReviewResult,
+} from "@/components/ReviewSection";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-/** Заглушка ревью по исходу — полноценная форма на этапе 8. */
-export default async function DecisionReviewStubPage({ params }: PageProps) {
+/** Ревью по исходу: форма факта → ближайший сценарий + упущение + урок. */
+export default async function DecisionReviewPage({ params }: PageProps) {
   const user = await getCurrentUser();
   if (!user) {
     notFound();
@@ -21,11 +25,38 @@ export default async function DecisionReviewStubPage({ params }: PageProps) {
 
   const decision = await prisma.decision.findFirst({
     where: { id, userId: user.id },
-    select: { id: true, title: true },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      outcome: true,
+      lesson: true,
+      reviewClosestScenario: true,
+      reviewMissed: true,
+      scenarios: { select: { id: true }, take: 1 },
+    },
   });
 
   if (!decision) {
     notFound();
+  }
+
+  const hasScenarios = decision.scenarios.length > 0;
+
+  let initialReview: ReviewResult | null = null;
+  if (
+    decision.status === "RESOLVED" &&
+    decision.outcome &&
+    decision.lesson &&
+    decision.reviewClosestScenario &&
+    decision.reviewMissed
+  ) {
+    initialReview = {
+      outcome: decision.outcome,
+      closestScenario: decision.reviewClosestScenario,
+      missed: decision.reviewMissed,
+      lesson: decision.lesson,
+    };
   }
 
   return (
@@ -46,19 +77,30 @@ export default async function DecisionReviewStubPage({ params }: PageProps) {
           <p className="mt-2 text-sm text-text-muted">{decision.title}</p>
         </header>
 
-        <div className="rounded-lg border border-border bg-surface px-6 py-10">
-          <p className="text-lg font-medium text-text">Скоро</p>
-          <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-text-muted">
-            Здесь можно будет коротко описать, чем всё закончилось: какой
-            сценарий ближе к реальности и какой урок вынести. Пока этот шаг в
-            разработке — вернитесь к разбору или в журнал.
-          </p>
-        </div>
+        {!hasScenarios ? (
+          <div className="rounded-lg border border-border bg-surface px-6 py-10">
+            <p className="text-lg font-medium text-text">Разбор ещё не готов</p>
+            <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-text-muted">
+              Сначала нужны три сценария — без них не с чем сверять исход.
+            </p>
+            <Link
+              href={`/decisions/${decision.id}`}
+              className={`mt-6 inline-flex h-11 items-center justify-center rounded-md bg-accent px-6 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 ${landingFocus}`}
+            >
+              К разбору
+            </Link>
+          </div>
+        ) : (
+          <ReviewSection
+            decisionId={decision.id}
+            initialReview={initialReview}
+          />
+        )}
 
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href={`/decisions/${decision.id}`}
-            className={`inline-flex h-11 items-center justify-center rounded-md bg-accent px-6 text-sm font-medium text-accent-contrast transition-opacity hover:opacity-90 ${landingFocus}`}
+            className={`inline-flex h-11 items-center justify-center rounded-md border border-border px-6 text-sm text-text transition-colors hover:border-border-strong hover:bg-surface-2 ${landingFocus}`}
           >
             Назад к разбору
           </Link>

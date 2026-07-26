@@ -38,6 +38,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
       context: true,
       horizon: true,
       type: true,
+      status: true,
       isPublic: true,
       tree: true,
       scenarios: {
@@ -213,7 +214,9 @@ export default async function DecisionDetailPage({ params }: PageProps) {
               href={`/decisions/${decision.id}/review`}
               className={`inline-flex h-11 items-center justify-center rounded-md border border-border px-6 text-sm text-text transition-colors hover:border-border-strong hover:bg-surface-2 ${landingFocus}`}
             >
-              Что получилось?
+              {decision.status === "RESOLVED"
+                ? "Итог и урок"
+                : "Что получилось?"}
             </Link>
           ) : null}
           <Link

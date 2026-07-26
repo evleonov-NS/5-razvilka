@@ -12,9 +12,9 @@
 |----------|----------|
 | Версия | 0.1.0 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | этап 7 — дерево развилок (см. `docs/STATUS.md`) |
+| Последний коммит | этап 8 — ревью по исходу (см. `docs/STATUS.md`) |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Текущий этап | **8 — ревью по исходу**; далее 9 |
+| Текущий этап | **9 — полировка и деплой** |
 
 ## Что уже сделано
 
@@ -29,12 +29,18 @@
 
 ### Этап 5 ✅ (экран результата)
 - `/decisions/[id]`: сценарии, pre-mortem, `LoadingState` / `ErrorMessage`, `loading.tsx` / `error.tsx`
-- Кнопки «В журнал», «Что получилось?» → заглушка `/decisions/[id]/review` (форма — этап 8)
+- Кнопки «В журнал», «Что получилось?» / «Итог и урок» → `/decisions/[id]/review`
 
 ### Этап 7 ✅ (дерево)
 - `POST /api/decisions/[id]/tree`: промпт 9.2 → `TreeResponseSchema` → `Decision.tree`
 - `DecisionTree` + `TreeSection` (tree_idle / generating / ready / error)
 - Follow-up без повторного списания кредита (`skipFreeCreditCheck`); идемпотентность если tree уже есть
+
+### Этап 8 ✅ (ревью)
+- `POST /api/decisions/[id]/resolve`: `{ outcome }` → промпт 9.3 → `ReviewResponseSchema`
+- Сохраняет `outcome`, `reviewClosestScenario`, `reviewMissed`, `lesson`; `status=RESOLVED`, `resolvedAt`
+- `ReviewSection` на `/decisions/[id]/review`; идемпотентность при уже RESOLVED (ADR-025)
+- Follow-up: `skipFreeCreditCheck`
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
@@ -53,20 +59,18 @@ DEEPSEEK_API_KEY=
 
 Не коммитить `.env`.
 
-## Следующий шаг — Этап 8: ревью по исходу
+## Следующий шаг — Этап 9: полировка и деплой
 
-См. `docs/PROMPTS.md` Промпт 8, `docs/PLAN.md` § этап 8, `PROJECT.md` §5.5 / §9.3.
+См. `docs/PROMPTS.md` Промпт 9, `docs/PLAN.md` § этап 9.
 
-- `POST /api/decisions/[id]/resolve`: принять `{ outcome }`, промпт 9.3 → `ReviewResponseSchema`
-- Сохранить `outcome`, `reviewClosestScenario`, `reviewMissed`, `lesson`; `status=RESOLVED`, `resolvedAt`
-- Заменить заглушку `/decisions/[id]/review` на форму ввода факта → ближайший сценарий + упущение + 1 урок
-- Владелец только; `requireUser()`; LLM только на сервере
-- Follow-up: `skipFreeCreditCheck` (как у дерева), не списывать кредит повторно
+- Единые состояния UI, likelihood-бейджи
+- Ошибки LLM/БД, prod-тест §16
+- `migrate deploy` в Build Command (опционально)
+- STATUS, CHANGELOG, версия
+- **Обязательно:** внести LLM-ключи в Vercel Environment Variables
 
-После этапа 8: **9** полировка и деплой.
+### Vercel Environment Variables (обязательно)
 
-### На этапе 9 (обязательно напомнить пользователю)
-Внести LLM-ключи в Vercel Environment Variables (иначе prod не генерирует на платформенном ключе):
 - Ссылка: https://vercel.com/dashboard → проект **5-razvilka** → **Settings** → **Environment Variables**
 - Добавить (Production + Preview по необходимости), значения как в локальном `.env`, **без кавычек**:
 
@@ -90,7 +94,6 @@ npm run build
 
 | Этап | Что |
 |------|-----|
-| 8 | Ревью + status=RESOLVED (промпт 9.3); заменить заглушку review |
 | 9 | Полировка + **ключи LLM в Vercel** + migrate deploy |
 | 2а | Демо-кнопки в `/cabinet/settings` |
 
@@ -105,7 +108,7 @@ npm run build
 - Старые Decision без Scenario → «Разбор ещё не готов» (ожидаемо)
 - На Windows `build` рядом с `dev` допустим; при EPERM агент ретраит сам, не просит остановить `dev`
 - Перегенерации пустой карточки нет — только новое решение
-- Дерево: повторный POST при уже сохранённом tree отдаёт существующее без LLM
-- `/decisions/[id]/review` пока заглушка — не ломать маршрут при этапе 8
+- Дерево / ревью: повторный POST при уже сохранённых данных отдаёт существующее без LLM
+- Повторно сменить исход у RESOLVED через UI нельзя (показываем итог)
 
-Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 8), `docs/PROMPTS.md` (Промпт 8).
+Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 9), `docs/PROMPTS.md` (Промпт 9).

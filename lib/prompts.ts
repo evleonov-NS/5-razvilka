@@ -58,3 +58,37 @@ export function buildTreeSystemPrompt(input: TreePromptInput): string {
 Верни ТОЛЬКО JSON, без markdown. likelihood — В ВЕРХНЕМ РЕГИСТРЕ:
 {"label": "Решение: ...", "branches": [{"choice": "...", "consequence": "...", "likelihood": "LOW|MEDIUM|HIGH", "branches": []}]}`;
 }
+
+export type ReviewScenarioLine = {
+  kind: string;
+  likelihood: string;
+  narrative: string;
+};
+
+export type ReviewPromptInput = {
+  title: string;
+  scenarios: ReviewScenarioLine[];
+  outcome: string;
+};
+
+/** Промпт 9.3 — ревью-калибровка по факту (system). */
+export function buildReviewSystemPrompt(input: ReviewPromptInput): string {
+  const scenariosBlock = input.scenarios
+    .map(
+      (s) =>
+        `- ${s.kind} (${s.likelihood}): ${s.narrative}`,
+    )
+    .join("\n");
+
+  return `Пользователь смоделировал решение, теперь известен исход. Даны сценарии и факт.
+
+Решение: ${input.title}
+Прогнозы:
+${scenariosBlock}
+Факт: ${input.outcome}
+
+Оцени: какой сценарий ближе всего, что упущено, и РОВНО один урок на будущее.
+
+Верни ТОЛЬКО JSON. closest_scenario — В ВЕРХНЕМ РЕГИСТРЕ:
+{"closest_scenario": "OPTIMISTIC|BASE|PESSIMISTIC", "missed": "...", "lesson": "..."}`;
+}

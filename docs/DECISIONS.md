@@ -271,4 +271,14 @@
 
 ---
 
+## ADR-025: Ревью по исходу идемпотентно (2026-07-26)
+
+**Решение:** `POST /api/decisions/[id]/resolve` принимает `{ outcome }`, вызывает промпт 9.3, валидирует `ReviewResponseSchema`, пишет `outcome` / `reviewClosestScenario` / `reviewMissed` / `lesson`, ставит `status=RESOLVED` и `resolvedAt`. Если решение уже RESOLVED с полным набором полей ревью — ответ без повторного вызова LLM (`alreadyExists: true`). Follow-up: `skipFreeCreditCheck`, кредит не списывается.
+
+**Причина:** повторный клик / refresh не должен жечь токены и перезаписывать урок; UI показывает сохранённый итог.
+
+**Связанные файлы:** `app/api/decisions/[id]/resolve/route.ts`, `components/ReviewSection.tsx`, `lib/prompts.ts`.
+
+---
+
 *Новые ADR добавлять с номером, датой и кратким обоснованием.*

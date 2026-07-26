@@ -100,7 +100,7 @@ export const TreeResponseSchema = z.object({
 
 export type TreeResponse = z.infer<typeof TreeResponseSchema>;
 
-/** Ответ промпта 9.3 — заготовка для этапа 8. */
+/** Ответ промпта 9.3 — ревью-калибровка (этап 8). */
 export const ReviewResponseSchema = z.object({
   closest_scenario: ScenarioKindSchema,
   missed: nonEmptyString,
