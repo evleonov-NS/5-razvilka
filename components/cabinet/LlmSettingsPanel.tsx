@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { LlmProviderKind } from "@prisma/client";
+import { CostUsagePanel } from "@/components/cabinet/CostUsagePanel";
 
 type ProviderPublic = {
   id: LlmProviderKind;
@@ -77,7 +78,12 @@ type LoadState = {
   appSettings: { platformKeyEnabled: boolean } | null;
 };
 
-export function LlmSettingsPanel() {
+export function LlmSettingsPanel({
+  demoSlot,
+}: {
+  /** Демо и прочие блоки правой колонки над «Доступом». */
+  demoSlot?: ReactNode;
+}) {
   const [data, setData] = useState<LoadState | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -207,7 +213,10 @@ export function LlmSettingsPanel() {
 
   if (loading && !data) {
     return (
-      <p className="text-sm text-text-muted" aria-live="polite">
+      <p
+        className="text-sm text-text-muted lg:col-span-2"
+        aria-live="polite"
+      >
         Загрузка настроек API…
       </p>
     );
@@ -215,7 +224,7 @@ export function LlmSettingsPanel() {
 
   if (!data) {
     return (
-      <p className="text-sm text-accent-ink" role="alert">
+      <p className="text-sm text-accent-ink lg:col-span-2" role="alert">
         {error ?? "Нет данных"}
       </p>
     );
@@ -225,64 +234,66 @@ export function LlmSettingsPanel() {
   const platformEnabled =
     data.appSettings?.platformKeyEnabled ?? quota.platformKeyEnabled;
 
+  // contents — дети участвуют в родительской сетке настроек (стоимость на 2 колонки)
   return (
-    <div className="space-y-8">
-      <section className="rounded-lg border border-border bg-surface p-5">
-        <h2 className="text-sm font-medium text-text">Доступ к разборам</h2>
-        <p className="mt-1 text-xs text-text-muted">
-          По умолчанию — DeepSeek на стороне сервиса. Свой ключ снимает лимит.
-        </p>
-
-        <ul className="mt-4 space-y-2 text-sm text-text">
-          {quota.isOwner ? (
-            <li>
-              Режим владельца: безлимитные разборы на платформенном ключе.
-            </li>
-          ) : quota.hasOwnKey ? (
-            <li>Подключён свой API — разборы без лимита сервиса.</li>
-          ) : !quota.platformKeyEnabled ? (
-            <li className="text-accent-ink">
-              Платформенный ключ отключён. Добавьте свой API ниже.
-            </li>
-          ) : quota.freeRemaining !== null && quota.freeRemaining > 0 ? (
-            <li>
-              Остался{" "}
-              <span className="font-medium text-accent-ink">
-                {quota.freeRemaining}
-              </span>{" "}
-              бесплатный тестовый разбор.
-            </li>
-          ) : (
-            <li className="text-accent-ink">
-              Бесплатный разбор использован. Добавьте свой API ниже, чтобы
-              продолжить.
-            </li>
-          )}
-          {!quota.canGenerate && quota.message ? (
-            <li className="text-text-muted">{quota.message}</li>
-          ) : null}
-        </ul>
-      </section>
-
-      {quota.isOwner ? (
+    <div className="contents">
+      <div className="space-y-8">
+        {demoSlot}
         <section className="rounded-lg border border-border bg-surface p-5">
-          <h2 className="text-sm font-medium text-text">
-            Токен по умолчанию
-          </h2>
+          <h2 className="text-sm font-medium text-text">Доступ к разборам</h2>
           <p className="mt-1 text-xs text-text-muted">
-            Разрешить обычным пользователям один бесплатный разбор на
-            платформенном ключе. Владелец всегда может пользоваться платформой.
+            По умолчанию — DeepSeek на стороне сервиса. Свой ключ снимает лимит.
           </p>
-          <label className="mt-4 flex items-center gap-3 text-sm text-text">
-            <input
-              type="checkbox"
-              checked={platformEnabled}
-              disabled={togglingPlatform}
-              onChange={(e) => void handlePlatformToggle(e.target.checked)}
-            />
-            Разрешить платформенный ключ (бесплатный разбор)
-          </label>
-          {quota.isOwner ? (
+
+          <ul className="mt-4 space-y-2 text-sm text-text">
+            {quota.isOwner ? (
+              <li>
+                Режим владельца: безлимитные разборы на платформенном ключе.
+              </li>
+            ) : quota.hasOwnKey ? (
+              <li>Подключён свой API — разборы без лимита сервиса.</li>
+            ) : !quota.platformKeyEnabled ? (
+              <li className="text-accent-ink">
+                Платформенный ключ отключён. Добавьте свой API ниже.
+              </li>
+            ) : quota.freeRemaining !== null && quota.freeRemaining > 0 ? (
+              <li>
+                Остался{" "}
+                <span className="font-medium text-accent-ink">
+                  {quota.freeRemaining}
+                </span>{" "}
+                бесплатный тестовый разбор.
+              </li>
+            ) : (
+              <li className="text-accent-ink">
+                Бесплатный разбор использован. Добавьте свой API ниже, чтобы
+                продолжить.
+              </li>
+            )}
+            {!quota.canGenerate && quota.message ? (
+              <li className="text-text-muted">{quota.message}</li>
+            ) : null}
+          </ul>
+        </section>
+
+        {quota.isOwner ? (
+          <section className="rounded-lg border border-border bg-surface p-5">
+            <h2 className="text-sm font-medium text-text">
+              Токен по умолчанию
+            </h2>
+            <p className="mt-1 text-xs text-text-muted">
+              Разрешить обычным пользователям один бесплатный разбор на
+              платформенном ключе. Владелец всегда может пользоваться платформой.
+            </p>
+            <label className="mt-4 flex items-center gap-3 text-sm text-text">
+              <input
+                type="checkbox"
+                checked={platformEnabled}
+                disabled={togglingPlatform}
+                onChange={(e) => void handlePlatformToggle(e.target.checked)}
+              />
+              Разрешить платформенный ключ (бесплатный разбор)
+            </label>
             <p className="mt-3">
               <Link
                 href="/cabinet/stats"
@@ -291,11 +302,26 @@ export function LlmSettingsPanel() {
                 Статистика и обратная связь →
               </Link>
             </p>
-          ) : null}
-        </section>
-      ) : null}
+          </section>
+        ) : null}
+      </div>
 
-      <section className="rounded-lg border border-border bg-surface p-5">
+      <div className="lg:col-span-2">
+        <CostUsagePanel
+          rateLabel={periods.rateLabel}
+          personal={periods.personal}
+          platform={periods.platform}
+          totals={{
+            requestCount: usage.requestCount,
+            costLabel: usage.costLabel,
+            promptTokens: usage.promptTokens,
+            completionTokens: usage.completionTokens,
+          }}
+          recent={usage.recent}
+        />
+      </div>
+
+      <section className="rounded-lg border border-border bg-surface p-5 lg:col-span-2 lg:max-w-xl">
         <h2 className="text-sm font-medium text-text">API и модель</h2>
         <p className="mt-1 text-xs text-text-muted">
           DeepSeek, Qwen или OpenAI — ключ хранится в зашифрованном виде и не
@@ -423,136 +449,6 @@ export function LlmSettingsPanel() {
             {saving ? "Сохраняем…" : "Сохранить"}
           </button>
         </form>
-      </section>
-
-      <section className="rounded-lg border border-border bg-surface p-5">
-        <h2 className="text-sm font-medium text-text">Стоимость запросов</h2>
-        <p className="mt-1 text-xs text-text-muted">
-          Оценка по прайсу каталога (не чек провайдера). Окна: сутки / 7 дней /
-          30 дней.
-          {periods.rateLabel ? ` ${periods.rateLabel}.` : " Курс ₽ не задан (USD_RUB_RATE)."}
-        </p>
-
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[20rem] text-left text-sm">
-            <thead>
-              <tr className="text-xs text-text-faint">
-                <th className="pb-2 font-medium">Период</th>
-                <th className="pb-2 font-medium">Запросов</th>
-                <th className="pb-2 font-medium">USD</th>
-                <th className="pb-2 font-medium">RUB</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {periods.personal.map((row) => (
-                <tr key={row.key}>
-                  <td className="py-2 text-text">{row.label}</td>
-                  <td className="py-2 tabular-nums text-text">
-                    {row.requestCount}
-                  </td>
-                  <td className="py-2 tabular-nums text-text">
-                    {row.costUsdLabel}
-                  </td>
-                  <td className="py-2 tabular-nums text-text-muted">
-                    {row.costRubLabel ?? "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {periods.platform ? (
-          <div className="mt-6">
-            <h3 className="text-xs font-medium text-text-muted">
-              Платформа (все пользователи, billedTo=PLATFORM)
-            </h3>
-            <div className="mt-2 overflow-x-auto">
-              <table className="w-full min-w-[20rem] text-left text-sm">
-                <thead>
-                  <tr className="text-xs text-text-faint">
-                    <th className="pb-2 font-medium">Период</th>
-                    <th className="pb-2 font-medium">Запросов</th>
-                    <th className="pb-2 font-medium">USD</th>
-                    <th className="pb-2 font-medium">RUB</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {periods.platform.map((row) => (
-                    <tr key={`p-${row.key}`}>
-                      <td className="py-2 text-text">{row.label}</td>
-                      <td className="py-2 tabular-nums text-text">
-                        {row.requestCount}
-                      </td>
-                      <td className="py-2 tabular-nums text-text">
-                        {row.costUsdLabel}
-                      </td>
-                      <td className="py-2 tabular-nums text-text-muted">
-                        {row.costRubLabel ?? "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : null}
-
-        <dl className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-          <div>
-            <dt className="text-xs text-text-faint">Всего запросов</dt>
-            <dd className="mt-0.5 font-medium text-text">{usage.requestCount}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-text-faint">Всего (оценка)</dt>
-            <dd className="mt-0.5 font-medium text-text">{usage.costLabel}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-text-faint">Токены in</dt>
-            <dd className="mt-0.5 font-medium text-text">
-              {usage.promptTokens.toLocaleString("ru-RU")}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-xs text-text-faint">Токены out</dt>
-            <dd className="mt-0.5 font-medium text-text">
-              {usage.completionTokens.toLocaleString("ru-RU")}
-            </dd>
-          </div>
-        </dl>
-
-        {usage.recent.length === 0 ? (
-          <p className="mt-4 text-sm text-text-muted">
-            Пока нет учтённых запросов.{" "}
-            <Link
-              href="/decisions/new"
-              className="text-accent-ink underline-offset-2 hover:underline"
-            >
-              Создать разбор
-            </Link>
-          </p>
-        ) : (
-          <ul className="mt-4 divide-y divide-border border-t border-border">
-            {usage.recent.map((row) => (
-              <li
-                key={row.id}
-                className="flex flex-wrap items-baseline justify-between gap-2 py-2.5 text-sm"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-text">
-                    {row.provider} · {row.model}
-                  </p>
-                  <p className="text-xs text-text-faint">
-                    {new Date(row.createdAt).toLocaleString("ru-RU")} ·{" "}
-                    {row.billedTo === "USER" ? "свой ключ" : "платформа"} ·{" "}
-                    {row.promptTokens + row.completionTokens} ток.
-                  </p>
-                </div>
-                <p className="shrink-0 font-medium text-text">{row.costLabel}</p>
-              </li>
-            ))}
-          </ul>
-        )}
       </section>
     </div>
   );

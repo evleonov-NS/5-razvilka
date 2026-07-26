@@ -20,7 +20,7 @@ export default async function CabinetSettingsPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
+      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8 md:px-8 md:py-10">
         <header className="mb-8">
           <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text md:text-3xl">
             Настройки
@@ -30,7 +30,7 @@ export default async function CabinetSettingsPage() {
           </p>
         </header>
 
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-x-10 lg:gap-y-8">
           <section className="space-y-8">
             <div className="rounded-lg border border-border bg-surface p-5">
               <h2 className="text-sm font-medium text-text">Профиль</h2>
@@ -73,15 +73,16 @@ export default async function CabinetSettingsPage() {
             </div>
           </section>
 
-          <div className="space-y-8">
-            <DemoDataPanel />
-            <LlmSettingsPanel />
-          </div>
+          {/*
+            LlmSettingsPanel: display:contents —
+            колонка (демо + доступ) | стоимость на 2 колонки | API ниже
+          */}
+          <LlmSettingsPanel demoSlot={<DemoDataPanel />} />
         </div>
       </div>
 
       <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
-        <div className="mx-auto w-full max-w-4xl">v{versionLabel}</div>
+        <div className="mx-auto w-full max-w-5xl">v{versionLabel}</div>
       </footer>
     </div>
   );

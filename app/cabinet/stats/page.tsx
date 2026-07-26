@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getStatsSummary } from "@/lib/analytics";
+import {
+  ANALYTICS_EVENT_LABELS,
+  getStatsSummary,
+} from "@/lib/analytics";
 import { getOwnerUser } from "@/lib/owner";
 import { prisma } from "@/lib/prisma";
+import { StatsUsageLog } from "@/components/cabinet/StatsUsageLog";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +41,29 @@ export default async function CabinetStatsPage() {
     }),
   ]);
 
+  const trackingLabel = stats.trackingSince
+    ? new Date(stats.trackingSince).toLocaleDateString("ru-RU")
+    : "начала учёта";
+
+  const reportText = [
+    `Лог использования · с ${trackingLabel}`,
+    `Всего действий: ${stats.eventsTotal}`,
+    `Пользователей: ${stats.usersTotal}`,
+    `Визиты: сутки ${stats.visitsDay}, 7 дней ${stats.visitsWeek}`,
+    "",
+    "События:",
+    ...stats.eventCountsAll.map(
+      (row) =>
+        `• ${ANALYTICS_EVENT_LABELS[row.type] ?? row.type}: ${row.count}`,
+    ),
+    "",
+    stats.unusedEventTypes.length
+      ? `Ни разу: ${stats.unusedEventTypes
+          .map((t) => ANALYTICS_EVENT_LABELS[t] ?? t)
+          .join(", ")}`
+      : "Все функции хотя бы раз использовались.",
+  ].join("\n");
+
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
       <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
@@ -45,8 +72,7 @@ export default async function CabinetStatsPage() {
             Статистика
           </h1>
           <p className="mt-2 text-sm text-text-muted">
-            Интерес к продукту: визиты, длительности, события. Только для
-            владельца.
+            Интерес к продукту. Страница только для владельца.
           </p>
           <p className="mt-2">
             <Link
@@ -63,79 +89,58 @@ export default async function CabinetStatsPage() {
           <StatCard label="Визиты / сутки" value={String(stats.visitsDay)} />
           <StatCard label="Визиты / 7 дней" value={String(stats.visitsWeek)} />
           <StatCard
-            label="Ср. длительность / сутки"
-            value={formatDuration(stats.avgDurationMsDay)}
+            label="Ср. длительность / польз."
+            value={formatDuration(stats.avgDurationMsPerUser)}
           />
         </section>
 
-        <section className="mb-10">
-          <h2 className="text-sm font-medium text-text">События за сутки</h2>
-          {stats.eventCountsDay.length === 0 ? (
-            <p className="mt-2 text-sm text-text-muted">Пока пусто</p>
-          ) : (
-            <ul className="mt-3 divide-y divide-border border-t border-border">
-              {stats.eventCountsDay.map((row) => (
-                <li
-                  key={row.type}
-                  className="flex justify-between py-2 text-sm"
-                >
-                  <span className="text-text">{row.type}</span>
-                  <span className="tabular-nums text-text-muted">
-                    {row.count}
-                  </span>
-                </li>
-              ))}
-            </ul>
+        <StatsUsageLog
+          trackingSinceLabel={trackingLabel}
+          eventsTotal={stats.eventsTotal}
+          used={stats.eventCountsAll.map((row) => ({
+            type: row.type,
+            label: ANALYTICS_EVENT_LABELS[row.type] ?? row.type,
+            count: row.count,
+          }))}
+          unused={stats.unusedEventTypes.map(
+            (t) => ANALYTICS_EVENT_LABELS[t] ?? t,
           )}
-        </section>
+          reportText={reportText}
+        />
 
-        <section className="mb-10">
-          <h2 className="text-sm font-medium text-text">События за 7 дней</h2>
-          {stats.eventCountsWeek.length === 0 ? (
-            <p className="mt-2 text-sm text-text-muted">Пока пусто</p>
-          ) : (
-            <ul className="mt-3 divide-y divide-border border-t border-border">
-              {stats.eventCountsWeek.map((row) => (
-                <li
-                  key={row.type}
-                  className="flex justify-between py-2 text-sm"
-                >
-                  <span className="text-text">{row.type}</span>
-                  <span className="tabular-nums text-text-muted">
-                    {row.count}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="mb-10">
+        <section className="mb-10 mt-10">
           <h2 className="text-sm font-medium text-text">Недавние визиты</h2>
-          <ul className="mt-3 divide-y divide-border border-t border-border">
-            {stats.recentVisits.map((v) => (
-              <li key={v.id} className="py-2.5 text-sm">
-                <p className="text-text">{v.email}</p>
-                <p className="text-xs text-text-faint">
-                  {new Date(v.startedAt).toLocaleString("ru-RU")} ·{" "}
-                  {formatDuration(v.durationMs)}
-                  {v.endedAt ? "" : " · активен"}
-                </p>
-              </li>
-            ))}
-          </ul>
+          {stats.recentVisits.length === 0 ? (
+            <p className="mt-2 text-sm text-text-muted">Пока пусто</p>
+          ) : (
+            <ul className="mt-3 divide-y divide-border rounded-xl border border-border bg-surface">
+              {stats.recentVisits.map((v) => (
+                <li key={v.id} className="px-4 py-2.5 text-sm">
+                  <p className="text-text">{v.email}</p>
+                  <p className="text-xs text-text-faint">
+                    {new Date(v.startedAt).toLocaleString("ru-RU")} ·{" "}
+                    {formatDuration(v.durationMs)}
+                    {v.endedAt ? "" : " · активен"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section>
           <h2 className="text-sm font-medium text-text">Обратная связь</h2>
+          <p className="mt-1 text-xs text-text-muted">
+            Сообщения с `/feedback`. Видны только вам.
+          </p>
           {feedback.length === 0 ? (
             <p className="mt-2 text-sm text-text-muted">Сообщений пока нет</p>
           ) : (
-            <ul className="mt-3 space-y-4">
+            <ul className="mt-3 space-y-3">
               {feedback.map((item) => (
                 <li
                   key={item.id}
-                  className="rounded-lg border border-border bg-surface p-4"
+                  className="rounded-xl border border-border bg-surface p-4"
                 >
                   <p className="whitespace-pre-wrap text-sm text-text">
                     {item.message}
@@ -158,7 +163,7 @@ export default async function CabinetStatsPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-4">
+    <div className="rounded-xl border border-border bg-surface p-4">
       <p className="text-xs text-text-faint">{label}</p>
       <p className="mt-1 text-xl font-medium tabular-nums text-text">{value}</p>
     </div>
