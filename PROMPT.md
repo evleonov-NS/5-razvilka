@@ -12,72 +12,124 @@
 |----------|----------|
 | Версия | 0.1.1 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | этап 9 полировка UI (см. `docs/STATUS.md`) |
+| Последний коммит | этап 9 полировка (см. `docs/STATUS.md`) |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Текущий этап | **9 — ключи LLM в Vercel + prod-тест** (код полировки готов) |
+| Prod LLM | ключи в Vercel внесены, Redeploy сделан |
+| Текущий пакет | **2а + аналитика + ОС + owner-настройки** |
 
-## Что уже сделано
+## Что уже сделано (не переделывать)
 
-### Этапы 0–8 ✅
-- Каркас, Prisma, Auth.js + Google, кабинет, лендинг, `/explore`
-- LLM: DeepSeek по умолчанию, BYOK, квоты, `LlmUsage`
-- Создание решения (9.1), экран результата, дерево (9.2), ревью (9.3) → RESOLVED
-
-### Этап 9 — полировка кода ✅
-- Единые `LoadingState` / `EmptyState` / `ErrorMessage`
-- Общий `LikelihoodBadge` (лендинг, demo, карточки)
-- `npm run vercel-build` = migrate deploy + generate + next build (ADR-026)
-- Версия 0.1.1
+- Этапы 0–8: auth, кабинет, сценарии, дерево, ревью → RESOLVED
+- Этап 9 (код): единые UI-состояния, `LikelihoodBadge`, `npm run vercel-build` (ADR-026)
+- Квоты: `OWNER_EMAIL` безлимит; остальные 1 бесплатный разбор платформы; BYOK в `/cabinet/settings`
+- `LlmUsage` + оценка USD в микродолларах; сейчас в настройках — общий usage + recent, **без** день/неделя/месяц и без RUB
+- Демо: CLI `npm run db:seed-demo` (`prisma/seed-demo-decisions.ts`, префикс `[Демо]`); **UI-кнопок в settings ещё нет** (этап 2а)
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
-## Env (локально уже есть; на Vercel — сейчас)
+## Задача этого чата (сделать всё ниже)
+
+### A. Этап 2а — демо-данные в `/cabinet/settings`
+
+См. `docs/PLAN.md` § этап 2а.
+
+- Секция **«Демо-данные»**
+- **Загрузить демо-данные** → `POST /api/user/demo-data` (логика из `prisma/seed-demo-decisions.ts` для текущего user; replace только `[Демо]`)
+- **Удалить демо-данные** → `DELETE /api/user/demo-data` + confirm; каскад
+- Состояния idle/loading/success/error; счётчик «N демо-решений»
+- CLI `npm run db:seed-demo` оставить
+
+### B. Аналитика интереса (лог) — только владелец
+
+Цель: понять, насколько интересен продукт (кто заходил, сколько был, чем пользовался).
+
+- Модели Prisma (имена на усмотрение): сессии/визиты + события использования
+  - кто: `userId` (+ email только на сервере для owner-UI, не отдавать чужим)
+  - когда вошёл / ушёл / длительность
+  - события: например `LOGIN`, `CREATE_DECISION`, `GENERATE_TREE`, `RESOLVE`, `OPEN_SETTINGS`, `SUBMIT_FEEDBACK`, …
+- Писать события с сервера (Route Handlers / auth callbacks), не светить PII в клиентских бандлах
+- Страница статистики, например `/cabinet/stats` или `/cabinet/admin/stats`
+  - ссылка **видна только владельцу** (в настройках и/или сайдбаре)
+  - доступ: `requireOwner()` — иначе 404/403
+- В UI статистики: пользователи/визиты, длительности, топ функций, простые агрегаты (день/неделя)
+
+### C. Обратная связь
+
+- Ссылка «Обратная связь» (футер лендинга / кабинет — уместно и для гостя, и для юзера)
+- Форма: текст сообщения (обязательно) + email (необязательно)
+- После отправки пользователю: **«Сообщение отправлено»** (без доступа к чужим сообщениям)
+- Хранение в БД (`FeedbackMessage` или аналог)
+- Читать может **только владелец** (вкладка на странице статистики или `/cabinet/feedback`)
+- Мутация: `POST /api/feedback` (Zod), без auth обязателен; если есть сессия — привязать `userId`
+
+### D. Владелец: email не должен читаться никем
+
+- `evleonov79@gmail.com` **не хардкодить** в клиентском коде и не отдавать в JSON не-владельцу
+- Сейчас `OWNER_EMAIL` / `OWNER_EMAIL_DEFAULT` в `lib/llm/quota.ts` — ужесветится в репо; исправить:
+  - в env хранить **хэш или AES-GCM** (как BYOK), например `OWNER_EMAIL_HASH` = HMAC-SHA256(email, AUTH_SECRET) **или** зашифрованное значение
+  - `isOwnerEmail` сравнивает только на сервере
+  - убрать plaintext default из публичного кода (fallback только через env)
+- В ответах API: `quota.isOwner: boolean` ок; сам email владельца не возвращать отдельным полем «ownerEmail»
+
+### E. Настройки — стоимость API: день / неделя / месяц, $ и ₽
+
+В `/cabinet/settings` (блок стоимости, сейчас в `LlmSettingsPanel`):
+
+- Агрегаты из `LlmUsage` за **сутки / 7 дней / 30 дней** (или календарные день/неделя/месяц — зафиксируй в ADR)
+- Показать **USD** и **RUB**
+- Курс: `USD_RUB_RATE` из env (число), с понятной подписью «оценка»; не выдумывать биржевой live-курс без ключа
+- Для **владельца** дополнительно (или вместо личного): суммарная стоимость **платформенных** запросов (`billedTo=PLATFORM`) за те же периоды — чтобы видеть расход сервиса
+
+### F. Настройки владельца — «токен по умолчанию» (платформенный ключ)
+
+Owner-only toggle в настройках:
+
+- Название UX: например **«Разрешить платформенный ключ (бесплатный разбор)»** или **«Токен по умолчанию»**
+- Если опция **выключена** (платформенный токен отключён):
+  - обычный пользователь **с первого** создания разбора получает ошибку/UI: **введите свой API-ключ** (как сейчас после исчерпания квоты), без 1 бесплатного кредита
+  - `getQuotaStatus` / `FREE_PLATFORM_CREDITS` учитывать флаг (хранить в БД `AppSettings` singleton или env+DB)
+- Если **включена** — текущее поведение (1 бесплатный разбор, затем свой ключ)
+- Владелец (`isOwner`) по-прежнему может пользоваться платформенным ключом (или тоже уважать флаг — зафиксируй в ADR; предпочтение: owner всегда может, флаг только для остальных)
+
+## Порядок реализации (рекомендуемый)
+
+1. Миграции Prisma (Feedback, Analytics events/sessions, AppSettings)
+2. Owner check без plaintext email + правка quota
+3. Этап 2а demo API + UI
+4. Стоимость день/неделя/месяц $ + ₽ в settings
+5. Toggle платформенного токена
+6. Лог событий + страница статистики (owner-only)
+7. Обратная связь (форма + inbox owner)
+8. Docs: STATUS, PLAN, CHANGELOG, DECISIONS (ADR), версия в `lib/version.ts`
+9. `npm run build` (по просьбе); **kip** = commit + push
+
+## Ограничения стека
+
+- Мутации — Route Handlers; чтение — Server Components
+- LLM только на сервере; Zod на входе/LLM
+- Prisma singleton `lib/prisma.ts`; Node runtime
+- Комментарии на русском; имена переменных на английском
+- Секреты только `process.env`; `.env` не коммитить
+- Примеры команд — **PowerShell**
+- Shell не дергать без просьбы; **kip** / «коммит и пуш» — сразу commit+push (заголовок + тело на русском)
+
+## Проверка
+
+- [ ] Демо: загрузка/удаление только `[Демо]`, идемпотентно
+- [ ] Не-owner не открывает `/cabinet/stats` и не читает feedback
+- [ ] Owner email нет в клиентском бандле / Network чужого пользователя
+- [ ] Стоимость: day/week/month в $ и ₽ отображаются
+- [ ] Toggle «токен по умолчанию» OFF → новый юзер без ключа не может сделать первый разбор, видит призыв ввести ключ
+- [ ] ОС: отправка → «Сообщение отправлено»; owner видит текст (+ email если указали)
+- [ ] `npm run build` ок
+
+## Env (добавить при необходимости)
 
 ```env
-DATABASE_URL=   DIRECT_URL=
-AUTH_SECRET=    AUTH_URL=http://localhost:3015
-GOOGLE_CLIENT_ID=   GOOGLE_CLIENT_SECRET=
-OWNER_EMAIL=evleonov79@gmail.com
-LLM_DEFAULT_PROVIDER=DEEPSEEK
-LLM_MODEL=deepseek-chat
-DEEPSEEK_API_KEY=
-# опционально: QWEN_API_KEY, OPENAI_API_KEY
+# вместо/вместе с OWNER_EMAIL plaintext:
+OWNER_EMAIL_HASH=
+# или OWNER_EMAIL_ENC=  (AES-GCM через AUTH_SECRET)
+USD_RUB_RATE=90
 ```
 
-Не коммитить `.env`.
-
-## Осталось по этапу 9 (вручную в Vercel)
-
-См. `docs/PLAN.md` § этап 9.
-
-1. Environment Variables (Production): `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, желательно `LLM_DEFAULT_PROVIDER`, `LLM_MODEL`
-2. Build Command → `npm run vercel-build`
-3. Redeploy
-4. Prod-тест §16: войти → `/decisions/new` → разобрать → дерево → ревью
-
-```powershell
-npm run build
-# при EPERM Prisma на Windows — агент сам повторяет build 1–2 раза; dev не останавливать
-```
-
-## Очередь
-
-| Этап | Что |
-|------|-----|
-| 9 | Ключи LLM в Vercel + vercel-build + prod-тест |
-| 2а | Демо-кнопки в `/cabinet/settings` |
-
-## Правила
-- Мутации — Route Handlers; чтение — Server Components
-- LLM только на сервере; ответы → `lib/json.ts` → Zod
-- Enum UPPERCASE; комментарии на русском; версия только `lib/version.ts`
-- **kip** = commit + push (заголовок + тело на русском)
-- Shell не дергать без просьбы; примеры команд — PowerShell
-
-## Известные нюансы
-- Старые Decision без Scenario → «Разбор ещё не готов» (ожидаемо)
-- На Windows `build` рядом с `dev` допустим; при EPERM агент ретраит сам
-- Дерево / ревью: повторный POST при уже сохранённых данных без LLM
-- Повторно сменить исход у RESOLVED через UI нельзя
-
-Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 9 — чеклист Vercel).
+Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (§ 2а), `lib/llm/quota.ts`, `components/cabinet/LlmSettingsPanel.tsx`, `prisma/seed-demo-decisions.ts`, `prisma/schema.prisma`.

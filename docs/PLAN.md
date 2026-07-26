@@ -526,9 +526,9 @@
 
 **Ближайшие шаги:**
 
-1. **Этап 9** — полировка + ключи LLM в Vercel
+1. **Пакет 2а+** (см. корневой `PROMPT.md`): демо в settings, аналитика, обратная связь, стоимость $/₽, toggle платформенного ключа, owner email без plaintext
 
-2. **Этап 2а** — демо-кнопки в `/cabinet/settings`
+2. Закрыть хвост этапа 9: Build Command `npm run vercel-build` на Vercel (если ещё не), отметка в STATUS
 
 
 

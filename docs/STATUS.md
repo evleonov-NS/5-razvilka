@@ -45,8 +45,8 @@
 | 6 | Журнал (главная) | ✅ Готово | кабинет; `/` — лендинг гостя |
 | 7 | Дерево развилок | ✅ Завершён |
 | 8 | Ревью по исходу | ✅ Завершён | OPEN → RESOLVED |
-| 9 | Полировка и деплой | 🔄 В работе | код UI ✅; ключи Vercel + prod-тест ⬜ |
-| 2а | Настройки: демо-данные (UI) | ⚪ Запланирован |
+| 9 | Полировка и деплой | 🔄 | код UI ✅; ключи Vercel ✅; Build Command / финальная отметка ⬜ |
+| 2а | Настройки: демо-данные | ⚪ | + аналитика, ОС, owner-cost, toggle платф. ключа — см. PROMPT.md |
 | 10 | Социальные механики | ✅ Завершён |
 
 ---
@@ -60,9 +60,9 @@
 - [x] Review empty → `EmptyState`; generating — скелетон как у дерева
 - [x] `POST /api/decisions` — безопасный parse JSON тела (400)
 - [x] `npm run vercel-build` (ADR-026); версия `0.1.1`
-- [ ] Vercel Environment Variables: `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, …
-- [ ] Vercel Build Command → `npm run vercel-build`
-- [ ] Redeploy + prod-тест §16
+- [x] Vercel Environment Variables: `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, …
+- [ ] Vercel Build Command → `npm run vercel-build` (проверить вручную)
+- [x] Redeploy после ключей; prod LLM работает
 
 ## Готово (Этап 8 — ревью по исходу, 2026-07-26)
 
@@ -157,10 +157,14 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 
 ## Следующий шаг
 
-1. **Внести LLM-ключи в Vercel** (таблица в [PLAN.md](./PLAN.md) § этап 9) → Redeploy  
-2. Build Command: `npm run vercel-build`  
-3. Prod-тест §16 на https://5-razvilka.vercel.app  
-4. Затем **этап 2а** — демо-кнопки в `/cabinet/settings`
+Пакет после этапа 9 (промпт в корневом [PROMPT.md](../PROMPT.md)):
+
+1. **Этап 2а** — демо-кнопки в `/cabinet/settings`
+2. **Аналитика** — лог визитов/функций, страница статистики только для владельца
+3. **Обратная связь** — форма + inbox только владельцу; email необязателен
+4. **Owner privacy** — email владельца не в plaintext в коде/клиенте
+5. **Стоимость API** в настройках: день / неделя / месяц, $ и ₽
+6. **Toggle** «токен по умолчанию» (платформенный ключ) — OFF → свой ключ с первого разбора
 
 Промпт для нового чата: корневой [PROMPT.md](../PROMPT.md).
 

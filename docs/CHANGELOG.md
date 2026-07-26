@@ -7,8 +7,8 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этап 9 — ключи LLM в Vercel + Build Command `vercel-build` + prod-тест §16
-- Этап 2а — демо-кнопки в `/cabinet/settings`
+- Пакет 2а+: демо в settings, аналитика интереса, обратная связь, стоимость день/неделя/месяц $/₽, toggle платформенного ключа, owner email без plaintext (см. корневой `PROMPT.md`)
+- Этап 9 — Build Command `vercel-build` на Vercel (если ещё не) + финальная отметка в STATUS
 
 ### Added
 - **Этап 9 (полировка UI):** единые `LoadingState` / `EmptyState` / `ErrorMessage` на кабинете, `/decisions/new`, ревью; скелетон generating в `ReviewSection`.
