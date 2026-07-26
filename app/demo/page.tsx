@@ -6,6 +6,7 @@ import { DEMO_DECISION, type DemoLikelihood } from "@/lib/demo-decision";
 import { versionLabel } from "@/lib/version";
 import { CabinetShell } from "@/components/cabinet/CabinetShell";
 import { LikelihoodBadge } from "@/components/LikelihoodBadge";
+import { cabinetPad4xl } from "@/components/cabinet/cabinetLayout";
 import { landingFocus } from "@/components/landing/landingLayout";
 import { HORIZON_LABELS, TYPE_LABELS } from "@/lib/decision-labels";
 
@@ -64,7 +65,7 @@ function DemoContent() {
   const d = DEMO_DECISION;
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-8 md:px-8 md:py-10">
+    <div className={cabinetPad4xl}>
       <div className="sticky top-[4.25rem] z-10 mb-8 rounded-lg border border-accent/40 bg-surface px-4 py-4 sm:flex sm:items-center sm:justify-between sm:gap-4 md:top-4">
         <p className="text-sm text-text">
           Это пример разбора. Чтобы разобрать своё решение, нажмите «Разобрать

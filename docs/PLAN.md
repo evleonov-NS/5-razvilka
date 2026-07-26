@@ -32,15 +32,15 @@
 
 | LLM / ядро продукта | ✅ Этапы 4–5, 7–8; далее полировка (9) |
 
-| Production Neon | ⚠️ Build Command: `npm run vercel-build` (migrate deploy + build) |
+| Production Neon | ✅ миграции на Neon; Build Command в `vercel.json` (`npm run vercel-build`) |
 
 
 
-**Следующий шаг:** **Этап 9** — полировка и деплой (+ ключи LLM в Vercel).
+**Следующий шаг:** закрыть хвост этапа 9 — `OWNER_EMAIL_HASH` / `USD_RUB_RATE` на Vercel + Redeploy + ручная проверка 2а+.
 
 
 
-**Оценка до MVP (осталось):** ~8–12 рабочих дней (solo + Cursor), см. таблицу ниже.
+**Оценка до MVP (осталось):** ~0.5 рабочего дня (Vercel env + проверка 2а+).
 
 
 
@@ -176,9 +176,9 @@
 
 | 8 | Ревью по исходу | ✅ | ~~1 д~~ |
 
-| 9 | Полировка и деплой | 🔄 | 1–2 д |
+| 9 | Полировка и деплой | 🔄 | ~0.5 д (Vercel env hash/rate + проверка) |
 
-| | **Итого осталось** | | **~1–2 д** (ключ и prod-проверка) |
+| | **Итого осталось** | | **~0.5 д** (prod env + ручная проверка 2а+) |
 
 
 
@@ -285,10 +285,10 @@
 
 #### Проверка
 
-- [ ] Загрузка → 6 решений в кабинете, 4 на `/explore`
+- [ ] Загрузка → 6 решений в кабинете, 4 на `/explore` (ручная проверка)
 - [ ] Удаление → демо исчезают, свои решения не трогаются
 - [ ] Повторная загрузка идемпотентна (replace по префиксу)
-- [x] Миграция `analytics_feedback_settings` применена
+- [x] Миграция `analytics_feedback_settings` на Neon (`migrate deploy` — no pending)
 
 
 
@@ -444,13 +444,15 @@
 
 - [x] Ошибки LLM/БД без падения UI (create / tree / resolve + error.tsx)
 
-- [x] `npm run vercel-build` = migrate deploy + generate + next build (ADR-026); в Vercel Build Command — вручную
+- [x] `npm run vercel-build` = migrate deploy + generate + next build (ADR-026); `vercel.json` → Build Command
 
-- [x] STATUS, CHANGELOG, версия `0.1.1`
+- [x] STATUS, CHANGELOG; версия → `0.1.3`
 
-- [ ] **Vercel: платформенные LLM API-ключи** (локальный `.env` на prod не попадает)
+- [x] **Vercel: платформенные LLM API-ключи** (локальный `.env` на prod не попадает)
 
-- [ ] Prod-тест §16 после ключей + Redeploy
+- [ ] Prod: `OWNER_EMAIL_HASH` + `USD_RUB_RATE` на Vercel + Redeploy
+
+- [ ] Ручная проверка 2а+ / демо-кейс §16 на prod
 
 
 
@@ -466,15 +468,19 @@
 | `DEEPSEEK_API_KEY` | ключ с platform.deepseek.com | `sk-…` | **да** (провайдер по умолчанию) |
 | `LLM_DEFAULT_PROVIDER` | имя провайдера UPPERCASE | `DEEPSEEK` | желательно |
 | `LLM_MODEL` | id модели | `deepseek-chat` | желательно |
-| `OWNER_EMAIL` | email владельца безлимита | `evleonov79@gmail.com` | **да** |
+| `OWNER_EMAIL_HASH` | HMAC-SHA256 email (см. `scripts/hash-owner-email.ts`) | 64 hex | **да** (предпочтительно) |
+| `OWNER_EMAIL` | fallback plaintext только в env | email | нет, если есть hash |
+| `USD_RUB_RATE` | оценка курса для ₽ в settings | `90` | желательно |
 | `QWEN_API_KEY` | ключ Qwen (если нужен) | строка ключа | нет |
 | `OPENAI_API_KEY` | ключ OpenAI (если нужен) | `sk-…` | нет |
 
 3. Убедиться, что уже есть Auth/DB (`AUTH_SECRET`, `AUTH_URL=https://5-razvilka.vercel.app`, Google, `DATABASE_URL`, `DIRECT_URL`) — см. [AUTH_GOOGLE_VERCEL.md](./AUTH_GOOGLE_VERCEL.md).
 
-4. После сохранения переменных — **Redeploy** последнего деплоя (иначе runtime не подхватит ключи).
+4. Build Command: корневой `vercel.json` задаёт `npm run vercel-build` (migrate deploy + generate + next build).
 
-5. Проверка: на https://5-razvilka.vercel.app войти → `/decisions/new` → «Разобрать» → сценарии на экране результата.
+5. После сохранения переменных — **Redeploy** последнего деплоя (иначе runtime не подхватит ключи).
+
+6. Проверка: на https://5-razvilka.vercel.app войти → `/decisions/new` → «Разобрать» → сценарии на экране результата.
 
 
 
@@ -508,9 +514,9 @@
 
 **Ближайшие шаги:**
 
-1. Применить миграцию `analytics_feedback_settings`; выставить `OWNER_EMAIL` или `OWNER_EMAIL_HASH`, `USD_RUB_RATE`
+1. На Vercel: `OWNER_EMAIL_HASH` + `USD_RUB_RATE` → Redeploy (локально и Neon уже готовы; Build Command — `vercel.json`)
 
-2. Закрыть хвост этапа 9: Build Command `npm run vercel-build` на Vercel (если ещё не), отметка в STATUS
+2. Ручная проверка 2а+; закрыть этап 9 в STATUS
 
 
 

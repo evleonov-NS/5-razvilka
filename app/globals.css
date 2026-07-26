@@ -92,6 +92,18 @@ body {
   box-shadow: 0 1px 3px rgb(28 26 23 / 0.1);
 }
 
+/*
+  Кабинет: сдвиг контента к сайдбару (~40% от прежнего центрирования).
+  В globals — без FOUC от JIT/произвольных утилит.
+  Левый край одинаковый на всех страницах (формула от 56rem = max-w-4xl).
+*/
+@media (min-width: 768px) {
+  .cabinet-shift {
+    margin-left: max(0px, calc((100% - 56rem) * 0.3));
+    margin-right: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

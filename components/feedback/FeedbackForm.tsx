@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { HoneypotField, useHoneypot } from "react-honeypot-field";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
@@ -8,6 +9,10 @@ type Props = {
 };
 
 export function FeedbackForm({ defaultEmail }: Props) {
+  const { fieldProps, validate, mountedAt } = useHoneypot({
+    fieldName: "website",
+    timeThreshold: 1500,
+  });
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState(defaultEmail ?? "");
   const [sending, setSending] = useState(false);
@@ -17,6 +22,15 @@ export function FeedbackForm({ defaultEmail }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (sending || sent) return;
+
+    // Клиентский отсев ботов без сообщения об ошибке
+    const hp = validate();
+    if (!hp.ok) {
+      setSent(true);
+      setMessage("");
+      return;
+    }
+
     setSending(true);
     setError(null);
     try {
@@ -26,6 +40,8 @@ export function FeedbackForm({ defaultEmail }: Props) {
         body: JSON.stringify({
           message: message.trim(),
           email: email.trim() || undefined,
+          website: "",
+          _mountedAt: mountedAt,
         }),
       });
       const body = (await res.json().catch(() => null)) as {
@@ -51,6 +67,7 @@ export function FeedbackForm({ defaultEmail }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <HoneypotField {...fieldProps} />
       <div>
         <label
           htmlFor="feedback-message"

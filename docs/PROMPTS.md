@@ -191,6 +191,17 @@ ReviewResponseSchema, сохранить outcome, reviewClosestScenario, reviewM
 и БД без падения приложения. Финальный деплой на Vercel, проверка на демо-кейсе из PROJECT.md §16.
 ```
 
+### Промпт — ops после 2а+ (migrate / env / Build Command)
+
+Актуальная выжимка для нового чата: корневой **[PROMPT.md](../PROMPT.md)** (не переделывать 2а+).
+
+```text
+Пакет 2а+ уже в main. Не трогать демо/аналитику/ОС/toggle.
+Довести хвост: prisma migrate deploy ( Neon ), OWNER_EMAIL_HASH + USD_RUB_RATE
+(локально + Vercel), Build Command через vercel.json → npm run vercel-build.
+Обновить PROMPT.md / STATUS / PLAN / CHANGELOG / version. Примеры команд — PowerShell.
+```
+
 ### Промпт 10 — социальные механики (после MVP)
 
 Полный текст: **[PROMPT-socium.md](./PROMPT-socium.md)** — лайки к публичным разборам, лента `/explore`, `isPublic` + `DecisionLike`.

@@ -5,6 +5,10 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { ProfileAvatar } from "@/components/cabinet/ProfileAvatar";
 import { DemoDataPanel } from "@/components/cabinet/DemoDataPanel";
 import { LlmSettingsPanel } from "@/components/cabinet/LlmSettingsPanel";
+import {
+  cabinetFooterInner4xl,
+  cabinetMain4xl,
+} from "@/components/cabinet/cabinetLayout";
 import { isOwnerEmail } from "@/lib/owner";
 import { versionLabel } from "@/lib/version";
 import Link from "next/link";
@@ -20,7 +24,7 @@ export default async function CabinetSettingsPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8 md:px-8 md:py-10">
+      <div className={cabinetMain4xl}>
         <header className="mb-8">
           <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text md:text-3xl">
             Настройки
@@ -30,8 +34,12 @@ export default async function CabinetSettingsPage() {
           </p>
         </header>
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-x-10 lg:gap-y-8">
-          <section className="space-y-8">
+        {/*
+          Две колонки одной ширины внутри себя:
+          слева — профиль/тема/владелец; справа — все рабочие панели на всю ширину колонки.
+        */}
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-10">
+          <aside className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-8 lg:self-start">
             <div className="rounded-lg border border-border bg-surface p-5">
               <h2 className="text-sm font-medium text-text">Профиль</h2>
               <p className="mt-1 text-xs text-text-faint">Только чтение · Google</p>
@@ -68,21 +76,17 @@ export default async function CabinetSettingsPage() {
               </div>
             ) : null}
 
-            <div className="max-w-xs">
-              <SignOutButton />
-            </div>
-          </section>
+            <SignOutButton />
+          </aside>
 
-          {/*
-            LlmSettingsPanel: display:contents —
-            колонка (демо + доступ) | стоимость на 2 колонки | API ниже
-          */}
-          <LlmSettingsPanel demoSlot={<DemoDataPanel />} />
+          <div className="min-w-0">
+            <LlmSettingsPanel demoSlot={<DemoDataPanel />} />
+          </div>
         </div>
       </div>
 
       <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
-        <div className="mx-auto w-full max-w-5xl">v{versionLabel}</div>
+        <div className={cabinetFooterInner4xl}>v{versionLabel}</div>
       </footer>
     </div>
   );

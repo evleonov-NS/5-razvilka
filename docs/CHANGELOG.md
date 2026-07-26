@@ -7,9 +7,11 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этап 9 — Build Command `vercel-build` на Vercel (если ещё не) + финальная отметка в STATUS
+- Этап 9 — `OWNER_EMAIL_HASH` / `USD_RUB_RATE` на Vercel + Redeploy + ручная проверка 2а+ → финальная отметка
 
 ### Added
+- **Ops после 2а+ (v0.1.3):** `vercel.json` с Build Command `npm run vercel-build`; локально `OWNER_EMAIL_HASH` + `USD_RUB_RATE`; миграция `analytics_feedback_settings` подтверждена на Neon; обновлены `PROMPT.md` / STATUS / PLAN.
+- **Антиспам `/feedback`:** `react-honeypot-field` (honeypot + time-threshold, ADR-030).
 - **Пакет 2а+ (v0.1.2):** демо в `/cabinet/settings` (`POST|DELETE /api/user/demo-data`); аналитика `VisitSession`/`AnalyticsEvent` + `/cabinet/stats` (owner); ОС `/feedback` + inbox; стоимость сутки/7д/30д в $ и ₽; toggle платформенного ключа (`AppSettings`); `OWNER_EMAIL_HASH` (ADR-027…029).
 - **Этап 9 (полировка UI):** единые `LoadingState` / `EmptyState` / `ErrorMessage` на кабинете, `/decisions/new`, ревью; скелетон generating в `ReviewSection`.
 - **`npm run vercel-build`** — `prisma migrate deploy && prisma generate && next build` (ADR-026).
@@ -25,7 +27,8 @@
 - В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel.
 
 ### Changed
-- Версия **0.1.2** (`lib/version.ts`).
+- Версия **0.1.3** (`lib/version.ts`).
+- `/cabinet/settings`: единая правая колонка одинаковой ширины (убраны `display:contents` / `col-span-2` / `max-w-xl`); карточка стоимости в том же стиле, что остальные.
 - Owner email: убран hardcoded default; проверка через `lib/owner.ts` (hash или env).
 - Лендинг и `/demo` используют общий `LikelihoodBadge` (без локальных копий).
 - `NewDecisionForm` — ошибки через `ErrorMessage`.

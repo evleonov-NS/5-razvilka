@@ -200,6 +200,11 @@ npm run dev
 | `AUTH_URL` | `https://5-razvilka.vercel.app` | Домен production **без** `/` в конце |
 | `GOOGLE_CLIENT_ID` | `....apps.googleusercontent.com` | Google Console |
 | `GOOGLE_CLIENT_SECRET` | `GOCSPX-...` | Google Console |
+| `OWNER_EMAIL_HASH` | 64 hex HMAC | локальный `.env` / `scripts/hash-owner-email.ts` |
+| `USD_RUB_RATE` | `90` | оценка курса для ₽ в settings |
+| `DEEPSEEK_API_KEY` | `sk-…` | platform.deepseek.com (провайдер по умолчанию) |
+
+Build Command: корневой `vercel.json` → `npm run vercel-build` (migrate deploy + generate + next build).
 
 ### 5.3. Частая ошибка в UI Vercel
 

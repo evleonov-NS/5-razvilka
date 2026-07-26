@@ -10,98 +10,55 @@
 
 | Параметр | Значение |
 |----------|----------|
-| Версия | 0.1.1 (`lib/version.ts`) |
+| Версия | 0.1.3 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | этап 9 полировка (см. `docs/STATUS.md`) |
+| Последний коммит | 2а+ в main (`5dbb7ff`) + хвост ops (migrate/env/vercel.json) — см. `docs/STATUS.md` |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Prod LLM | ключи в Vercel внесены, Redeploy сделан |
-| Текущий пакет | **2а + аналитика + ОС + owner-настройки** |
+| Prod LLM | ключи в Vercel внесены |
+| Текущий фокус | **закрыть хвост этапа 9 на Vercel** (env hash/rate + Redeploy) и ручная проверка 2а+ |
 
 ## Что уже сделано (не переделывать)
 
 - Этапы 0–8: auth, кабинет, сценарии, дерево, ревью → RESOLVED
 - Этап 9 (код): единые UI-состояния, `LikelihoodBadge`, `npm run vercel-build` (ADR-026)
-- Квоты: `OWNER_EMAIL` безлимит; остальные 1 бесплатный разбор платформы; BYOK в `/cabinet/settings`
-- `LlmUsage` + оценка USD в микродолларах; сейчас в настройках — общий usage + recent, **без** день/неделя/месяц и без RUB
-- Демо: CLI `npm run db:seed-demo` (`prisma/seed-demo-decisions.ts`, префикс `[Демо]`); **UI-кнопок в settings ещё нет** (этап 2а)
+- **Пакет 2а+ (код в main):** демо в `/cabinet/settings`; аналитика + `/cabinet/stats`; ОС `/feedback`; стоимость сутки/7д/30д $ и ₽; toggle платф. ключа; `OWNER_EMAIL_HASH` (ADR-027…029)
+- Миграция `analytics_feedback_settings` на Neon применена (`prisma migrate deploy` — no pending)
+- `vercel.json` → `buildCommand: npm run vercel-build`
+- Локально в `.env`: `OWNER_EMAIL_HASH`, `USD_RUB_RATE=90` (см. `.env.example`)
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
-## Задача этого чата (сделать всё ниже)
+## Задача этого чата
 
-### A. Этап 2а — демо-данные в `/cabinet/settings`
+**Не трогать и не переписывать пакет 2а+.** Сфокусироваться на prod-хвосте и проверке.
 
-См. `docs/PLAN.md` § этап 2а.
+### 1. Vercel Environment Variables (вручную)
 
-- Секция **«Демо-данные»**
-- **Загрузить демо-данные** → `POST /api/user/demo-data` (логика из `prisma/seed-demo-decisions.ts` для текущего user; replace только `[Демо]`)
-- **Удалить демо-данные** → `DELETE /api/user/demo-data` + confirm; каскад
-- Состояния idle/loading/success/error; счётчик «N демо-решений»
-- CLI `npm run db:seed-demo` оставить
+Settings → Environment Variables → Production (+ Preview при необходимости):
 
-### B. Аналитика интереса (лог) — только владелец
+| Key | Значение |
+|-----|----------|
+| `OWNER_EMAIL_HASH` | тот же, что локально (из `.env`; сгенерировать: `npx tsx --env-file=.env scripts/hash-owner-email.ts you@email.com`) |
+| `USD_RUB_RATE` | `90` (или актуальная оценка) |
+| `OWNER_EMAIL` | опционально fallback; предпочтителен hash |
 
-Цель: понять, насколько интересен продукт (кто заходил, сколько был, чем пользовался).
+После сохранения — **Redeploy**.
 
-- Модели Prisma (имена на усмотрение): сессии/визиты + события использования
-  - кто: `userId` (+ email только на сервере для owner-UI, не отдавать чужим)
-  - когда вошёл / ушёл / длительность
-  - события: например `LOGIN`, `CREATE_DECISION`, `GENERATE_TREE`, `RESOLVE`, `OPEN_SETTINGS`, `SUBMIT_FEEDBACK`, …
-- Писать события с сервера (Route Handlers / auth callbacks), не светить PII в клиентских бандлах
-- Страница статистики, например `/cabinet/stats` или `/cabinet/admin/stats`
-  - ссылка **видна только владельцу** (в настройках и/или сайдбаре)
-  - доступ: `requireOwner()` — иначе 404/403
-- В UI статистики: пользователи/визиты, длительности, топ функций, простые агрегаты (день/неделя)
+### 2. Build Command
 
-### C. Обратная связь
+Уже зафиксирован в корневом `vercel.json` (`npm run vercel-build`). При сомнении сверить Dashboard → Settings → General → Build Command.
 
-- Ссылка «Обратная связь» (футер лендинга / кабинет — уместно и для гостя, и для юзера)
-- Форма: текст сообщения (обязательно) + email (необязательно)
-- После отправки пользователю: **«Сообщение отправлено»** (без доступа к чужим сообщениям)
-- Хранение в БД (`FeedbackMessage` или аналог)
-- Читать может **только владелец** (вкладка на странице статистики или `/cabinet/feedback`)
-- Мутация: `POST /api/feedback` (Zod), без auth обязателен; если есть сессия — привязать `userId`
+### 3. Ручная проверка 2а+ (чеклист)
 
-### D. Владелец: email не должен читаться никем
+- [ ] Демо: загрузка → 6 решений в кабинете, 4 на `/explore`; удаление; повтор идемпотентен
+- [ ] Owner: `/cabinet/stats` + inbox ОС; не-owner → 404
+- [ ] Стоимость: day/week/month в $ и ₽ в settings
+- [ ] Toggle «платформенный ключ» OFF → новый юзер без ключа не делает первый разбор
+- [ ] Owner email нет в клиентском бандле чужого пользователя
 
-- `evleonov79@gmail.com` **не хардкодить** в клиентском коде и не отдавать в JSON не-владельцу
-- Сейчас `OWNER_EMAIL` / `OWNER_EMAIL_DEFAULT` в `lib/llm/quota.ts` — ужесветится в репо; исправить:
-  - в env хранить **хэш или AES-GCM** (как BYOK), например `OWNER_EMAIL_HASH` = HMAC-SHA256(email, AUTH_SECRET) **или** зашифрованное значение
-  - `isOwnerEmail` сравнивает только на сервере
-  - убрать plaintext default из публичного кода (fallback только через env)
-- В ответах API: `quota.isOwner: boolean` ок; сам email владельца не возвращать отдельным полем «ownerEmail»
+### 4. Docs / kip
 
-### E. Настройки — стоимость API: день / неделя / месяц, $ и ₽
-
-В `/cabinet/settings` (блок стоимости, сейчас в `LlmSettingsPanel`):
-
-- Агрегаты из `LlmUsage` за **сутки / 7 дней / 30 дней** (или календарные день/неделя/месяц — зафиксируй в ADR)
-- Показать **USD** и **RUB**
-- Курс: `USD_RUB_RATE` из env (число), с понятной подписью «оценка»; не выдумывать биржевой live-курс без ключа
-- Для **владельца** дополнительно (или вместо личного): суммарная стоимость **платформенных** запросов (`billedTo=PLATFORM`) за те же периоды — чтобы видеть расход сервиса
-
-### F. Настройки владельца — «токен по умолчанию» (платформенный ключ)
-
-Owner-only toggle в настройках:
-
-- Название UX: например **«Разрешить платформенный ключ (бесплатный разбор)»** или **«Токен по умолчанию»**
-- Если опция **выключена** (платформенный токен отключён):
-  - обычный пользователь **с первого** создания разбора получает ошибку/UI: **введите свой API-ключ** (как сейчас после исчерпания квоты), без 1 бесплатного кредита
-  - `getQuotaStatus` / `FREE_PLATFORM_CREDITS` учитывать флаг (хранить в БД `AppSettings` singleton или env+DB)
-- Если **включена** — текущее поведение (1 бесплатный разбор, затем свой ключ)
-- Владелец (`isOwner`) по-прежнему может пользоваться платформенным ключом (или тоже уважать флаг — зафиксируй в ADR; предпочтение: owner всегда может, флаг только для остальных)
-
-## Порядок реализации (рекомендуемый)
-
-1. Миграции Prisma (Feedback, Analytics events/sessions, AppSettings)
-2. Owner check без plaintext email + правка quota
-3. Этап 2а demo API + UI
-4. Стоимость день/неделя/месяц $ + ₽ в settings
-5. Toggle платформенного токена
-6. Лог событий + страница статистики (owner-only)
-7. Обратная связь (форма + inbox owner)
-8. Docs: STATUS, PLAN, CHANGELOG, DECISIONS (ADR), версия в `lib/version.ts`
-9. `npm run build` (по просьбе); **kip** = commit + push
+По завершении: STATUS (отметить Vercel env + проверку), CHANGELOG; по запросу **kip** — commit + push (заголовок + тело на русском).
 
 ## Ограничения стека
 
@@ -111,25 +68,14 @@ Owner-only toggle в настройках:
 - Комментарии на русском; имена переменных на английском
 - Секреты только `process.env`; `.env` не коммитить
 - Примеры команд — **PowerShell**
-- Shell не дергать без просьбы; **kip** / «коммит и пуш» — сразу commit+push (заголовок + тело на русском)
+- Shell не дергать без просьбы; **kip** / «коммит и пуш» — сразу commit+push
 
-## Проверка
-
-- [ ] Демо: загрузка/удаление только `[Демо]`, идемпотентно
-- [ ] Не-owner не открывает `/cabinet/stats` и не читает feedback
-- [ ] Owner email нет в клиентском бандле / Network чужого пользователя
-- [ ] Стоимость: day/week/month в $ и ₽ отображаются
-- [ ] Toggle «токен по умолчанию» OFF → новый юзер без ключа не может сделать первый разбор, видит призыв ввести ключ
-- [ ] ОС: отправка → «Сообщение отправлено»; owner видит текст (+ email если указали)
-- [ ] `npm run build` ок
-
-## Env (добавить при необходимости)
+## Env (справка)
 
 ```env
-# вместо/вместе с OWNER_EMAIL plaintext:
 OWNER_EMAIL_HASH=
-# или OWNER_EMAIL_ENC=  (AES-GCM через AUTH_SECRET)
+OWNER_EMAIL=
 USD_RUB_RATE=90
 ```
 
-Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (§ 2а), `lib/llm/quota.ts`, `components/cabinet/LlmSettingsPanel.tsx`, `prisma/seed-demo-decisions.ts`, `prisma/schema.prisma`.
+Начни с чтения `docs/STATUS.md` и этого файла. Код 2а+ не переписывать.

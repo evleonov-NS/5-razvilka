@@ -285,11 +285,11 @@
 
 ## ADR-026: Локальный build без migrate; Vercel — `vercel-build` (2026-07-26)
 
-**Решение:** `npm run build` остаётся `prisma generate && next build` (удобно локально рядом с `dev`). Для Production на Vercel — `npm run vercel-build` = `prisma migrate deploy && prisma generate && next build`. В Dashboard → Settings → General → **Build Command** указать `npm run vercel-build` (или оставить migrate вручную).
+**Решение:** `npm run build` остаётся `prisma generate && next build` (удобно локально рядом с `dev`). Для Production на Vercel — `npm run vercel-build` = `prisma migrate deploy && prisma generate && next build`. Build Command зафиксирован в корневом `vercel.json` (`"buildCommand": "npm run vercel-build"`); при необходимости сверить Dashboard → Settings → General.
 
 **Причина:** `migrate deploy` на каждом локальном build ломает/замедляет разработку без доступа к Neon; на Vercel миграции должны применяться до `next build`.
 
-**Связанные файлы:** `package.json`, `docs/PLAN.md` § этап 9.
+**Связанные файлы:** `package.json`, `vercel.json`, `docs/PLAN.md` § этап 9.
 
 ---
 
@@ -323,6 +323,16 @@
 **Причина:** контроль расхода платформы, понимание интереса к продукту, канал ОС без публичного inbox.
 
 **Связанные файлы:** `lib/app-settings.ts`, `lib/analytics.ts`, `app/cabinet/stats`, `app/feedback`, миграция `analytics_feedback_settings`.
+
+---
+
+## ADR-030: Антиспам ОС — react-honeypot-field (2026-07-26)
+
+**Решение:** на `/feedback` — библиотека `react-honeypot-field`: скрытое поле + порог 1.5 с. Клиент и `POST /api/feedback` валидируют; при провале — тихий `{ ok: true }` без записи в БД. CAPTCHA не используем.
+
+**Альтернатива при росте спама:** Cloudflare Turnstile (`@marsidev/react-turnstile`) — нужен ключ в env.
+
+**Связанные файлы:** `components/feedback/FeedbackForm.tsx`, `app/api/feedback/route.ts`.
 
 ---
 

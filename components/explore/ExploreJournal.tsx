@@ -1,6 +1,7 @@
 import { EmptyState } from "@/components/EmptyState";
 import { ExploreSortLinks } from "@/components/ExploreSortLinks";
 import { PublicDecisionCard } from "@/components/PublicDecisionCard";
+import { cabinetMain4xl } from "@/components/cabinet/cabinetLayout";
 import { getCurrentUser } from "@/lib/auth";
 import {
   listPublicDecisions,
@@ -18,7 +19,7 @@ export async function ExploreJournal({ sort }: Props) {
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
+      <div className={cabinetMain4xl}>
         <header className="mb-8">
           <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight md:text-3xl">
             Сообщество

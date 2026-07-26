@@ -7,6 +7,7 @@ import {
 import { getOwnerUser } from "@/lib/owner";
 import { prisma } from "@/lib/prisma";
 import { StatsUsageLog } from "@/components/cabinet/StatsUsageLog";
+import { cabinetMain4xl } from "@/components/cabinet/cabinetLayout";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 export const dynamic = "force-dynamic";
@@ -66,7 +67,7 @@ export default async function CabinetStatsPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
+      <div className={cabinetMain4xl}>
         <header className="mb-8">
           <h1 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight md:text-3xl">
             Статистика

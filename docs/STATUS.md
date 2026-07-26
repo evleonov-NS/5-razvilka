@@ -1,25 +1,25 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
 **Обновлено:** 2026-07-26  
-**Версия приложения:** 0.1.2 (`lib/version.ts`)  
-**Последний коммит:** пакет 2а+ (демо / аналитика / ОС / owner) — см. git log  
-**Текущий этап:** 2а+ реализован в коде; нужна миграция + env (`OWNER_EMAIL_HASH` / `USD_RUB_RATE`)  
+**Версия приложения:** 0.1.3 (`lib/version.ts`)  
+**Последний коммит:** пакет 2а+ в main (`5dbb7ff`) + ops (migrate/env/`vercel.json`)  
+**Текущий этап:** 2а+ ✅ в коде и на Neon; хвост — env на Vercel (`OWNER_EMAIL_HASH` / `USD_RUB_RATE`) + Redeploy + ручная проверка  
 **Dev-log:** [26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md](./26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md)
 
 ---
 
-## Сводка (этап 9 — полировка кода)
+## Сводка
 
 | Вопрос | Ответ |
 |--------|--------|
-| Что умеет продукт сейчас | Войти → описать решение → 3 сценария + pre-mortem → дерево → «Что получилось?» → ревью → RESOLVED |
-| Чего ещё нет | Ключи LLM в Vercel + prod-прогон §16; этап 2а (демо-кнопки в settings) |
+| Что умеет продукт сейчас | Войти → описать решение → 3 сценария + pre-mortem → дерево → «Что получилось?» → ревью → RESOLVED; демо/аналитика/ОС/owner-настройки |
+| Чего ещё нет | Vercel: `OWNER_EMAIL_HASH` + `USD_RUB_RATE` (локально уже есть); финальная отметка этапа 9 после Redeploy + ручной проверки 2а+ |
 | Где смотреть | Локально: полный цикл; prod: https://5-razvilka.vercel.app |
-| Риск для prod | Без `DEEPSEEK_API_KEY` в Vercel генерация на платформенном ключе не работает — **внести сейчас** (чеклист в PLAN § этап 9) |
+| Риск для prod | Без hash/rate на Vercel owner-проверка и ₽ в UI на prod могут отличаться от локалки |
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
-| Доменная схема Prisma | ✅ Готово | + `LlmUsage`, поля LLM у User |
+| Доменная схема Prisma | ✅ Готово | + `LlmUsage`, аналитика, ОС, `AppSettings` |
 | Auth (Google OAuth) | ✅ Готово | Auth.js v5 |
 | LLM / провайдеры | ✅ Слой + настройки | DeepSeek по умолчанию; BYOK; квоты |
 | Создание решения | ✅ Этап 4 | промпт 9.1 → Scenario + FailureMode |
@@ -27,8 +27,9 @@
 | Дерево развилок | ✅ Этап 7 | `POST …/tree`, `DecisionTree`, `TreeSection` |
 | Ревью по исходу | ✅ Этап 8 | `POST …/resolve`, `ReviewSection`, OPEN → RESOLVED |
 | Полировка UI | ✅ Этап 9 (код) | единые состояния, LikelihoodBadge, vercel-build |
-| Личный кабинет | ✅ Готово | настройки API в `/cabinet/settings` |
-| Деплой Vercel | ⚠️ сайт есть | LLM-ключи + Build Command `vercel-build` — вручную |
+| Личный кабинет | ✅ Готово | настройки API + демо в `/cabinet/settings` |
+| Пакет 2а+ | ✅ Код + Neon | демо, stats, feedback, $/₽, toggle, owner hash |
+| Деплой Vercel | 🔄 | Build Command в `vercel.json`; env hash/rate — вручную + Redeploy |
 
 ---
 
@@ -45,11 +46,22 @@
 | 6 | Журнал (главная) | ✅ Готово | кабинет; `/` — лендинг гостя |
 | 7 | Дерево развилок | ✅ Завершён |
 | 8 | Ревью по исходу | ✅ Завершён | OPEN → RESOLVED |
-| 9 | Полировка и деплой | 🔄 | код UI ✅; ключи Vercel ✅; Build Command / финальная отметка ⬜ |
+| 9 | Полировка и деплой | 🔄 | код ✅; ключи LLM ✅; `vercel.json` ✅; Vercel env hash/rate ⬜ |
 | 2а | Настройки: демо-данные | ✅ | + аналитика, ОС, стоимость $/₽, toggle платф. ключа, OWNER_EMAIL_HASH |
 | 10 | Социальные механики | ✅ Завершён |
 
 ---
+
+## Готово (ops после 2а+, 2026-07-26)
+
+- [x] `npx prisma migrate deploy` — pending нет (`analytics_feedback_settings` на Neon)
+- [x] Локальный `.env`: `OWNER_EMAIL_HASH`, `USD_RUB_RATE=90` (пользователь подтвердил)
+- [x] `vercel.json` → `buildCommand: npm run vercel-build` (ADR-026)
+- [x] `.env.example` уже содержит hash/rate
+- [ ] Vercel Environment Variables: `OWNER_EMAIL_HASH`, `USD_RUB_RATE` (+ Redeploy) — если ещё не на Dashboard
+- [ ] Ручная проверка демо / stats / стоимость / toggle (чеклист в корневом `PROMPT.md`)
+- [x] Антиспам `/feedback` — `react-honeypot-field` (ADR-030)
+- [x] Выравнивание карточек на `/cabinet/settings`
 
 ## Готово (Этап 9 — полировка кода, 2026-07-26)
 
@@ -59,9 +71,9 @@
 - [x] `loading.tsx` / `error.tsx` для `/decisions/new`
 - [x] Review empty → `EmptyState`; generating — скелетон как у дерева
 - [x] `POST /api/decisions` — безопасный parse JSON тела (400)
-- [x] `npm run vercel-build` (ADR-026); версия `0.1.1`
+- [x] `npm run vercel-build` (ADR-026); версия `0.1.1` → далее `0.1.2` / `0.1.3`
 - [x] Vercel Environment Variables: `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, …
-- [ ] Vercel Build Command → `npm run vercel-build` (проверить вручную)
+- [x] Build Command → `npm run vercel-build` (зафиксирован в `vercel.json`)
 - [x] Redeploy после ключей; prod LLM работает
 
 ## Готово (Этап 8 — ревью по исходу, 2026-07-26)
@@ -103,12 +115,12 @@
 
 - [x] Платформа по умолчанию — DeepSeek (`DEEPSEEK_API_KEY`)
 - [x] `/cabinet/settings` — провайдер / модель / свой ключ; блок стоимости запросов
-- [x] Квоты: `OWNER_EMAIL` безлимит; остальные — 1 бесплатный разбор
+- [x] Квоты: owner безлимит; остальные — 1 бесплатный разбор
 - [x] `LlmUsage` + оценка USD; ключ AES-GCM (`AUTH_SECRET`)
 - [x] Миграция `user_llm_settings`
 - [x] ADR-022
 
-Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER`, `LLM_MODEL`, `OWNER_EMAIL` — см. `.env.example`.
+Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER`, `LLM_MODEL`, `OWNER_EMAIL` / `OWNER_EMAIL_HASH`, `USD_RUB_RATE` — см. `.env.example`.
 
 ## Готово (Этап 3 — LLM-слой, 2026-07-23)
 
@@ -157,14 +169,9 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 
 ## Следующий шаг
 
-Пакет после этапа 9 (промпт в корневом [PROMPT.md](../PROMPT.md)):
-
-1. **Этап 2а** — демо-кнопки в `/cabinet/settings`
-2. **Аналитика** — лог визитов/функций, страница статистики только для владельца
-3. **Обратная связь** — форма + inbox только владельцу; email необязателен
-4. **Owner privacy** — email владельца не в plaintext в коде/клиенте
-5. **Стоимость API** в настройках: день / неделя / месяц, $ и ₽
-6. **Toggle** «токен по умолчанию» (платформенный ключ) — OFF → свой ключ с первого разбора
+1. **Vercel** — добавить `OWNER_EMAIL_HASH` и `USD_RUB_RATE`, Redeploy  
+2. Ручная проверка чеклиста 2а+ (демо / stats / ОС / стоимость / toggle)  
+3. Закрыть этап 9 в STATUS/PLAN после проверки  
 
 Промпт для нового чата: корневой [PROMPT.md](../PROMPT.md).
 

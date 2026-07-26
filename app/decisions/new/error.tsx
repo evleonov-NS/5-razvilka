@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { cabinetMain2xlLoose } from "@/components/cabinet/cabinetLayout";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
 
 export default function NewDecisionError({ error, reset }: Props) {
   return (
-    <div className="mx-auto w-full max-w-2xl flex-1 px-6 py-10 md:px-8">
+    <div className={cabinetMain2xlLoose}>
       <ErrorMessage
         title="Не удалось открыть форму"
         message={

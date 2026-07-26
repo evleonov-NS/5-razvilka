@@ -41,13 +41,11 @@ export function CostUsagePanel({
   recent,
 }: CostUsageProps) {
   return (
-    <section className="rounded-2xl border border-border bg-surface p-5 md:p-6">
+    <section className="rounded-lg border border-border bg-surface p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-lg font-medium tracking-tight text-text">
-            Стоимость запросов
-          </h2>
-          <p className="mt-1 text-sm text-text-muted">
+          <h2 className="text-sm font-medium text-text">Стоимость запросов</h2>
+          <p className="mt-1 text-xs text-text-muted">
             Оценка по прайсу каталога (не чек провайдера). Окна: сутки / 7 дней /
             30 дней.
             {rateLabel
@@ -55,7 +53,7 @@ export function CostUsagePanel({
               : " Курс ₽ не задан (USD_RUB_RATE)."}
           </p>
         </div>
-        <span className="rounded-full bg-surface-2 px-3 py-1 text-xs text-text-muted">
+        <span className="rounded-md bg-surface-2 px-3 py-1 text-xs text-text-muted">
           Всего:{" "}
           <span className="font-medium tabular-nums text-text">
             {totals.costLabel}
@@ -102,7 +100,7 @@ export function CostUsagePanel({
           {recent.map((row) => (
             <li
               key={row.id}
-              className="flex flex-wrap items-baseline justify-between gap-3 rounded-xl bg-surface-2/80 px-4 py-3"
+              className="flex flex-wrap items-baseline justify-between gap-3 rounded-md bg-surface-2/80 px-4 py-3"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm text-text">
@@ -127,7 +125,7 @@ export function CostUsagePanel({
 
 function SummaryChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-surface-2/80 px-3 py-3">
+    <div className="rounded-md bg-surface-2/80 px-3 py-3">
       <dt className="text-xs text-text-faint">{label}</dt>
       <dd className="mt-0.5 text-sm font-medium tabular-nums text-text">
         {value}
@@ -156,7 +154,7 @@ function PeriodTable({
         ) : null}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
+      <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full min-w-[28rem] table-fixed text-left text-sm">
           <colgroup>
             <col className="w-[28%]" />

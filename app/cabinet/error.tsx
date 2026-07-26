@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ErrorMessage } from "@/components/ErrorMessage";
+import { cabinetMain4xlLoose } from "@/components/cabinet/cabinetLayout";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
 
 export default function CabinetError({ error, reset }: Props) {
   return (
-    <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-10 md:px-8">
+    <div className={cabinetMain4xlLoose}>
       <ErrorMessage
         title="Не удалось открыть кабинет"
         message={

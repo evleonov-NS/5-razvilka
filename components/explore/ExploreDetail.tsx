@@ -10,6 +10,7 @@ import {
 } from "@/lib/decision-labels";
 import type { PublicDecisionItem } from "@/lib/public-decisions";
 import { versionLabel } from "@/lib/version";
+import { cabinetMain4xl } from "@/components/cabinet/cabinetLayout";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 type Props = {
@@ -21,7 +22,7 @@ export async function ExploreDetail({ decision }: Props) {
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
+      <div className={cabinetMain4xl}>
         <Link
           href="/explore"
           className={`mb-6 inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-text ${landingFocus}`}

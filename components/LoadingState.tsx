@@ -1,3 +1,5 @@
+import { cabinetPad4xlLoose } from "@/components/cabinet/cabinetLayout";
+
 type Props = {
   label?: string;
 };
@@ -6,7 +8,7 @@ type Props = {
 export function LoadingState({ label = "Загрузка…" }: Props) {
   return (
     <div
-      className="mx-auto w-full max-w-4xl px-6 py-10 md:px-8"
+      className={cabinetPad4xlLoose}
       role="status"
       aria-live="polite"
       aria-busy="true"

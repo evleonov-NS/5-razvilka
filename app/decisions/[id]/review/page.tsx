@@ -5,6 +5,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { versionLabel } from "@/lib/version";
 import { EmptyState } from "@/components/EmptyState";
+import {
+  cabinetFooterInner4xl,
+  cabinetMain4xl,
+} from "@/components/cabinet/cabinetLayout";
 import { landingFocus } from "@/components/landing/landingLayout";
 import {
   ReviewSection,
@@ -62,7 +66,7 @@ export default async function DecisionReviewPage({ params }: PageProps) {
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
+      <div className={cabinetMain4xl}>
         <Link
           href={`/decisions/${decision.id}`}
           className={`mb-8 inline-flex items-center gap-2 text-sm text-text-muted transition-colors hover:text-text ${landingFocus}`}
@@ -111,7 +115,7 @@ export default async function DecisionReviewPage({ params }: PageProps) {
       </div>
 
       <footer className="border-t border-border px-6 py-4 text-sm text-text-muted md:px-8">
-        <div className="mx-auto w-full max-w-4xl">v{versionLabel}</div>
+        <div className={cabinetFooterInner4xl}>v{versionLabel}</div>
       </footer>
     </div>
   );

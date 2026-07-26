@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { validateHoneypot } from "react-honeypot-field/validate";
 import { trackEvent } from "@/lib/analytics";
 import { getCurrentUser } from "@/lib/auth";
 import { forbiddenResponse, requireOwner } from "@/lib/owner";
@@ -16,6 +17,9 @@ const postSchema = z.object({
     .max(320)
     .optional()
     .or(z.literal("")),
+  // honeypot: боты заполняют; люди не видят
+  website: z.string().optional().default(""),
+  _mountedAt: z.number().finite().optional(),
 });
 
 /** Публичная отправка ОС. Auth необязателен. */
@@ -31,6 +35,20 @@ export async function POST(request: Request) {
         },
         { status: 400 },
       );
+    }
+
+    // Тихий отказ: боту отвечаем успехом, в БД не пишем
+    if (parsed.data._mountedAt == null) {
+      return NextResponse.json({ ok: true });
+    }
+    const hp = validateHoneypot({
+      fieldValue: parsed.data.website,
+      mountedAt: parsed.data._mountedAt,
+      submittedAt: Date.now(),
+      timeThreshold: 1500,
+    });
+    if (!hp.ok) {
+      return NextResponse.json({ ok: true });
     }
 
     const user = await getCurrentUser();

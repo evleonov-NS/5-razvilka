@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import Link from "next/link";
 import type { LlmProviderKind } from "@prisma/client";
 import { CostUsagePanel } from "@/components/cabinet/CostUsagePanel";
 
@@ -213,10 +212,7 @@ export function LlmSettingsPanel({
 
   if (loading && !data) {
     return (
-      <p
-        className="text-sm text-text-muted lg:col-span-2"
-        aria-live="polite"
-      >
+      <p className="text-sm text-text-muted" aria-live="polite">
         Загрузка настроек API…
       </p>
     );
@@ -224,7 +220,7 @@ export function LlmSettingsPanel({
 
   if (!data) {
     return (
-      <p className="text-sm text-accent-ink lg:col-span-2" role="alert">
+      <p className="text-sm text-accent-ink" role="alert">
         {error ?? "Нет данных"}
       </p>
     );
@@ -234,94 +230,80 @@ export function LlmSettingsPanel({
   const platformEnabled =
     data.appSettings?.platformKeyEnabled ?? quota.platformKeyEnabled;
 
-  // contents — дети участвуют в родительской сетке настроек (стоимость на 2 колонки)
+  // Одна колонка: все карточки на всю ширину правой колонки настроек
   return (
-    <div className="contents">
-      <div className="space-y-8">
-        {demoSlot}
+    <div className="flex w-full min-w-0 flex-col gap-6">
+      {demoSlot}
+      <section className="rounded-lg border border-border bg-surface p-5">
+        <h2 className="text-sm font-medium text-text">Доступ к разборам</h2>
+        <p className="mt-1 text-xs text-text-muted">
+          По умолчанию — DeepSeek на стороне сервиса. Свой ключ снимает лимит.
+        </p>
+
+        <ul className="mt-4 space-y-2 text-sm text-text">
+          {quota.isOwner ? (
+            <li>
+              Режим владельца: безлимитные разборы на платформенном ключе.
+            </li>
+          ) : quota.hasOwnKey ? (
+            <li>Подключён свой API — разборы без лимита сервиса.</li>
+          ) : !quota.platformKeyEnabled ? (
+            <li className="text-accent-ink">
+              Платформенный ключ отключён. Добавьте свой API ниже.
+            </li>
+          ) : quota.freeRemaining !== null && quota.freeRemaining > 0 ? (
+            <li>
+              Остался{" "}
+              <span className="font-medium text-accent-ink">
+                {quota.freeRemaining}
+              </span>{" "}
+              бесплатный тестовый разбор.
+            </li>
+          ) : (
+            <li className="text-accent-ink">
+              Бесплатный разбор использован. Добавьте свой API ниже, чтобы
+              продолжить.
+            </li>
+          )}
+          {!quota.canGenerate && quota.message ? (
+            <li className="text-text-muted">{quota.message}</li>
+          ) : null}
+        </ul>
+      </section>
+
+      {quota.isOwner ? (
         <section className="rounded-lg border border-border bg-surface p-5">
-          <h2 className="text-sm font-medium text-text">Доступ к разборам</h2>
+          <h2 className="text-sm font-medium text-text">Токен по умолчанию</h2>
           <p className="mt-1 text-xs text-text-muted">
-            По умолчанию — DeepSeek на стороне сервиса. Свой ключ снимает лимит.
+            Разрешить обычным пользователям один бесплатный разбор на
+            платформенном ключе. Владелец всегда может пользоваться платформой.
           </p>
-
-          <ul className="mt-4 space-y-2 text-sm text-text">
-            {quota.isOwner ? (
-              <li>
-                Режим владельца: безлимитные разборы на платформенном ключе.
-              </li>
-            ) : quota.hasOwnKey ? (
-              <li>Подключён свой API — разборы без лимита сервиса.</li>
-            ) : !quota.platformKeyEnabled ? (
-              <li className="text-accent-ink">
-                Платформенный ключ отключён. Добавьте свой API ниже.
-              </li>
-            ) : quota.freeRemaining !== null && quota.freeRemaining > 0 ? (
-              <li>
-                Остался{" "}
-                <span className="font-medium text-accent-ink">
-                  {quota.freeRemaining}
-                </span>{" "}
-                бесплатный тестовый разбор.
-              </li>
-            ) : (
-              <li className="text-accent-ink">
-                Бесплатный разбор использован. Добавьте свой API ниже, чтобы
-                продолжить.
-              </li>
-            )}
-            {!quota.canGenerate && quota.message ? (
-              <li className="text-text-muted">{quota.message}</li>
-            ) : null}
-          </ul>
+          <label className="mt-4 flex items-center gap-3 text-sm text-text">
+            <input
+              type="checkbox"
+              checked={platformEnabled}
+              disabled={togglingPlatform}
+              onChange={(e) => void handlePlatformToggle(e.target.checked)}
+            />
+            Разрешить платформенный ключ (бесплатный разбор)
+          </label>
         </section>
+      ) : null}
 
-        {quota.isOwner ? (
-          <section className="rounded-lg border border-border bg-surface p-5">
-            <h2 className="text-sm font-medium text-text">
-              Токен по умолчанию
-            </h2>
-            <p className="mt-1 text-xs text-text-muted">
-              Разрешить обычным пользователям один бесплатный разбор на
-              платформенном ключе. Владелец всегда может пользоваться платформой.
-            </p>
-            <label className="mt-4 flex items-center gap-3 text-sm text-text">
-              <input
-                type="checkbox"
-                checked={platformEnabled}
-                disabled={togglingPlatform}
-                onChange={(e) => void handlePlatformToggle(e.target.checked)}
-              />
-              Разрешить платформенный ключ (бесплатный разбор)
-            </label>
-            <p className="mt-3">
-              <Link
-                href="/cabinet/stats"
-                className="text-sm text-accent-ink underline-offset-2 hover:underline"
-              >
-                Статистика и обратная связь →
-              </Link>
-            </p>
-          </section>
-        ) : null}
-      </div>
+      <CostUsagePanel
+        rateLabel={periods.rateLabel}
+        personal={periods.personal}
+        platform={periods.platform}
+        totals={{
+          requestCount: usage.requestCount,
+          costLabel: usage.costLabel,
+          promptTokens: usage.promptTokens,
+          completionTokens: usage.completionTokens,
+        }}
+        recent={usage.recent}
+      />
 
-      <div className="lg:col-span-2">
-        <CostUsagePanel
-          rateLabel={periods.rateLabel}
-          personal={periods.personal}
-          platform={periods.platform}
-          totals={{
-            requestCount: usage.requestCount,
-            costLabel: usage.costLabel,
-            promptTokens: usage.promptTokens,
-            completionTokens: usage.completionTokens,
-          }}
-          recent={usage.recent}
-        />
-      </div>
-
-      <section className="rounded-lg border border-border bg-surface p-5 lg:col-span-2 lg:max-w-xl">
+      <section className="rounded-lg border border-border bg-surface p-5">
         <h2 className="text-sm font-medium text-text">API и модель</h2>
         <p className="mt-1 text-xs text-text-muted">
           DeepSeek, Qwen или OpenAI — ключ хранится в зашифрованном виде и не
