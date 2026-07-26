@@ -7,7 +7,8 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этап 9 — `OWNER_EMAIL_HASH` / `USD_RUB_RATE` на Vercel + Redeploy + ручная проверка 2а+ → финальная отметка
+- ~~Этап 9~~ ✅ закрыт
+- Post-MVP: прогон build/verify + security-аудит (новый чат, см. корневой `PROMPT.md`)
 
 ### Added
 - **Ops после 2а+ (v0.1.3):** `vercel.json` с Build Command `npm run vercel-build`; локально `OWNER_EMAIL_HASH` + `USD_RUB_RATE`; миграция `analytics_feedback_settings` подтверждена на Neon; обновлены `PROMPT.md` / STATUS / PLAN.

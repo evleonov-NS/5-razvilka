@@ -202,6 +202,18 @@ ReviewResponseSchema, сохранить outcome, reviewClosestScenario, reviewM
 Обновить PROMPT.md / STATUS / PLAN / CHANGELOG / version. Примеры команд — PowerShell.
 ```
 
+### Промпт — прогон + security (после этапа 9)
+
+Актуальная выжимка: корневой **[PROMPT.md](../PROMPT.md)**.
+
+```text
+Этап 9 закрыт. Новый пакет: (1) прогон npm run build / llm:verify / db:verify
+и фиксация результата; при необходимости предложить минимальные автотесты.
+(2) Security-аудит: auth, ownership API, feedback abuse, LLM-секреты, PII —
+таблица «дыра → риск → фикс»; без эксплойтов. По согласованию — внедрить фиксы.
+Docs + kip по запросу. PowerShell.
+```
+
 ### Промпт 10 — социальные механики (после MVP)
 
 Полный текст: **[PROMPT-socium.md](./PROMPT-socium.md)** — лайки к публичным разборам, лента `/explore`, `isPublic` + `DecisionLike`.

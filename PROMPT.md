@@ -4,7 +4,7 @@
 
 ---
 
-Ты — ведущий fullstack-разработчик проекта **«Развилка»** (Next.js 15 App Router, TypeScript, Prisma 6, Neon, Tailwind, Auth.js v5 + Google OAuth).
+Ты — ведущий fullstack-разработчик и security-minded ревьюер проекта **«Развилка»** (Next.js 15 App Router, TypeScript, Prisma 6, Neon, Tailwind, Auth.js v5 + Google OAuth).
 
 ## Снимок состояния
 
@@ -12,70 +12,63 @@
 |----------|----------|
 | Версия | 0.1.3 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | 2а+ в main (`5dbb7ff`) + хвост ops (migrate/env/vercel.json) — см. `docs/STATUS.md` |
+| Последний коммит | `4fc2d3f` (ops 2а+/honeypot/кабинет) — см. `docs/STATUS.md` |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Prod LLM | ключи в Vercel внесены |
-| Текущий фокус | **закрыть хвост этапа 9 на Vercel** (env hash/rate + Redeploy) и ручная проверка 2а+ |
+| Этап 9 | ✅ закрыт (UI + Vercel LLM/hash/rate + Build Command + ручная проверка 2а+) |
+| Текущий фокус | **Прогон проверок/тестов → аудит безопасности → предложения и правки** |
 
 ## Что уже сделано (не переделывать)
 
-- Этапы 0–8: auth, кабинет, сценарии, дерево, ревью → RESOLVED
-- Этап 9 (код): единые UI-состояния, `LikelihoodBadge`, `npm run vercel-build` (ADR-026)
-- **Пакет 2а+ (код в main):** демо в `/cabinet/settings`; аналитика + `/cabinet/stats`; ОС `/feedback`; стоимость сутки/7д/30д $ и ₽; toggle платф. ключа; `OWNER_EMAIL_HASH` (ADR-027…029)
-- Миграция `analytics_feedback_settings` на Neon применена (`prisma migrate deploy` — no pending)
-- `vercel.json` → `buildCommand: npm run vercel-build`
-- Локально в `.env`: `OWNER_EMAIL_HASH`, `USD_RUB_RATE=90` (см. `.env.example`)
+- Этапы 0–10 + 2а+: полный цикл решения, кабинет, explore, демо, аналитика, ОС, стоимость $/₽, owner hash, toggle платф. ключа
+- `vercel.json` → `npm run vercel-build`; Neon-миграции актуальны
+- Антиспам ОС: `react-honeypot-field` (ADR-030)
+- Автотестов (Jest/Vitest/Playwright) **пока нет**; есть `npm run build`, `npm run llm:verify`, `npm run db:verify`
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
 ## Задача этого чата
 
-**Не трогать и не переписывать пакет 2а+.** Сфокусироваться на prod-хвосте и проверке.
+### A. Прогон проверок / тестов
 
-### 1. Vercel Environment Variables (вручную)
+1. По явной просьбе пользователя (или в этом чате, если попросит «запусти»):  
+   - `npm run build`  
+   - `npm run llm:verify` (нужен ключ в `.env`)  
+   - `npm run db:verify`  
+   - при необходимости smoke руками: демо-кейс PROJECT.md §16 на local/prod  
+2. Зафиксировать результат: что прошло / что упало.  
+3. Если дыр в покрытии критично мало — **предложить** минимальный набор автотестов (что именно: Zod-валидаторы, owner-check, honeypot API, ownership на API) и согласовать перед внедрением. Не раздувать CI без нужды.
 
-Settings → Environment Variables → Production (+ Preview при необходимости):
+### B. Аудит безопасности → дыры → решения
 
-| Key | Значение |
-|-----|----------|
-| `OWNER_EMAIL_HASH` | тот же, что локально (из `.env`; сгенерировать: `npx tsx --env-file=.env scripts/hash-owner-email.ts you@email.com`) |
-| `USD_RUB_RATE` | `90` (или актуальная оценка) |
-| `OWNER_EMAIL` | опционально fallback; предпочтителен hash |
+Пройти код и поверхность атаки (без эксплойтов/PoC в ответах — только описание риска и фикс):
 
-После сохранения — **Redeploy**.
+| Зона | На что смотреть |
+|------|-----------------|
+| Auth / сессии | Cookie httpOnly, `requireUser` / `requireOwner`, утечка email владельца |
+| API | Ownership на `decisions/*`, rate-limit/abuse на `/api/feedback`, IDOR, массовые действия |
+| LLM / секреты | Ключи только server; BYOK AES-GCM; нет ключей в клиентском бандле |
+| Данные | PII в аналитике/feedback; публичный `/explore` без лишнего |
+| Infra | `.env` не в git; Vercel env; CORS/headers по желанию |
 
-### 2. Build Command
+**Формат результата:** таблица «дыра → риск → предложение (конкретный фикс)».  
+По согласованию пользователя — внедрить приоритетные фиксы (не всё сразу).
 
-Уже зафиксирован в корневом `vercel.json` (`npm run vercel-build`). При сомнении сверить Dashboard → Settings → General → Build Command.
+### C. Docs
 
-### 3. Ручная проверка 2а+ (чеклист)
+Обновить `docs/STATUS.md`, `docs/CHANGELOG.md`, при новых решениях — ADR в `docs/DECISIONS.md`, `__version__` при значимых правках. По запросу **kip** — commit + push (заголовок + тело на русском).
 
-- [ ] Демо: загрузка → 6 решений в кабинете, 4 на `/explore`; удаление; повтор идемпотентен
-- [ ] Owner: `/cabinet/stats` + inbox ОС; не-owner → 404
-- [ ] Стоимость: day/week/month в $ и ₽ в settings
-- [ ] Toggle «платформенный ключ» OFF → новый юзер без ключа не делает первый разбор
-- [ ] Owner email нет в клиентском бандле чужого пользователя
+## Ограничения
 
-### 4. Docs / kip
-
-По завершении: STATUS (отметить Vercel env + проверку), CHANGELOG; по запросу **kip** — commit + push (заголовок + тело на русском).
-
-## Ограничения стека
-
-- Мутации — Route Handlers; чтение — Server Components
-- LLM только на сервере; Zod на входе/LLM
-- Prisma singleton `lib/prisma.ts`; Node runtime
-- Комментарии на русском; имена переменных на английском
-- Секреты только `process.env`; `.env` не коммитить
+- Мутации — Route Handlers; чтение — Server Components; LLM только на сервере; Zod
+- Не писать эксплойты / PoC / malware
+- Shell (build/verify) — только по просьбе или если пользователь в этом чате явно просит прогон
 - Примеры команд — **PowerShell**
-- Shell не дергать без просьбы; **kip** / «коммит и пуш» — сразу commit+push
+- `.env` не коммитить
 
-## Env (справка)
+## С чего начать
 
-```env
-OWNER_EMAIL_HASH=
-OWNER_EMAIL=
-USD_RUB_RATE=90
-```
+1. Прочитать `docs/STATUS.md`, этот `PROMPT.md`.  
+2. Спросить / дождаться: запускать ли сразу `build` + `llm:verify` + `db:verify`.  
+3. Параллельно набросать план security-аудита по зонам выше.
 
-Начни с чтения `docs/STATUS.md` и этого файла. Код 2а+ не переписывать.
+Не начинать с переписывания UI 2а+/кабинета.

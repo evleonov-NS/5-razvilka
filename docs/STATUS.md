@@ -2,8 +2,8 @@
 
 **Обновлено:** 2026-07-26  
 **Версия приложения:** 0.1.3 (`lib/version.ts`)  
-**Последний коммит:** пакет 2а+ в main (`5dbb7ff`) + ops (migrate/env/`vercel.json`)  
-**Текущий этап:** 2а+ ✅ в коде и на Neon; хвост — env на Vercel (`OWNER_EMAIL_HASH` / `USD_RUB_RATE`) + Redeploy + ручная проверка  
+**Последний коммит:** `4fc2d3f` — ops после 2а+ (см. git log)  
+**Текущий этап:** этап 9 ✅ закрыт; следующий пакет — прогон проверок + security-аудит (см. корневой `PROMPT.md`)  
 **Dev-log:** [26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md](./26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md)
 
 ---
@@ -12,10 +12,10 @@
 
 | Вопрос | Ответ |
 |--------|--------|
-| Что умеет продукт сейчас | Войти → описать решение → 3 сценария + pre-mortem → дерево → «Что получилось?» → ревью → RESOLVED; демо/аналитика/ОС/owner-настройки |
-| Чего ещё нет | Vercel: `OWNER_EMAIL_HASH` + `USD_RUB_RATE` (локально уже есть); финальная отметка этапа 9 после Redeploy + ручной проверки 2а+ |
-| Где смотреть | Локально: полный цикл; prod: https://5-razvilka.vercel.app |
-| Риск для prod | Без hash/rate на Vercel owner-проверка и ₽ в UI на prod могут отличаться от локалки |
+| Что умеет продукт сейчас | Полный цикл MVP + 2а+ (демо, stats, ОС, $/₽, toggle, owner hash) |
+| Чего ещё нет | Автотесты (Jest/Vitest/e2e); формальный security-проход с фиксами |
+| Где смотреть | Локально + prod: https://5-razvilka.vercel.app |
+| Риск для prod | Низкий операционный; дальше — abuse ОС / IDOR / утечки — в новом чате |
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
@@ -26,10 +26,10 @@
 | Экран результата | ✅ Этап 5 | Loading/Error, CTA на ревью |
 | Дерево развилок | ✅ Этап 7 | `POST …/tree`, `DecisionTree`, `TreeSection` |
 | Ревью по исходу | ✅ Этап 8 | `POST …/resolve`, `ReviewSection`, OPEN → RESOLVED |
-| Полировка UI | ✅ Этап 9 (код) | единые состояния, LikelihoodBadge, vercel-build |
+| Полировка UI | ✅ Этап 9 | единые состояния, LikelihoodBadge, vercel-build |
 | Личный кабинет | ✅ Готово | настройки API + демо в `/cabinet/settings` |
-| Пакет 2а+ | ✅ Код + Neon | демо, stats, feedback, $/₽, toggle, owner hash |
-| Деплой Vercel | 🔄 | Build Command в `vercel.json`; env hash/rate — вручную + Redeploy |
+| Пакет 2а+ | ✅ Код + Neon + prod | демо, stats, feedback, $/₽, toggle, owner hash |
+| Деплой Vercel | ✅ | `vercel.json` + LLM/hash/rate env + Redeploy |
 
 ---
 
@@ -46,24 +46,25 @@
 | 6 | Журнал (главная) | ✅ Готово | кабинет; `/` — лендинг гостя |
 | 7 | Дерево развилок | ✅ Завершён |
 | 8 | Ревью по исходу | ✅ Завершён | OPEN → RESOLVED |
-| 9 | Полировка и деплой | 🔄 | код ✅; ключи LLM ✅; `vercel.json` ✅; Vercel env hash/rate ⬜ |
-| 2а | Настройки: демо-данные | ✅ | + аналитика, ОС, стоимость $/₽, toggle платф. ключа, OWNER_EMAIL_HASH |
+| 9 | Полировка и деплой | ✅ Завершён | UI + Vercel + ручная проверка 2а+ |
+| 2а | Настройки: демо-данные | ✅ | + аналитика, ОС, стоимость $/₽, toggle, OWNER_EMAIL_HASH |
 | 10 | Социальные механики | ✅ Завершён |
+| — | Прогон + security | ⬜ | новый чат: `PROMPT.md` |
 
 ---
 
 ## Готово (ops после 2а+, 2026-07-26)
 
 - [x] `npx prisma migrate deploy` — pending нет (`analytics_feedback_settings` на Neon)
-- [x] Локальный `.env`: `OWNER_EMAIL_HASH`, `USD_RUB_RATE=90` (пользователь подтвердил)
+- [x] Локальный `.env`: `OWNER_EMAIL_HASH`, `USD_RUB_RATE=90`
 - [x] `vercel.json` → `buildCommand: npm run vercel-build` (ADR-026)
 - [x] `.env.example` уже содержит hash/rate
-- [ ] Vercel Environment Variables: `OWNER_EMAIL_HASH`, `USD_RUB_RATE` (+ Redeploy) — если ещё не на Dashboard
-- [ ] Ручная проверка демо / stats / стоимость / toggle (чеклист в корневом `PROMPT.md`)
+- [x] Vercel Environment Variables: `OWNER_EMAIL_HASH`, `USD_RUB_RATE` (+ Redeploy)
+- [x] Ручная проверка демо / stats / стоимость / toggle
 - [x] Антиспам `/feedback` — `react-honeypot-field` (ADR-030)
-- [x] Выравнивание карточек на `/cabinet/settings`
+- [x] Выравнивание карточек на `/cabinet/settings`; сдвиг кабинета к сайдбару
 
-## Готово (Этап 9 — полировка кода, 2026-07-26)
+## Готово (Этап 9 — полировка и деплой, 2026-07-26)
 
 - [x] Общий `LikelihoodBadge` на лендинге и `/demo` (без локальных копий)
 - [x] `NewDecisionForm` — ошибки через `ErrorMessage`
@@ -71,10 +72,10 @@
 - [x] `loading.tsx` / `error.tsx` для `/decisions/new`
 - [x] Review empty → `EmptyState`; generating — скелетон как у дерева
 - [x] `POST /api/decisions` — безопасный parse JSON тела (400)
-- [x] `npm run vercel-build` (ADR-026); версия `0.1.1` → далее `0.1.2` / `0.1.3`
-- [x] Vercel Environment Variables: `DEEPSEEK_API_KEY`, `OWNER_EMAIL`, …
-- [x] Build Command → `npm run vercel-build` (зафиксирован в `vercel.json`)
-- [x] Redeploy после ключей; prod LLM работает
+- [x] `npm run vercel-build` (ADR-026); версия `0.1.3`
+- [x] Vercel Environment Variables: `DEEPSEEK_API_KEY`, `OWNER_EMAIL` / hash, `USD_RUB_RATE`, …
+- [x] Build Command → `npm run vercel-build` (`vercel.json`)
+- [x] Redeploy; prod LLM работает; 2а+ проверен вручную
 
 ## Готово (Этап 8 — ревью по исходу, 2026-07-26)
 
@@ -169,11 +170,7 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 
 ## Следующий шаг
 
-1. **Vercel** — добавить `OWNER_EMAIL_HASH` и `USD_RUB_RATE`, Redeploy  
-2. Ручная проверка чеклиста 2а+ (демо / stats / ОС / стоимость / toggle)  
-3. Закрыть этап 9 в STATUS/PLAN после проверки  
-
-Промпт для нового чата: корневой [PROMPT.md](../PROMPT.md).
+Прогон проверок + security-аудит — новый чат, корневой [PROMPT.md](../PROMPT.md).
 
 ---
 
