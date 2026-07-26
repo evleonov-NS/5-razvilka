@@ -12,7 +12,7 @@ export type QuotaUser = {
 };
 
 export type QuotaOptions = {
-  /** false — обычным юзерам без своего ключа генерация недоступна (даже 1 кредит). */
+  /** false — обычным юзерам без своего ключа генерация недоступна (лок без бесплатных кредитов). */
   platformKeyEnabled?: boolean;
 };
 
@@ -94,7 +94,7 @@ export function getQuotaStatus(
       reason: "NEED_API_KEY",
       message: !platformKeyEnabled
         ? "Платформенный ключ отключён. Добавьте свой API-ключ в настройках (DeepSeek, Qwen или OpenAI)."
-        : "Бесплатный тестовый разбор уже использован. Добавьте свой API-ключ в настройках (DeepSeek, Qwen или OpenAI).",
+        : "Бесплатные разборы использованы. Добавьте свой API-ключ в настройках (DeepSeek, Qwen или OpenAI).",
     };
   }
 

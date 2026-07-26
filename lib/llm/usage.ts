@@ -148,7 +148,7 @@ export async function recordLlmUsage(input: RecordUsageInput) {
   return row;
 }
 
-/** Один бесплатный/платформенный разбор для обычного пользователя. */
+/** Списать один платформенный кредит (лимит FREE_PLATFORM_CREDITS). */
 export async function consumePlatformCredit(userId: string) {
   await prisma.user.update({
     where: { id: userId },

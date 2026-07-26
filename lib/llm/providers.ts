@@ -102,7 +102,7 @@ export const DEFAULT_PROVIDER: LlmProviderKind = "DEEPSEEK";
 export const DEFAULT_MODEL = LLM_PROVIDERS.DEEPSEEK.defaultModel;
 
 /** Бесплатных разборов за счёт платформы для обычных пользователей. */
-export const FREE_PLATFORM_CREDITS = 1;
+export const FREE_PLATFORM_CREDITS = 3;
 
 export function getProvider(kind: LlmProviderKind): LlmProviderInfo {
   return LLM_PROVIDERS[kind];

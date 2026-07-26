@@ -134,7 +134,7 @@ export function NewDecisionForm({ presetId }: Props) {
           setNeedApiKey(true);
           throw new Error(
             body.error ??
-              "Бесплатный разбор использован. Добавьте API-ключ в настройках.",
+              "Бесплатные разборы использованы. Добавьте API-ключ в настройках.",
           );
         }
         throw new Error(body?.error ?? "Не удалось разобрать решение");

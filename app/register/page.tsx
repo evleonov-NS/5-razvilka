@@ -25,7 +25,7 @@ export default async function RegisterPage({ searchParams }: PageProps) {
       </h1>
       <p className="mt-2 text-sm text-text-muted">
         Создайте аккаунт через Google, чтобы сохранить разбор в журнале решений.
-        Первый разбор — бесплатно.
+        Три разбора — бесплатно.
       </p>
 
       <div className="mt-8">

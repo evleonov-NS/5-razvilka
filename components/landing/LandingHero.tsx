@@ -71,7 +71,7 @@ export function LandingHero() {
           </Link>
         </div>
         <p className="mt-4 text-xs uppercase tracking-wider text-text-faint">
-          Первый разбор — бесплатно.
+          Три разбора — бесплатно.
         </p>
       </div>
 

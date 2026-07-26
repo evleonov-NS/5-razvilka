@@ -242,10 +242,10 @@
 - Платформа по умолчанию — **DeepSeek** (`DEEPSEEK_API_KEY`, `LLM_DEFAULT_PROVIDER=DEEPSEEK`).
 - В `/cabinet/settings` пользователь выбирает провайдера (DeepSeek / Qwen / OpenAI), модель и свой API-ключ.
 - Ключ хранится в `User.llmApiKeyEnc` (AES-256-GCM от `AUTH_SECRET`), в UI только маска.
-- Квоты: `OWNER_EMAIL` (по умолчанию `evleonov79@gmail.com`) — безлимит на платформенном ключе; остальные — `FREE_PLATFORM_CREDITS=1`, затем свой ключ.
+- Квоты: `OWNER_EMAIL` (по умолчанию `evleonov79@gmail.com`) — безлимит на платформенном ключе; остальные — `FREE_PLATFORM_CREDITS=3`, затем лок и свой ключ.
 - Стоимость: таблица `LlmUsage` (токены + оценка USD по прайсу каталога `lib/llm/providers.ts`).
 
-**Причина:** свой BYOK снимает стоимость с сервиса; один тестовый разбор снижает барьер входа.
+**Причина:** свой BYOK снимает стоимость с сервиса; три тестовых разбора снижают барьер входа, после лимита генерация блокируется до своего API.
 
 **Связанные файлы:** `lib/llm/*`, `GET|PUT /api/settings/llm`, миграция `user_llm_settings`.
 
@@ -344,7 +344,7 @@
 - Публичный контекст: в ленте обрезка CSS, на `/explore/[id]` — полный текст; предупреждение в `VisibilityToggle` честное.
 - Чужие BYOK-ключи: API настроек отдаёт только ключ текущего пользователя (маска); plaintext чужих ключей в UI нет.
 
-**Отложено:** отдельный cap на LLM follow-up (`tree`/`resolve`) — при квоте «1 бесплатный разбор» риск низкий; security headers (P3).
+**Отложено:** отдельный cap на LLM follow-up (`tree`/`resolve`) — при квоте «3 бесплатных разбора» риск умеренный; security headers (P3).
 
 **Связанные файлы:** `lib/view-db/guard.ts`, `app/view-db/layout.tsx`, `app/api/view-db/**`, `lib/rate-limit.ts`, `app/api/feedback/route.ts`.
 

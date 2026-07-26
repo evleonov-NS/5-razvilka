@@ -77,6 +77,22 @@ type LoadState = {
   appSettings: { platformKeyEnabled: boolean } | null;
 };
 
+/** Склонение остатка бесплатных разборов для UI квоты. */
+function freeRemainingParts(n: number): { verb: string; noun: string } {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  const verb = mod10 === 1 && mod100 !== 11 ? "Остался" : "Осталось";
+  let noun: string;
+  if (mod10 === 1 && mod100 !== 11) {
+    noun = "бесплатный тестовый разбор";
+  } else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) {
+    noun = "бесплатных тестовых разбора";
+  } else {
+    noun = "бесплатных тестовых разборов";
+  }
+  return { verb, noun };
+}
+
 export function LlmSettingsPanel({
   demoSlot,
 }: {
@@ -229,6 +245,10 @@ export function LlmSettingsPanel({
   const { quota, usage, settings, periods } = data;
   const platformEnabled =
     data.appSettings?.platformKeyEnabled ?? quota.platformKeyEnabled;
+  const freeParts =
+    quota.freeRemaining !== null && quota.freeRemaining > 0
+      ? freeRemainingParts(quota.freeRemaining)
+      : null;
 
   // Одна колонка: все карточки на всю ширину правой колонки настроек
   return (
@@ -251,18 +271,18 @@ export function LlmSettingsPanel({
             <li className="text-accent-ink">
               Платформенный ключ отключён. Добавьте свой API ниже.
             </li>
-          ) : quota.freeRemaining !== null && quota.freeRemaining > 0 ? (
+          ) : freeParts && quota.freeRemaining !== null ? (
             <li>
-              Остался{" "}
+              {freeParts.verb}{" "}
               <span className="font-medium text-accent-ink">
                 {quota.freeRemaining}
               </span>{" "}
-              бесплатный тестовый разбор.
+              {freeParts.noun}.
             </li>
           ) : (
             <li className="text-accent-ink">
-              Бесплатный разбор использован. Добавьте свой API ниже, чтобы
-              продолжить.
+              Бесплатные разборы использованы — генерация заблокирована.
+              Добавьте свой API ниже, чтобы продолжить.
             </li>
           )}
           {!quota.canGenerate && quota.message ? (
@@ -275,8 +295,9 @@ export function LlmSettingsPanel({
         <section className="rounded-lg border border-border bg-surface p-5">
           <h2 className="text-sm font-medium text-text">Токен по умолчанию</h2>
           <p className="mt-1 text-xs text-text-muted">
-            Разрешить обычным пользователям один бесплатный разбор на
-            платформенном ключе. Владелец всегда может пользоваться платформой.
+            Разрешить обычным пользователям три бесплатных разбора на
+            платформенном ключе. После лимита — лок до своего API. Владелец
+            всегда может пользоваться платформой.
           </p>
           <label className="mt-4 flex items-center gap-3 text-sm text-text">
             <input
@@ -285,7 +306,7 @@ export function LlmSettingsPanel({
               disabled={togglingPlatform}
               onChange={(e) => void handlePlatformToggle(e.target.checked)}
             />
-            Разрешить платформенный ключ (бесплатный разбор)
+            Разрешить платформенный ключ (бесплатные разборы)
           </label>
         </section>
       ) : null}

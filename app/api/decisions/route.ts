@@ -271,7 +271,7 @@ export async function POST(request: Request) {
       failureModes: decision.failureModes,
       quota: {
         freeRemaining: usesPlatformSlot
-          ? Math.max(0, (quota.freeRemaining ?? 1) - 1)
+          ? Math.max(0, (quota.freeRemaining ?? 0) - 1)
           : quota.freeRemaining,
         hasOwnKey: quota.hasOwnKey,
         isOwner: quota.isOwner,
