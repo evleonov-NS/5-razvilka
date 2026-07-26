@@ -107,7 +107,7 @@ export async function CabinetJournal({
           <FilterEmptyState
             variant="open"
             title="Пока нет открытых разборов"
-            description="Решение считается открытым, пока вы не отметили, что вышло по факту."
+            description="Решение считается открытым, пока вы не записали, что получилось."
           />
         ) : isEmpty && section === "resolved" ? (
           <FilterEmptyState

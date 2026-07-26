@@ -156,7 +156,7 @@ GET app/api/decisions — список.
 ```text
 Страница decisions/[id]: секции «Сценарии будущего» (3 карточки ScenarioCard), «Pre-mortem»
 (FailureModeList: cause + prevention). Состояния страницы loading/ready/error. Кнопки «В журнал»,
-«Отметить исход».
+«Что получилось?».
 ```
 
 ### Промпт 6 — журнал

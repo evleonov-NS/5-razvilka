@@ -18,7 +18,7 @@ export function DecisionCard({ decision }: { decision: DecisionListItem }) {
 
   const hints: string[] = [];
   if (!decision.hasTree) hints.push("Дерево не построено");
-  if (!decision.hasOutcome) hints.push("Исход не отмечен");
+  if (!decision.hasOutcome) hints.push("Ещё не записали, что получилось");
 
   return (
     <article className="group relative rounded-lg border border-border bg-surface p-5 transition-colors hover:border-border-strong">

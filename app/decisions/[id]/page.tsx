@@ -13,6 +13,7 @@ import { VisibilityToggle } from "@/components/VisibilityToggle";
 import { LikeButton } from "@/components/LikeButton";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { FailureModeList } from "@/components/FailureModeList";
+import { EmptyState } from "@/components/EmptyState";
 import { landingFocus } from "@/components/landing/landingLayout";
 
 type PageProps = {
@@ -86,6 +87,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
 
   const hasScenarios = scenarios.length > 0;
   const hasFailureModes = decision.failureModes.length > 0;
+  const analysisReady = hasScenarios || hasFailureModes;
 
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
@@ -136,19 +138,21 @@ export default async function DecisionDetailPage({ params }: PageProps) {
           </p>
         </header>
 
-        {!hasScenarios && !hasFailureModes ? (
-          <div className="rounded-lg border border-border bg-surface px-6 py-12 text-center">
-            <p className="text-lg font-medium text-text">Разбор ещё не готов</p>
-            <p className="mt-2 text-sm text-text-muted">
-              Сценарии и pre-mortem появятся после успешной генерации. Создайте
-              новое решение или откройте{" "}
+        {!analysisReady ? (
+          <div className="rounded-lg border border-border bg-surface">
+            <EmptyState
+              title="Разбор ещё не готов"
+              description="Сценарии и pre-mortem появятся после успешной генерации. Создайте новое решение или откройте пример."
+              actionLabel="Новое решение"
+              actionHref="/decisions/new"
+            />
+            <p className="pb-10 text-center text-sm text-text-muted">
               <Link
                 href="/demo"
                 className={`text-accent-ink hover:underline ${landingFocus}`}
               >
-                пример
+                Посмотреть пример
               </Link>
-              .
             </p>
           </div>
         ) : (
@@ -191,7 +195,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
               <p className="mt-2 text-sm text-text-muted">
                 {decision.tree
                   ? "Дерево уже есть — полный просмотр подключится на следующем этапе."
-                  : "Генерация дерева — отдельный шаг (этап 7). Пока можно вернуться в журнал."}
+                  : "Генерация дерева — отдельный шаг. Появится позже; пока можно вернуться в журнал."}
               </p>
             </section>
           </>
@@ -204,6 +208,14 @@ export default async function DecisionDetailPage({ params }: PageProps) {
           >
             В журнал
           </Link>
+          {hasScenarios ? (
+            <Link
+              href={`/decisions/${decision.id}/review`}
+              className={`inline-flex h-11 items-center justify-center rounded-md border border-border px-6 text-sm text-text transition-colors hover:border-border-strong hover:bg-surface-2 ${landingFocus}`}
+            >
+              Что получилось?
+            </Link>
+          ) : null}
           <Link
             href="/decisions/new"
             className={`inline-flex h-11 items-center justify-center rounded-md border border-border px-6 text-sm text-text transition-colors hover:border-border-strong hover:bg-surface-2 ${landingFocus}`}

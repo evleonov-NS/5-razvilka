@@ -177,7 +177,7 @@ function DemoContent() {
         <div className="mt-6 space-y-6">
           <div>
             <p className="text-xs uppercase tracking-wider text-text-faint">
-              Что вышло
+              Что получилось
             </p>
             <p className="mt-2 text-base leading-relaxed text-text">
               {d.review.outcome}

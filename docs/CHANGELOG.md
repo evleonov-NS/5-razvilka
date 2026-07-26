@@ -7,16 +7,19 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этап 5: полировка экрана результата; этапы 7–8 — дерево и ревью
+- Этапы 7–8 — дерево развилок и ревью по исходу; этап 9 — полировка + ключи LLM в Vercel
 
 ### Added
+- **Этап 5 — экран результата:** `LoadingState`, `ErrorMessage`; `loading.tsx` / `error.tsx` на `/decisions/[id]`; кнопка «Что получилось?» → заглушка `/decisions/[id]/review` (форма — этап 8).
 - **Этап 4 — ядро создания решения (ADR-023):** `POST /api/decisions` вызывает промпт 9.1, валидирует через `ScenarioResponseSchema`, сохраняет `Decision` + 3 сценария + 3–5 failure modes в одной транзакции.
 - **`lib/prompts.ts`** — сборка system-промпта 9.1.
 - **`ScenarioCard`**, **`FailureModeList`**, **`LikelihoodBadge`** — экран `/decisions/[id]` показывает сценарии и pre-mortem из БД.
-- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`; обновлён корневой `PROMPT.md` (этап 5).
+- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`; обновлён корневой `PROMPT.md` (этап 7).
 - В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel (ссылка, таблица Key/значение).
 
 ### Changed
+- **`/decisions/[id]`:** пустое состояние через `EmptyState`; нижние CTA — «В журнал» / «Что получилось?» / «Новое решение».
+- **ADR-024:** при EPERM Prisma на Windows агент ретраит `build` сам; `dev` не останавливать по умолчанию (правила + `PROMPT.md`).
 - **`POST /api/decisions`:** генерация до записи; при невалидном LLM — без сохранения, лог raw, 502/422; кредит списывается только после успеха на платформенном ключе.
 - Форма `/decisions/new`: обработка кодов `NO_PLATFORM_KEY` / `INVALID_KEY` со ссылкой в настройки.
 - **PLAN этап 9:** явный шаг «внести `DEEPSEEK_API_KEY` / `OWNER_EMAIL` / … в Vercel Environment Variables».
