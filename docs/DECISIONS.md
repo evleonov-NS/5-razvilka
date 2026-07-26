@@ -247,4 +247,16 @@
 
 ---
 
+## ADR-023: Генерация сценариев до записи Decision (2026-07-26)
+
+**Решение:** в `POST /api/decisions` сначала `resolveLlmCredentials` → промпт 9.1 → `parseJsonSafe` → `ScenarioResponseSchema`, и только при успехе — транзакция `Decision` + `Scenario[3]` + `FailureMode[3–5]`. Невалидный ответ LLM не создаёт карточку; сырой текст логируется; клиенту — 502/422.
+
+**Квоты:** `recordLlmUsage` после успеха; `consumePlatformCredit` только если `billedTo === PLATFORM` и пользователь не owner.
+
+**Причина:** иначе журнал засоряется пустыми решениями без сценариев, а бесплатный кредит списывается зря.
+
+**Связанные файлы:** `app/api/decisions/route.ts`, `lib/prompts.ts`, `components/ScenarioCard.tsx`, `components/FailureModeList.tsx`.
+
+---
+
 *Новые ADR добавлять с номером, датой и кратким обоснованием.*

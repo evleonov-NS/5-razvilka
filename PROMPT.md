@@ -12,94 +12,96 @@
 |----------|----------|
 | Версия | 0.1.0 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | `6ee90c3` — «Личный кабинет: журнал решений, лендинг и серверный logout» |
+| Последний коммит | этап 4 — сценарии + pre-mortem (см. `docs/STATUS.md`) |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Текущий этап | **3 — LLM-слой** (следующий) |
+| Текущий этап | **5 — экран результата (полировка)**; далее 7 → 8 → 9 |
 
 ## Что уже сделано
 
-### Этапы 0–2
-- Каркас Next.js + Prisma 6 + Neon + Vercel
-- Домен: `User`, `Decision`, `Scenario`, `FailureMode`
-- Auth.js v5 + Google OAuth (local + Vercel)
-- `lib/auth.ts`: `getCurrentUser`, `requireUser`
-- Док: `docs/AUTH_GOOGLE_VERCEL.md`
+### Этапы 0–3
+- Каркас, домен Prisma, Auth.js + Google, кабинет, лендинг, `/explore`
+- LLM-слой: `lib/json.ts`, `lib/llm/*` (DeepSeek по умолчанию, BYOK DeepSeek/Qwen/OpenAI)
+- Квоты: `OWNER_EMAIL` безлимит; остальные 1 бесплатный разбор; `LlmUsage`; `/cabinet/settings`
 
-### Личный кабинет (после этапа 2, до LLM)
-- `/cabinet` — сайдбар, журнал, открытые/решённые, поиск, пагинация
-- `/cabinet/settings` — заглушка
-- `/` — лендинг; авторизованные → redirect `/cabinet`
-- `DELETE /api/decisions/[id]` — удаление с проверкой владельца
-- `POST /api/auth/logout` — серверный signOut (client `signOut` не работал с database-сессией)
-- Заглушки: `/decisions/new`, `/decisions/[id]`
-- Компоненты: `components/cabinet/*`, `EmptyState`, `lucide-react`
-- Middleware: `/cabinet/*`, `/decisions/*`
+### Этап 4 ✅ (ядро)
+- `POST /api/decisions`: `resolveLlmCredentials` → промпт 9.1 (`lib/prompts.ts`) → `parseJsonSafe` → `ScenarioResponseSchema` → транзакция Decision + Scenario[3] + FailureMode[3–5]
+- Невалидный LLM → без записи, лог raw, 502/422 (ADR-023)
+- `recordLlmUsage`; `consumePlatformCredit` только PLATFORM + не-owner
+- `/decisions/[id]`: `ScenarioCard`, `FailureModeList`, `LikelihoodBadge`
+- Форма `/decisions/new` с шагами ожидания (не ломать радикально)
+- Статус `OPEN` → `RESOLVED` **ещё нет** (этап 8)
 
-### Dev-утилиты
-- `/view-db` — только local dev
+Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
-## Не закоммичено (локально)
-
-- `PROMPT.md` (этот файл)
-- `.vscode/settings.json` — `npm.autoDetect: off` (фикс ложной ошибки task detection)
-- `.vscode/tasks.json` — явные npm-задачи
-
-## Env (важно)
+## Env (локально уже есть; на Vercel — на этапе 9)
 
 ```env
-# Локально
-AUTH_URL=http://localhost:3015
-AUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-DATABASE_URL, DIRECT_URL
-
-# LLM (этап 3 — заполнить)
-OPENAI_API_KEY=
-OPENAI_BASE_URL=          # пусто = api.openai.com
-LLM_MODEL=                # напр. gpt-4o-mini
+DATABASE_URL=   DIRECT_URL=
+AUTH_SECRET=    AUTH_URL=http://localhost:3015
+GOOGLE_CLIENT_ID=   GOOGLE_CLIENT_SECRET=
+OWNER_EMAIL=evleonov79@gmail.com
+LLM_DEFAULT_PROVIDER=DEEPSEEK
+LLM_MODEL=deepseek-chat
+DEEPSEEK_API_KEY=
+# опционально: QWEN_API_KEY, OPENAI_API_KEY
 ```
 
 Не коммитить `.env`.
 
-## Следующий шаг — Этап 3: LLM-слой
+## Следующий шаг — Этап 5: экран результата
 
-См. `docs/PROMPTS.md` Промпт 3, `PROJECT.md` §9–§10.
+См. `docs/PROMPTS.md` Промпт 5, `docs/PLAN.md` § этап 5, `PROJECT.md` §5.4.
 
-Создать:
-- `lib/llm.ts` — OpenAI client, промпты 9.1–9.3, `callLlmAndValidate`
-- `lib/json.ts` — срез markdown → JSON.parse
-- `lib/validators.ts` — Scenario/Tree/Review + входные Zod-схемы
-- `scripts/verify-llm-layer.ts` + `npm run llm:verify`
+Довести `/decisions/[id]`:
+- сценарии + pre-mortem уже есть (этап 4)
+- кнопки «В журнал» (есть), «Отметить исход» (заглушка/ссылка под этап 8)
+- единые LoadingState / ErrorMessage по желанию
+- placeholder дерева (этап 7) — уже текст-заглушка
+- не полный этап 7/8
+
+После этапа 5 по плану: **7** дерево → **8** ревью (RESOLVED) → **9** полировка и деплой.
+
+### На этапе 9 (обязательно напомнить пользователю)
+Внести LLM-ключи в Vercel Environment Variables (иначе prod не генерирует на платформенном ключе):
+- Ссылка: https://vercel.com/dashboard → проект **5-razvilka** → **Settings** → **Environment Variables**
+- Добавить (Production + Preview по необходимости), значения как в локальном `.env`, **без кавычек**:
+
+| Key | Пример / форма | Обязательно |
+|-----|----------------|-------------|
+| `DEEPSEEK_API_KEY` | `sk-...` (ключ DeepSeek) | да (платформа по умолчанию) |
+| `LLM_DEFAULT_PROVIDER` | `DEEPSEEK` | желательно |
+| `LLM_MODEL` | `deepseek-chat` | желательно |
+| `OWNER_EMAIL` | `evleonov79@gmail.com` | да (безлимит владельца) |
+| `QWEN_API_KEY` | ключ Qwen | опционально |
+| `OPENAI_API_KEY` | `sk-...` | опционально |
+
+После сохранения — **Redeploy**. Auth/DB переменные уже должны быть (см. `docs/AUTH_GOOGLE_VERCEL.md`).
 
 ```powershell
-npm install openai --legacy-peer-deps
-npm run llm:verify
 npm run build
+# при EPERM Prisma — остановить npm run dev, повторить
 ```
 
-**Не в scope этапа 3:** `POST /api/decisions`, форма, экран результата.
-
-## Очередь после этапа 3
+## Очередь
 
 | Этап | Что |
 |------|-----|
-| 4 | `POST /api/decisions` + `DecisionForm` на `/decisions/new` |
-| 5 | Экран `/decisions/[id]` — сценарии, pre-mortem |
-| 7 | Дерево развилок |
-| 8 | Ревью по исходу |
+| 5 | Полировка `/decisions/[id]`, «Отметить исход» |
+| 7 | Дерево развилок (промпт 9.2) |
+| 8 | Ревью + status=RESOLVED (промпт 9.3) |
+| 9 | Полировка + **ключи LLM в Vercel** + migrate deploy |
+| 2а | Демо-кнопки в `/cabinet/settings` |
 
-## Правила проекта (`.cursor/rules/project.mdc`)
-
+## Правила
 - Мутации — Route Handlers; чтение — Server Components
 - LLM только на сервере; ответы → `lib/json.ts` → Zod
-- Enum: LOW/MEDIUM/HIGH, OPTIMISTIC/BASE/PESSIMISTIC (Zod `toUpperCase`)
-- Комментарии в коде — на русском
-- Версия — только `lib/version.ts`
+- Enum UPPERCASE; комментарии на русском; версия только `lib/version.ts`
 - **kip** = commit + push (заголовок + тело на русском)
+- Shell не дергать без просьбы; примеры команд — PowerShell
 
 ## Известные нюансы
+- Старые Decision без Scenario → «Разбор ещё не готов» (ожидаемо)
+- Не `build` параллельно с `dev` на Windows
+- Перегенерации пустой карточки нет — только новое решение
 
-- Seed-пользователь `demo@razvilka.local` — не Google; после OAuth журнал может быть пустым
-- Не запускать `npm run build` пока работает `npm run dev` (ломает `.next` на Windows)
-- При `Cannot find module './XXX.js'` → `Remove-Item -Recurse -Force .next` + перезапуск dev
-
-Начни с чтения `docs/STATUS.md`, `docs/PROMPTS.md` (Промпт 3), `PROJECT.md` §9–§10.
+Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 5), `docs/PROMPTS.md` (Промпт 5).

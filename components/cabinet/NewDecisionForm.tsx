@@ -125,7 +125,11 @@ export function NewDecisionForm({ presetId }: Props) {
       } | null;
 
       if (!res.ok) {
-        if (body?.code === "NEED_API_KEY") {
+        if (
+          body?.code === "NEED_API_KEY" ||
+          body?.code === "NO_PLATFORM_KEY" ||
+          body?.code === "INVALID_KEY"
+        ) {
           setNeedApiKey(true);
           throw new Error(
             body.error ??

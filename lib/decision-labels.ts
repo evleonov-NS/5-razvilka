@@ -14,6 +14,19 @@ export const TYPE_LABELS: Record<string, string> = {
   HABIT: "привычка",
 };
 
+export const SCENARIO_KIND_LABELS: Record<string, string> = {
+  OPTIMISTIC: "Оптимистичный",
+  BASE: "Базовый",
+  PESSIMISTIC: "Пессимистичный",
+};
+
+/** Порядок карточек на экране результата. */
+export const SCENARIO_KIND_ORDER = [
+  "OPTIMISTIC",
+  "BASE",
+  "PESSIMISTIC",
+] as const;
+
 export function formatDecisionDate(date: Date): string {
   return new Intl.DateTimeFormat("ru-RU", {
     day: "numeric",

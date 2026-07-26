@@ -1,21 +1,31 @@
 # STATUS.md — текущее состояние проекта «Развилка»
 
-**Обновлено:** 2026-07-23  
+**Обновлено:** 2026-07-26  
 **Версия приложения:** 0.1.0 (`lib/version.ts`)  
-**Последний коммит:** 9698f1a (кабинет + /demo)  
-**Текущий этап:** 4 — создание решения (ядро); 2а — демо в настройках (запланирован)
+**Последний коммит:** этап 4 (сценарии + pre-mortem) — см. git log  
+**Текущий этап:** 5 — экран результата (полировка); далее 7 → 8 → 9  
+**Dev-log:** [26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md](./26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md)
 
 ---
 
-## Сводка
+## Сводка (этап 4 закрыт)
+
+| Вопрос | Ответ |
+|--------|--------|
+| Что умеет продукт сейчас | Войти → описать решение → получить 3 сценария + pre-mortem → видеть в журнале |
+| Чего ещё нет | Дерево (7), ревью / RESOLVED (8), полировка prod + ключи LLM в Vercel (9) |
+| Где смотреть | Локально: `/decisions/new` → `/decisions/[id]`; prod: https://5-razvilka.vercel.app |
+| Риск для prod | Без `DEEPSEEK_API_KEY` в Vercel генерация на платформенном ключе не работает — **внести на этапе 9** (чеклист в PLAN) |
 
 | Область | Статус | Комментарий |
 |---------|--------|-------------|
 | Доменная схема Prisma | ✅ Готово | + `LlmUsage`, поля LLM у User |
 | Auth (Google OAuth) | ✅ Готово | Auth.js v5 |
-| LLM / провайдеры | ✅ Слой + настройки | DeepSeek по умолчанию; BYOK DeepSeek/Qwen/OpenAI; квоты; стоимость |
+| LLM / провайдеры | ✅ Слой + настройки | DeepSeek по умолчанию; BYOK; квоты; стоимость |
+| Создание решения | ✅ Этап 4 | промпт 9.1 → Scenario + FailureMode |
+| Экран результата | 🟡 Частично | сценарии + pre-mortem; кнопка исхода / дерево — позже |
 | Личный кабинет | ✅ Готово | настройки API в `/cabinet/settings` |
-| Деплой Vercel | ✅ | https://5-razvilka.vercel.app |
+| Деплой Vercel | ✅ сайт | LLM-ключи в env — чеклист этапа 9 |
 
 ---
 
@@ -27,16 +37,27 @@
 | 1 | Доменная схема | ✅ Завершён |
 | 2 | Авторизация (Google) | ✅ Завершён |
 | 3 | LLM-слой и валидация | ✅ Завершён |
-| 4 | Создание решения (ядро) | 🟡 Частично | форма + `POST /api/decisions`, без LLM-сохранения Scenario |
-| 5 | Экран результата | ⚪ Ожидает |
+| 4 | Создание решения (ядро) | ✅ Завершён |
+| 5 | Экран результата | 🟡 Частично | сценарии + pre-mortem; дерево/ревью — позже |
 | 6 | Журнал (главная) | ✅ Готово | кабинет; `/` — лендинг гостя |
 | 7 | Дерево развилок | ⚪ Ожидает |
-| 8 | Ревью по исходу | ⚪ Ожидает |
-| 9 | Полировка и деплой | ⚪ Ожидает |
+| 8 | Ревью по исходу | ⚪ Ожидает | тогда OPEN → RESOLVED |
+| 9 | Полировка и деплой | ⚪ Ожидает | + **API-ключи LLM в Vercel** |
 | 2а | Настройки: демо-данные (UI) | ⚪ Запланирован |
 | 10 | Социальные механики | ✅ Завершён |
 
 ---
+
+## Готово (Этап 4 — ядро создания решения, 2026-07-26)
+
+- [x] `POST /api/decisions`: `resolveLlmCredentials` → промпт 9.1 → `parseJsonSafe` → `ScenarioResponseSchema`
+- [x] Транзакция `Decision` + `Scenario[3]` + `FailureMode[3–5]` только после валидного LLM
+- [x] Невалидный JSON/схема — без записи в БД, лог сырого ответа, 502/422
+- [x] `recordLlmUsage`; `consumePlatformCredit` только при платформенном ключе (не owner)
+- [x] `/decisions/[id]`: `ScenarioCard`, `FailureModeList` из БД
+- [x] `lib/prompts.ts` (промпт 9.1); ADR-023
+- [x] Ручная проверка: разбор «проверка» — 3 сценария + pre-mortem
+- [x] `npm run build` ок; dev-log + `PROMPT.md` для следующего чата
 
 ## Готово (LLM: провайдеры + квоты + стоимость, 2026-07-23)
 
@@ -55,7 +76,6 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 - [x] `lib/llm/*` — клиент, провайдеры, квоты, usage
 - [x] `lib/validators.ts` — `CreateDecisionInputSchema`, `ScenarioResponseSchema`, заготовки Tree/Review
 - [x] `scripts/verify-llm-layer.ts` + `npm run llm:verify`
-- [x] `POST /api/decisions` — валидация + квота (генерация Scenario — этап 4)
 
 ---
 
@@ -87,7 +107,7 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 ## Готово (Этап 2)
 
 - [x] `next-auth` beta + `@auth/prisma-adapter`
-- [x] Миграция `auth_google`, Account/Session/VerificationToken
+- [x] Миграция `auth_google`, Account/Session, VerificationToken
 - [x] `auth.ts`, `/api/auth/[...nextauth]`, `/login`, Header
 - [x] `lib/auth.ts` — getCurrentUser, requireUser
 - [x] Google OAuth: local + production
@@ -97,13 +117,11 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 
 ## Следующий шаг
 
-**Этап 4 — создание решения:** промпт 9.1 → `ScenarioResponseSchema` → транзакция Decision + Scenario[] + FailureMode[]; экран `/decisions/[id]` с данными из БД.
+**Этап 5** — довести экран результата («Отметить исход», Loading/Error по желанию).
 
-Параллельно **этап 2а** — кнопки «Загрузить / удалить демо-данные» в `/cabinet/settings`.
+Затем **7** дерево → **8** ревью (RESOLVED) → **9** полировка + **внести LLM-ключи в Vercel** (чеклист в [PLAN.md](./PLAN.md) § этап 9).
 
-Проверка слоя: `npm run llm:verify` (smoke LLM — если ключ в `.env`).
-
-Подробности: [PLAN.md](./PLAN.md), [PROMPTS.md](./PROMPTS.md).
+Промпт для нового чата: корневой [PROMPT.md](../PROMPT.md).
 
 ---
 
@@ -112,5 +130,7 @@ Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OPENAI_API_KEY`, `LLM_DEFAULT_PROVIDER
 | Документ | Назначение |
 |----------|------------|
 | [AUTH_GOOGLE_VERCEL.md](./AUTH_GOOGLE_VERCEL.md) | OAuth: Google, .env, Vercel |
-| [PLAN.md](./PLAN.md) | План MVP |
+| [PLAN.md](./PLAN.md) | План MVP (+ чеклист ключей LLM на этапе 9) |
 | [PROMPTS.md](./PROMPTS.md) | Промпты Cursor |
+| [PROMPT.md](../PROMPT.md) | Выжимка для следующего чата |
+| [26.07.26-CRS-Этап_4…](./26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md) | Dev-log этапа 4 |

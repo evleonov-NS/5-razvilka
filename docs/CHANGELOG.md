@@ -7,18 +7,28 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этап 4: генерация сценариев + pre-mortem в `POST /api/decisions`
-- Экран результата, дерево, ревью
+- Этап 5: полировка экрана результата; этапы 7–8 — дерево и ревью
 
 ### Added
+- **Этап 4 — ядро создания решения (ADR-023):** `POST /api/decisions` вызывает промпт 9.1, валидирует через `ScenarioResponseSchema`, сохраняет `Decision` + 3 сценария + 3–5 failure modes в одной транзакции.
+- **`lib/prompts.ts`** — сборка system-промпта 9.1.
+- **`ScenarioCard`**, **`FailureModeList`**, **`LikelihoodBadge`** — экран `/decisions/[id]` показывает сценарии и pre-mortem из БД.
+- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`; обновлён корневой `PROMPT.md` (этап 5).
+- В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel (ссылка, таблица Key/значение).
+
+### Changed
+- **`POST /api/decisions`:** генерация до записи; при невалидном LLM — без сохранения, лог raw, 502/422; кредит списывается только после успеха на платформенном ключе.
+- Форма `/decisions/new`: обработка кодов `NO_PLATFORM_KEY` / `INVALID_KEY` со ссылкой в настройки.
+- **PLAN этап 9:** явный шаг «внести `DEEPSEEK_API_KEY` / `OWNER_EMAIL` / … в Vercel Environment Variables».
+
+### Added (ранее)
 - **LLM multi-provider (ADR-022):** DeepSeek по умолчанию; в `/cabinet/settings` — DeepSeek / Qwen / OpenAI, выбор модели, свой API-ключ (AES-GCM); квоты (`OWNER_EMAIL` безлимит, остальные 1 бесплатный разбор); учёт стоимости в `LlmUsage`.
 - **`GET|PUT /api/settings/llm`**, `components/cabinet/LlmSettingsPanel.tsx`.
 - Миграция `user_llm_settings` (`llmProvider`, `llmModel`, `llmApiKeyEnc`, `platformCreditsUsed`, `LlmUsage`).
 - **Этап 3 — LLM-слой:** `lib/json.ts`, `lib/llm/*`, `lib/validators.ts`, `npm run llm:verify`.
 
-### Changed
+### Changed (ранее)
 - **Сайдбар:** пункт «Настройки»; тема светлая/тёмная только на `/cabinet/settings` (убрана из футера сайдбара).
-- **`POST /api/decisions`:** проверка квоты; списание бесплатного кредита; ответ `llmReady` / `quota`.
 - Env: `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `OWNER_EMAIL`, `LLM_DEFAULT_PROVIDER` (см. `.env.example`).
 - **Сайдбар (ранее):** sticky + `self-start` + `h-[100dvh]`; снят `overflow-x-hidden` с предков (ADR-021); Theme/Выйти через `mt-auto`.
 - **Демо `/demo`:** единые h2 снаружи секций; дерево — метка у узла, линия/точка вложенности; pre-mortem парами; ревью с выделенным уроком; sticky-плашка CTA.

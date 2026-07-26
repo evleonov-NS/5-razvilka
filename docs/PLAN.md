@@ -30,13 +30,13 @@
 
 | Демо-данные (CLI) | ✅ `npm run db:seed-demo` |
 
-| LLM / ядро продукта | ⏳ Этапы 4–5 — **следующие** (слой 3 ✅) |
+| LLM / ядро продукта | ✅ Этап 4; ⏳ этап 5 — полировка экрана |
 
 | Production Neon | ⚠️ `migrate deploy` вручную или в Build Command |
 
 
 
-**Следующий шаг:** **Этап 4** — создание решения (промпт 9.1 → Scenario + FailureMode).
+**Следующий шаг:** **Этап 5** — довести экран результата; затем дерево (7) / ревью (8).
 
 
 
@@ -76,13 +76,13 @@
 
 - [x] 2. Выйти из аккаунта
 
-- [ ] 3. Создать новое решение
+- [x] 3. Создать новое решение
 
-- [ ] 4. Получить 3 сценария будущего
+- [x] 4. Получить 3 сценария будущего
 
-- [ ] 5. Получить pre-mortem
+- [x] 5. Получить pre-mortem
 
-- [ ] 6. Найти решение в журнале (автосохранение после генерации)
+- [x] 6. Найти решение в журнале (автосохранение после генерации)
 
 - [x] 7. Открыть решение из журнала
 
@@ -166,9 +166,9 @@
 
 | **3** | **LLM-слой** | ✅ | ~~0.5–1 д~~ |
 
-| **4** | **Создание решения** | 🔵 **следующий** | **1.5–2 д** |
+| **4** | **Создание решения** | ✅ | ~~1.5–2 д~~ |
 
-| 5 | Экран результата | ⏳ | 1–1.5 д |
+| 5 | Экран результата | 🟡 частично | 0.5–1 д |
 
 | 6 | Журнал | 🟡 частично | 0.5 д (после 4) |
 
@@ -344,7 +344,7 @@
 
 
 
-### Этап 4 — Ядро: создание решения
+### Этап 4 — Ядро: создание решения ✅
 
 **Промпт 4** · **Оценка:** 1.5–2 д
 
@@ -352,9 +352,9 @@
 
 #### API
 
-- [ ] `POST /api/decisions` — промпт 9.1, транзакция Prisma
+- [x] `POST /api/decisions` — промпт 9.1, транзакция Prisma
 
-- [ ] `GET /api/decisions`, `GET /api/decisions/[id]` — ownership
+- [ ] `GET /api/decisions`, `GET /api/decisions/[id]` — ownership (чтение — Server Components)
 
 - [x] `DELETE /api/decisions/[id]`
 
@@ -362,15 +362,15 @@
 
 #### UI
 
-- [ ] `components/DecisionForm.tsx` — заменить заглушку `/decisions/new`
+- [x] Форма `/decisions/new` (`NewDecisionForm`) + `/decisions/[id]` (ScenarioCard / FailureModeList)
 
 
 
 #### Проверка
 
-- [ ] Демо-кейс §16 → 3 сценария + failure modes в БД
+- [ ] Демо-кейс §16 → 3 сценария + failure modes в БД (ручной прогон с ключом)
 
-- [ ] Невалидный LLM → ошибка, записей нет
+- [x] Невалидный LLM → ошибка, записей нет
 
 
 
@@ -386,13 +386,17 @@
 
 #### Задачи
 
-- [ ] `ScenarioCard`, `FailureModeList`, `LoadingState`, `ErrorMessage`
+- [x] `ScenarioCard`, `FailureModeList` (базово на этапе 4)
 
-- [ ] Полноценный `/decisions/[id]` (сценарии + pre-mortem + visibility/like)
+- [ ] `LoadingState`, `ErrorMessage`
 
-- [ ] Кнопки «В журнал», «Отметить исход»
+- [x] `/decisions/[id]` — сценарии + pre-mortem + visibility/like
 
-- [ ] Placeholder дерева (этап 7)
+- [x] Кнопка «В журнал»
+
+- [ ] Кнопка «Отметить исход»
+
+- [x] Placeholder дерева (этап 7)
 
 
 
@@ -462,6 +466,32 @@
 
 - [ ] STATUS, CHANGELOG, версия
 
+- [ ] **Vercel: платформенные LLM API-ключи** (локальный `.env` на prod не попадает)
+
+
+
+#### Vercel — Environment Variables (обязательно на этапе 9)
+
+1. Открыть: [vercel.com/dashboard](https://vercel.com/dashboard) → проект **5-razvilka** (или ваш) → **Settings** → **Environment Variables**  
+   Прямой вход в список проектов: https://vercel.com/dashboard
+
+2. Добавить переменные для **Production** (и **Preview**, если нужен LLM на превью). Значение — как в локальном `.env`, **одной строкой, без кавычек и без пробелов по краям**.
+
+| Key | Что внести | Пример формы | Обязательно |
+|-----|------------|--------------|-------------|
+| `DEEPSEEK_API_KEY` | ключ с platform.deepseek.com | `sk-…` | **да** (провайдер по умолчанию) |
+| `LLM_DEFAULT_PROVIDER` | имя провайдера UPPERCASE | `DEEPSEEK` | желательно |
+| `LLM_MODEL` | id модели | `deepseek-chat` | желательно |
+| `OWNER_EMAIL` | email владельца безлимита | `evleonov79@gmail.com` | **да** |
+| `QWEN_API_KEY` | ключ Qwen (если нужен) | строка ключа | нет |
+| `OPENAI_API_KEY` | ключ OpenAI (если нужен) | `sk-…` | нет |
+
+3. Убедиться, что уже есть Auth/DB (`AUTH_SECRET`, `AUTH_URL=https://5-razvilka.vercel.app`, Google, `DATABASE_URL`, `DIRECT_URL`) — см. [AUTH_GOOGLE_VERCEL.md](./AUTH_GOOGLE_VERCEL.md).
+
+4. После сохранения переменных — **Redeploy** последнего деплоя (иначе runtime не подхватит ключи).
+
+5. Проверка: на https://5-razvilka.vercel.app войти → `/decisions/new` → «Разобрать» → сценарии на экране результата.
+
 
 
 ---
@@ -494,11 +524,11 @@
 
 **Ближайшие 3 шага:**
 
-1. **Этап 4** — промпт 9.1 + сохранение Scenario/FailureMode
+1. **Этап 5** — полировка экрана результата (кнопки, состояния)
 
-2. **Этап 5** — экран результата `/decisions/[id]`
+2. **Этап 7** — дерево развилок
 
-3. **Этап 2а** — кнопки демо в `/cabinet/settings` (удобно тестировать без CLI)
+3. **Этап 2а** — кнопки демо в `/cabinet/settings`
 
 
 
