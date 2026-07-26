@@ -92,7 +92,7 @@ export const TreeBranchSchema: z.ZodType<TreeBranch> = z.lazy(() =>
   }),
 );
 
-/** Ответ промпта 9.2 — заготовка для этапа 7. */
+/** Ответ промпта 9.2 — дерево развилок (этап 7). */
 export const TreeResponseSchema = z.object({
   label: nonEmptyString,
   branches: z.array(TreeBranchSchema),

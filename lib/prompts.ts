@@ -39,3 +39,22 @@ export function buildScenariosSystemPrompt(input: ScenariosPromptInput): string 
   "failure_modes": [ {"cause": "...", "prevention": "..."} ]
 }`;
 }
+
+export type TreePromptInput = {
+  title: string;
+  context: string;
+  horizon: string;
+};
+
+/** Промпт 9.2 — дерево развилок (system). */
+export function buildTreeSystemPrompt(input: TreePromptInput): string {
+  return `Построй дерево ключевых развилок — точек, где выбор сильно меняет исход. Глубина 2-3
+уровня. Только значимые развилки. На каждой ветке — короткое следствие и метка вероятности.
+
+Название: ${input.title}
+Контекст: ${input.context}
+Горизонт: ${input.horizon}
+
+Верни ТОЛЬКО JSON, без markdown. likelihood — В ВЕРХНЕМ РЕГИСТРЕ:
+{"label": "Решение: ...", "branches": [{"choice": "...", "consequence": "...", "likelihood": "LOW|MEDIUM|HIGH", "branches": []}]}`;
+}

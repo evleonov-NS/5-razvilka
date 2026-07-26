@@ -4,6 +4,7 @@ import {
   landingLead,
   landingSection,
 } from "@/components/landing/landingLayout";
+import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
 
 type Likelihood = "LOW" | "MEDIUM" | "HIGH";
 
@@ -58,9 +59,9 @@ const likelihoodClass: Record<Likelihood, string> = {
 function LikelihoodBadge({ value }: { value: Likelihood }) {
   return (
     <span
-      className={`inline-block rounded border px-2 py-0.5 text-xs uppercase tracking-wider ${likelihoodClass[value]}`}
+      className={`inline-block rounded border px-2 py-0.5 text-xs tracking-wide ${likelihoodClass[value]}`}
     >
-      {value}
+      {LIKELIHOOD_LABELS[value]}
     </span>
   );
 }
@@ -90,7 +91,7 @@ export function LandingExample() {
 
       <div className={`mt-6 ${landingCard}`}>
         <h3 className="text-base font-medium text-text">
-          Pre-mortem — почему может провалиться
+          Сценарий провала — почему может провалиться
         </h3>
         <ul className="mt-5 space-y-5">
           {preMortem.map((item) => (

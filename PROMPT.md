@@ -12,9 +12,9 @@
 |----------|----------|
 | Версия | 0.1.0 (`lib/version.ts`) |
 | Production | https://5-razvilka.vercel.app |
-| Последний коммит | этап 5 — экран результата (см. `docs/STATUS.md`) |
+| Последний коммит | этап 7 — дерево развилок (см. `docs/STATUS.md`) |
 | Локально | `npm run dev` → http://localhost:3015 |
-| Текущий этап | **7 — дерево развилок**; далее 8 → 9 |
+| Текущий этап | **8 — ревью по исходу**; далее 9 |
 
 ## Что уже сделано
 
@@ -30,7 +30,11 @@
 ### Этап 5 ✅ (экран результата)
 - `/decisions/[id]`: сценарии, pre-mortem, `LoadingState` / `ErrorMessage`, `loading.tsx` / `error.tsx`
 - Кнопки «В журнал», «Что получилось?» → заглушка `/decisions/[id]/review` (форма — этап 8)
-- Placeholder дерева без генерации
+
+### Этап 7 ✅ (дерево)
+- `POST /api/decisions/[id]/tree`: промпт 9.2 → `TreeResponseSchema` → `Decision.tree`
+- `DecisionTree` + `TreeSection` (tree_idle / generating / ready / error)
+- Follow-up без повторного списания кредита (`skipFreeCreditCheck`); идемпотентность если tree уже есть
 
 Правила — `PROJECT.md`, `.cursor/rules/project.mdc`. Документы: `docs/STATUS.md`, `docs/PLAN.md`, `docs/PROMPTS.md`, `docs/DECISIONS.md`.
 
@@ -49,17 +53,17 @@ DEEPSEEK_API_KEY=
 
 Не коммитить `.env`.
 
-## Следующий шаг — Этап 7: дерево развилок
+## Следующий шаг — Этап 8: ревью по исходу
 
-См. `docs/PROMPTS.md` Промпт 7, `docs/PLAN.md` § этап 7, `PROJECT.md` §5.4.
+См. `docs/PROMPTS.md` Промпт 8, `docs/PLAN.md` § этап 8, `PROJECT.md` §5.5 / §9.3.
 
-- `POST /api/decisions/[id]/tree`: промпт 9.2 → `parseJsonSafe` → `TreeResponseSchema` → сохранить в `Decision.tree`
-- Если `tree` пустой — кнопка «Сгенерировать дерево развилок»; если есть — показать
-- Компонент `DecisionTree` — вложенный сворачиваемый вид, глубина до 3
-- Состояния: `tree_idle` / `tree_generating` / `tree_ready` / `tree_error`
+- `POST /api/decisions/[id]/resolve`: принять `{ outcome }`, промпт 9.3 → `ReviewResponseSchema`
+- Сохранить `outcome`, `reviewClosestScenario`, `reviewMissed`, `lesson`; `status=RESOLVED`, `resolvedAt`
+- Заменить заглушку `/decisions/[id]/review` на форму ввода факта → ближайший сценарий + упущение + 1 урок
 - Владелец только; `requireUser()`; LLM только на сервере
+- Follow-up: `skipFreeCreditCheck` (как у дерева), не списывать кредит повторно
 
-После этапа 7: **8** ревью (RESOLVED) → **9** полировка и деплой.
+После этапа 8: **9** полировка и деплой.
 
 ### На этапе 9 (обязательно напомнить пользователю)
 Внести LLM-ключи в Vercel Environment Variables (иначе prod не генерирует на платформенном ключе):
@@ -86,7 +90,6 @@ npm run build
 
 | Этап | Что |
 |------|-----|
-| 7 | Дерево развилок (промпт 9.2) |
 | 8 | Ревью + status=RESOLVED (промпт 9.3); заменить заглушку review |
 | 9 | Полировка + **ключи LLM в Vercel** + migrate deploy |
 | 2а | Демо-кнопки в `/cabinet/settings` |
@@ -102,6 +105,7 @@ npm run build
 - Старые Decision без Scenario → «Разбор ещё не готов» (ожидаемо)
 - На Windows `build` рядом с `dev` допустим; при EPERM агент ретраит сам, не просит остановить `dev`
 - Перегенерации пустой карточки нет — только новое решение
+- Дерево: повторный POST при уже сохранённом tree отдаёт существующее без LLM
 - `/decisions/[id]/review` пока заглушка — не ломать маршрут при этапе 8
 
-Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 7), `docs/PROMPTS.md` (Промпт 7).
+Начни с чтения `docs/STATUS.md`, `docs/PLAN.md` (этап 8), `docs/PROMPTS.md` (Промпт 8).

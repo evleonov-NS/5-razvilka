@@ -20,6 +20,13 @@ export const SCENARIO_KIND_LABELS: Record<string, string> = {
   PESSIMISTIC: "Пессимистичный",
 };
 
+/** Подписи вероятности в UI (в БД — LOW/MEDIUM/HIGH). */
+export const LIKELIHOOD_LABELS: Record<string, string> = {
+  LOW: "низкая",
+  MEDIUM: "средняя",
+  HIGH: "высокая",
+};
+
 /** Порядок карточек на экране результата. */
 export const SCENARIO_KIND_ORDER = [
   "OPTIMISTIC",

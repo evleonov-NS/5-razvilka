@@ -1,5 +1,7 @@
 /** Призрачное превью разбора — декорация, не реальные данные. */
 
+import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
+
 type Likelihood = "LOW" | "MEDIUM" | "HIGH";
 
 const scenarios: {
@@ -54,9 +56,9 @@ export function GhostResultPreview() {
                     {s.label}
                   </h3>
                   <span
-                    className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${likelihoodClass[s.likelihood]}`}
+                    className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] tracking-wide ${likelihoodClass[s.likelihood]}`}
                   >
-                    {s.likelihood}
+                    {LIKELIHOOD_LABELS[s.likelihood]}
                   </span>
                 </div>
                 <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-text-muted">

@@ -8,7 +8,7 @@ type Props = {
   items: FailureModeItem[];
 };
 
-/** Pre-mortem: причина провала + предупреждающее действие «сейчас». */
+/** Сценарий провала: причина + предупреждающее действие «сейчас». */
 export function FailureModeList({ items }: Props) {
   if (items.length === 0) {
     return (

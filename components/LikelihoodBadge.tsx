@@ -1,3 +1,5 @@
+import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
+
 type Likelihood = "LOW" | "MEDIUM" | "HIGH";
 
 const likelihoodClass: Record<Likelihood, string> = {
@@ -11,16 +13,17 @@ type Props = {
   className?: string;
 };
 
-/** Метка LOW/MEDIUM/HIGH — без процентов, по насыщенности акцента. */
+/** Метка вероятности на русском (в данных — LOW/MEDIUM/HIGH). */
 export function LikelihoodBadge({ value, className = "" }: Props) {
   const key = value.toUpperCase() as Likelihood;
   const styles = likelihoodClass[key] ?? likelihoodClass.MEDIUM;
+  const label = LIKELIHOOD_LABELS[key] ?? LIKELIHOOD_LABELS.MEDIUM;
 
   return (
     <span
-      className={`inline-block shrink-0 rounded border px-2 py-0.5 text-xs uppercase tracking-wider ${styles} ${className}`}
+      className={`inline-block shrink-0 rounded border px-2 py-0.5 text-xs tracking-wide ${styles} ${className}`}
     >
-      {key}
+      {label}
     </span>
   );
 }

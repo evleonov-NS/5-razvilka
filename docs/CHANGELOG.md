@@ -7,18 +7,21 @@
 ## [Unreleased]
 
 ### Planned (MVP)
-- Этапы 7–8 — дерево развилок и ревью по исходу; этап 9 — полировка + ключи LLM в Vercel
+- Этап 8 — ревью по исходу; этап 9 — полировка + ключи LLM в Vercel
 
 ### Added
+- **Этап 7 — дерево развилок (ADR-008):** `POST /api/decisions/[id]/tree` — промпт 9.2 → `TreeResponseSchema` → `Decision.tree`; компоненты `DecisionTree`, `TreeSection` (idle/generating/ready/error).
+- **`buildTreeSystemPrompt`** в `lib/prompts.ts`.
 - **Этап 5 — экран результата:** `LoadingState`, `ErrorMessage`; `loading.tsx` / `error.tsx` на `/decisions/[id]`; кнопка «Что получилось?» → заглушка `/decisions/[id]/review` (форма — этап 8).
 - **Этап 4 — ядро создания решения (ADR-023):** `POST /api/decisions` вызывает промпт 9.1, валидирует через `ScenarioResponseSchema`, сохраняет `Decision` + 3 сценария + 3–5 failure modes в одной транзакции.
 - **`lib/prompts.ts`** — сборка system-промпта 9.1.
 - **`ScenarioCard`**, **`FailureModeList`**, **`LikelihoodBadge`** — экран `/decisions/[id]` показывает сценарии и pre-mortem из БД.
-- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`; обновлён корневой `PROMPT.md` (этап 7).
+- Dev-log: `docs/26.07.26-CRS-Этап_4_сценарии_pre-mortem-v0.1.0.md`; обновлён корневой `PROMPT.md` (этап 8).
 - В [PLAN.md](./PLAN.md) этап 9: чеклист LLM API-ключей в Vercel (ссылка, таблица Key/значение).
 
 ### Changed
-- **`/decisions/[id]`:** пустое состояние через `EmptyState`; нижние CTA — «В журнал» / «Что получилось?» / «Новое решение».
+- **`resolveLlmCredentials`:** опция `skipFreeCreditCheck` для follow-up (дерево без повторного списания кредита).
+- **`/decisions/[id]`:** секция дерева с генерацией вместо placeholder; пустое состояние через `EmptyState`; CTA — «В журнал» / «Что получилось?» / «Новое решение».
 - **ADR-024:** при EPERM Prisma на Windows агент ретраит `build` сам; `dev` не останавливать по умолчанию (правила + `PROMPT.md`).
 - **`POST /api/decisions`:** генерация до записи; при невалидном LLM — без сохранения, лог raw, 502/422; кредит списывается только после успеха на платформенном ключе.
 - Форма `/decisions/new`: обработка кодов `NO_PLATFORM_KEY` / `INVALID_KEY` со ссылкой в настройки.

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getCabinetCounts } from "@/lib/cabinet-counts";
 import { DEMO_DECISION, type DemoLikelihood } from "@/lib/demo-decision";
 import { versionLabel } from "@/lib/version";
+import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
 import { CabinetShell } from "@/components/cabinet/CabinetShell";
 import { landingFocus } from "@/components/landing/landingLayout";
 import { HORIZON_LABELS, TYPE_LABELS } from "@/lib/decision-labels";
@@ -19,9 +20,9 @@ const likelihoodClass: Record<DemoLikelihood, string> = {
 function LikelihoodBadge({ value }: { value: DemoLikelihood }) {
   return (
     <span
-      className={`inline-block shrink-0 rounded border px-2 py-0.5 text-xs uppercase tracking-wider ${likelihoodClass[value]}`}
+      className={`inline-block shrink-0 rounded border px-2 py-0.5 text-xs tracking-wide ${likelihoodClass[value]}`}
     >
-      {value}
+      {LIKELIHOOD_LABELS[value]}
     </span>
   );
 }
@@ -131,10 +132,11 @@ function DemoContent() {
 
       <section className="mt-12">
         <h2 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text">
-          Pre-mortem
+          Сценарий провала
         </h2>
         <p className="mt-2 text-sm text-text-muted">
-          Если разбор «провалится» — почему, и что сделать сейчас.
+          Допустим, всё пошло не по плану. Почему это произошло — и что сделать
+          сейчас, чтобы этого избежать.
         </p>
         <ul className="mt-6 space-y-6">
           {d.preMortem.map((item) => (

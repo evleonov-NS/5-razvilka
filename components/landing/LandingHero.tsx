@@ -4,6 +4,7 @@ import {
   landingContainer,
   landingFocus,
 } from "@/components/landing/landingLayout";
+import { LIKELIHOOD_LABELS } from "@/lib/decision-labels";
 
 const branchLabels = [
   { name: "Оптимистичный", likelihood: "LOW", pos: "left-[2%] top-[2%]" },
@@ -84,8 +85,8 @@ export function LandingHero() {
             <span className="text-xs uppercase tracking-wider text-text">
               {label.name}
             </span>
-            <span className="text-xs uppercase tracking-wider text-accent-ink">
-              {label.likelihood}
+            <span className="text-xs tracking-wide text-accent-ink">
+              {LIKELIHOOD_LABELS[label.likelihood]}
             </span>
           </div>
         ))}

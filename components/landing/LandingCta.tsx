@@ -12,7 +12,7 @@ export function LandingCta() {
           Разберите следующее решение
         </h2>
         <p className="mt-3 max-w-[62ch] text-base leading-relaxed text-text-muted md:text-lg">
-          Опишите выбор — получите сценарии, pre-mortem и точку, с которой можно
+          Опишите выбор — получите сценарии, сценарий провала и точку, с которой можно
           сверить факт позже.
         </p>
         <Link

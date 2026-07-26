@@ -99,6 +99,8 @@
 
 **Хранение:** `Decision.tree Json?`.
 
+**Квоты (уточнение, этап 7):** follow-up вызывает `resolveLlmCredentials(..., { skipFreeCreditCheck: true })` и **не** списывает `platformCreditsUsed` — бесплатный кредит уже учтён при создании разбора. Usage (`LlmUsage`) пишется.
+
 ---
 
 ## ADR-009: Вероятность — только метка LOW/MEDIUM/HIGH

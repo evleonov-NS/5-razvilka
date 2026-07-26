@@ -81,17 +81,30 @@ export function resolvePlatformDefaults(): {
   };
 }
 
+export type ResolveLlmOptions = {
+  /**
+   * Follow-up (дерево / ревью): разрешить платформенный ключ без проверки
+   * бесплатного кредита — кредит уже списан при создании разбора.
+   */
+  skipFreeCreditCheck?: boolean;
+};
+
 /**
  * Credentials для вызова LLM от имени пользователя.
  * Бросает LlmResolveError, если генерировать нельзя.
  */
-export function resolveLlmCredentials(user: ResolveUser): LlmCredentials {
-  const quota = getQuotaStatus(user);
-  if (!quota.canGenerate) {
-    throw new LlmResolveError(
-      quota.reason ?? "NEED_API_KEY",
-      quota.message ?? "Нет доступа к генерации",
-    );
+export function resolveLlmCredentials(
+  user: ResolveUser,
+  options: ResolveLlmOptions = {},
+): LlmCredentials {
+  if (!options.skipFreeCreditCheck) {
+    const quota = getQuotaStatus(user);
+    if (!quota.canGenerate) {
+      throw new LlmResolveError(
+        quota.reason ?? "NEED_API_KEY",
+        quota.message ?? "Нет доступа к генерации",
+      );
+    }
   }
 
   if (user.llmApiKeyEnc) {

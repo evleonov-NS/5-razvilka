@@ -14,7 +14,9 @@ import { LikeButton } from "@/components/LikeButton";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { FailureModeList } from "@/components/FailureModeList";
 import { EmptyState } from "@/components/EmptyState";
+import { TreeSection } from "@/components/TreeSection";
 import { landingFocus } from "@/components/landing/landingLayout";
+import { TreeResponseSchema } from "@/lib/validators";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -89,6 +91,9 @@ export default async function DecisionDetailPage({ params }: PageProps) {
   const hasFailureModes = decision.failureModes.length > 0;
   const analysisReady = hasScenarios || hasFailureModes;
 
+  const treeParsed = TreeResponseSchema.safeParse(decision.tree);
+  const initialTree = treeParsed.success ? treeParsed.data : null;
+
   return (
     <div className="flex flex-1 flex-col bg-bg text-text">
       <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-8 md:px-8 md:py-10">
@@ -142,7 +147,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
           <div className="rounded-lg border border-border bg-surface">
             <EmptyState
               title="Разбор ещё не готов"
-              description="Сценарии и pre-mortem появятся после успешной генерации. Создайте новое решение или откройте пример."
+              description="Сценарии и сценарий провала появятся после успешной генерации. Создайте новое решение или откройте пример."
               actionLabel="Новое решение"
               actionHref="/decisions/new"
             />
@@ -178,26 +183,21 @@ export default async function DecisionDetailPage({ params }: PageProps) {
 
             <section className="mt-12">
               <h2 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text">
-                Pre-mortem
+                Сценарий провала
               </h2>
               <p className="mt-2 text-sm text-text-muted">
-                Если разбор «провалится» — почему, и что сделать сейчас.
+                Допустим, всё пошло не по плану. Почему это произошло — и что
+                сделать сейчас, чтобы этого избежать.
               </p>
               <div className="mt-6">
                 <FailureModeList items={decision.failureModes} />
               </div>
             </section>
 
-            <section className="mt-12">
-              <h2 className="font-[family-name:var(--font-landing-serif)] text-2xl tracking-tight text-text">
-                Дерево развилок
-              </h2>
-              <p className="mt-2 text-sm text-text-muted">
-                {decision.tree
-                  ? "Дерево уже есть — полный просмотр подключится на следующем этапе."
-                  : "Генерация дерева — отдельный шаг. Появится позже; пока можно вернуться в журнал."}
-              </p>
-            </section>
+            <TreeSection
+              decisionId={decision.id}
+              initialTree={initialTree}
+            />
           </>
         )}
 
